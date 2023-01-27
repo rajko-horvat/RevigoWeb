@@ -72,9 +72,15 @@
     <Content Include="Admin\Default.aspx" />
     <Content Include="Admin\GetRevigoStats.aspx" />
     <Content Include="Admin\RevigoStats.aspx" />
+<<<<<<< HEAD
     <Content Include="Examples\example1.txt" />
     <Content Include="Examples\example2.txt" />
     <Content Include="Examples\example3.txt" />
+=======
+    <Content Include="App_Data\Examples\example1.txt" />
+    <Content Include="App_Data\Examples\example2.txt" />
+    <Content Include="App_Data\Examples\example3.txt" />
+>>>>>>> 4318214375ef2052e3ef5eb9f5dbef19553fb5be
     <Content Include="CodeExamples\revigo_restful.cs.txt" />
     <Content Include="CodeExamples\revigo_restful.py.txt" />
     <Content Include="CodeExamples\revigo_restful.R.txt" />
@@ -343,6 +349,11 @@
     <None Include="Properties\PublishProfiles\Revigo.pubxml" />
   </ItemGroup>
   <ItemGroup>
+<<<<<<< HEAD
+=======
+    <Folder Include="App_Data\Annotations\" />
+    <Folder Include="App_Data\GeneOntology\" />
+>>>>>>> 4318214375ef2052e3ef5eb9f5dbef19553fb5be
     <Folder Include="App_Data\Logs\" />
   </ItemGroup>
   <ItemGroup>
