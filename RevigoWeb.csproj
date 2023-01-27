@@ -344,6 +344,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\Logs\" />
+    <Folder Include="Databases\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RevigoCore\RevigoCore.csproj">
