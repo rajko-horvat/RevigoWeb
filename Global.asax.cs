@@ -95,11 +95,7 @@ namespace RevigoWeb
 				string sPath = ConfigurationManager.AppSettings["PathToGO"];
 				if (!string.IsNullOrEmpty(sPath))
 				{
-<<<<<<< HEAD
 					oOntology = GeneOntology.Deserialize(sPath);
-=======
-					oOntology = new GeneOntology(HostingEnvironment.MapPath(sPath));
->>>>>>> 4318214375ef2052e3ef5eb9f5dbef19553fb5be
 				}
 				else
 				{
@@ -118,12 +114,7 @@ namespace RevigoWeb
 				string sPath = ConfigurationManager.AppSettings["PathToSpeciesAnnotations"];
 				if (!string.IsNullOrEmpty(sPath))
 				{
-<<<<<<< HEAD
 					oSpeciesAnnotations = SpeciesAnnotationsList.Deserialize(sPath);
-=======
-					oSpeciesAnnotations = SpeciesAnnotationsList.Deserialize(HostingEnvironment.MapPath(sPath));
-					oSpeciesAnnotations.SortByName();
->>>>>>> 4318214375ef2052e3ef5eb9f5dbef19553fb5be
 				}
 				else
 				{
