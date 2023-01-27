@@ -1,0 +1,57 @@
+﻿<%@ Page Language="C#" MasterPageFile="~/RevigoMasterPage.master" AutoEventWireup="true" CodeBehind="TermsOfUse.aspx.cs"
+    Inherits="RevigoWeb.TermsOfUse" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MasterHeaderContent" runat="server">
+    <title>Terms Of Use</title>
+</asp:Content>
+
+<asp:Content ID="Content2" ContentPlaceHolderID="MasterContent" runat="server">
+    <div style="max-width:950px; margin-left: auto; margin-right: auto" >
+        <h2>Terms of Use</h2>
+
+        <p>These Terms of Use (hereinafter the "Terms") are applicable to all users of this web site, its services and available materials. Users should read, understand and accept these Terms when accessing this web site, its services and available materials.  If a given user has not done this, or does not agree with the contents of these Terms, that user should not use this web site, its services or available materials.</p>
+
+        <p>By accepting these Terms, the user enters into an agreement with Ruđer Bošković Institute made up by the contents of these Terms, in order to regulate the user’s access and use of this web site, its services and available materials. Users which accept these Terms hereby represent and warrant that:</p>
+        <ul>
+            <li>They accept to be bound by these Terms, either individually, or in representation of an organization;</li>
+            <li>They are at least 18 years old;</li>
+            <li>They are capable, under the terms of the law applicable to them, to be legally bound by and comply with these Terms;</li>
+            <li>Their use of this web site, its services and available materials will be carried out in accordance with all applicable laws and regulations.</li>
+            <li>In the event of doubts concerning the Terms, the authors and maintainers of this web site, its services and available materials you can <asp:HyperLink ID="HyperLink1" runat="server" NavigateUrl="~/Contact.aspx">Contact Us</asp:HyperLink> for more information.</li>
+        </ul>
+
+        <p>For information on the processing of personal data on users which is carried out via this web site or its services, please see the <asp:HyperLink ID="HyperLink4" runat="server" NavigateUrl="~/PrivacyPolicy.aspx">Privacy Policy</asp:HyperLink>.</p>
+
+        <h2>Rules of Conduct</h2>
+
+        <p>You agree to comply with all applicable laws, rules and regulations in accessing and/or using this web site, its services and available materials. In addition, your use of the web site, its services and available materials is conditioned on your compliance with the following rules of conduct. You agree not to:</p>
+        <ul>
+            <li>Use this web site, its services and available materials for any fraudulent or unlawful purpose.</li>
+            <li>Interfere with or disrupt the operation of this web site, its services, or to break into any of its servers.</li>
+            <li>Transmit or otherwise make available in connection with this web site, its services and available materials any virus, worm, Trojan Horse, or other harmful code.</li>
+            <li>Restrict or inhibit any other person from using this web site, its services and available materials, including by means of hacking or defacing any portion of this web site.</li>
+            <li>Sell, resell, transfer, license, or exploit for any commercial purposes any use of or access to this web site, its services and available materials.</li>
+            <li>Modify, adapt, translate, reverse engineer, decompile, or disassemble any portion of this web site, its services and available materials without prior written consent from the authors.</li>
+        </ul>
+
+        <h2>Links</h2>
+
+        <p>This web site contains links to other Internet web sites, including affiliated web sites, which may or may not be owned or operated by the Ruđer Bošković Institute. The Ruđer Bošković Institute has not reviewed all of the web sites that are linked to this web site, its services and available materials, and the Ruđer Bošković Institute has no control over such web sites. Unless otherwise explicitly stated, the Ruđer Bošković Institute is not responsible for the content of such web sites, any updates or changes to such sites, or the privacy or other practices of such sites, and the fact that Ruđer Bošković Institute offers such links does not indicate any approval or endorsement of any material contained on any linked site. Ruđer Bošković Institute is providing these links to you only as a convenience. Accordingly, we strongly encourage you to become familiar with the terms of use, privacy policy and practices of any linked site.</p>
+
+        <h2>Services provided</h2>
+
+        <p>This webpage provides Revigo web service which summarizes and visualizes long lists of Gene Ontology terms.</p>
+
+        <h2>Limitation of Liability</h2>
+
+        <p>Ruđer Bošković Institute will not be responsible or liable for any direct, indirect, incidental, consequential, special, exemplary, or punitive damages of any kind, under any contract, negligence, strict liability, or other theory, including but not limited to damages for loss of profits, use, data, or other intangibles, that result from the use of, or the inability to use this web site, its services and available materials, even if Ruđer Bošković Institute have been advised of the possibility of such damages.</p>
+
+        <h2>Disclaimer of Warranties</h2>
+
+        <p>This web site, its services and available materials are provided to you "as is" without any warranties of any kind, whether express, implied, or statutory. The Ruđer Bošković Institute does not make any, and hereby disclaim all, warranties that might arise from your use or reliance on this web site (including any links to other web sites that are contained within this web site), its services and available materials; including, without limitation, any implied warranties of merchantability, fitness for a particular purpose, title, or non-infringement. Your sole remedy for dissatisfaction with this web site, its services and available materials is to stop using the web site, its services and available materials.</p>
+
+        <h2>Jurisdictional Issues</h2>
+
+        <p>This web site, its services and available materials are controlled and operated by the Ruđer Bošković Institute from its principal office in Zagreb, Republic of Croatia, and is not intended to subject the Ruđer Bošković Institute to the laws or jurisdiction of any state, country, or territory other than that of Republic of Croatia. The Ruđer Bošković Institute does not represent or warrant that the web site or the included materials, or any aspect thereof, are appropriate or available for use in any particular jurisdiction. Those who choose to access the web site, its services and available materials do so on their own initiative and at their own risk, and are responsible for complying with local laws. We may limit the availability of this web site, its services and available materials to any person, geographic area, or jurisdiction we choose, at any time in our sole discretion.</p>
+    </div>
+</asp:Content>

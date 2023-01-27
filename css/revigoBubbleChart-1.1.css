@@ -1,0 +1,71 @@
+
+.bubbles {
+  stroke-width: 1px;
+  stroke: white;
+}
+.bubbles:hover {
+  stroke: black;
+}
+
+.popup {
+  position: relative;
+  display: inline-block;
+  cursor: default;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* .popup .popuptext { */
+.popuptext {
+  position: relative;
+  display: inline-block;
+  cursor: default;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  visibility: hidden;
+  width: 160px;
+  background-color: #fff;
+  color: #000;
+  text-align: center;
+  border-radius: 5px;
+  border-color: #000;
+  border-style: solid;
+  border-width: 1px;
+  padding: 8px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+}
+
+.tooltip:hover > text {
+    fill: crimson;
+}
+
+.tooltip:hover > rect,
+.tooltip:hover > line {
+    stroke: crimson;
+}
+
+.popupline {
+    visibility: hidden;
+}
+
+.popuprect {
+    visibility: hidden;
+    fill: #fff;
+    stroke: #000;
+    rx: 0.5%;
+}
+
+/* Toggle this class - hide and show the popup */
+.show, .persist {
+  visibility: visible;
+  cursor: default;
+}
+
