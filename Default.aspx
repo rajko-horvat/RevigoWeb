@@ -43,11 +43,7 @@
         <script type="text/javascript">
             function fetchExample(n)
             {
-<<<<<<< HEAD
                 $.get("<%=Request.ApplicationPath %>Examples/example"+n+".txt", function (data, status)
-=======
-                $.get("GetExample.aspx?id="+n, function (data, status)
->>>>>>> 4318214375ef2052e3ef5eb9f5dbef19553fb5be
                 {
                     if (status === "success") {
                         $('#<%= this.txtGOInput.ClientID %>').val(data);
