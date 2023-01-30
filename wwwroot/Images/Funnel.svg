@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100px" height="100px" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50 (54983) - http://www.bohemiancoding.com/sketch -->
+    <title>77. Funnel</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="77.-Funnel" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+        <g transform="translate(2.000000, 2.000000)" id="Layer-1" stroke="#222F3E" stroke-width="4">
+            <path d="M36.4790935,45.3628179 C37.4948579,46.4591107 38.0525324,47.8912049 38.0525324,49.3726816 L38.0525324,93.026863 C38.0525324,95.6541139 41.2492027,96.9874429 43.1413128,95.1404365 L55.4201117,81.1849256 C57.06326,79.2293763 57.9694812,78.2613794 57.9694812,76.3256818 L57.9694812,49.3825581 C57.9694812,47.9010814 58.5371142,46.4689872 59.5429201,45.3725956 L94.7759029,7.45676628 C97.4148986,4.61233093 95.3834694,0 91.4796479,0 L4.54216657,0 C0.638444616,0 -1.40304263,4.60245442 1.24591155,7.45676628 L36.4790935,45.3628179 L36.4790935,45.3628179 Z"></path>
+        </g>
+    </g>
+</svg>

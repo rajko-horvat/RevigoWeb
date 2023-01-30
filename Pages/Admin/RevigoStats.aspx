@@ -1,0 +1,356 @@
+﻿<%@ Page Language="C#" MasterPageFile="~/RevigoMasterPage.master" AutoEventWireup="true" CodeBehind="RevigoStats.aspx.cs" Inherits="RevigoWeb.RevigoStats" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MasterHeaderContent" runat="server">
+    <title>Revigo statistics</title>
+    <script type="text/javascript" src="<%=Request.ApplicationPath %>js/d3-7.4.5.min.js"></script>
+        <style type="text/css">
+        .ui-tooltip-content {
+            font-size: 13px;
+        }
+        .ui-tooltip {
+            max-width:400px;
+            background-color: LightYellow;
+        }
+    </style>
+</asp:Content>
+
+<asp:Content ID="Content2" ContentPlaceHolderID="MasterContent" runat="server">
+    <h1 style="margin-bottom:40px; text-align:center; font-style:normal; color:black;">Revigo statistics</h1>
+   	<div style="margin:0 auto 0 auto; width:1000px">
+	    <p>Date: <button id="previousRange" style="font-size: 8pt" title="Return to the previous date range">&lt;&lt;</button> 
+            <input id="rangeFrom" type="text" style="width:80px; text-align:right;"/> - <input id="rangeTo" type="text" style="width:80px; text-align:right;"/> 
+            <button id="nextRange" style="font-size: 8pt" title="Advance to the next date range">&gt;&gt;</button></p>
+	    <p>View: <select id="view_Names"><option value="-1">Please choose a date range first</option></select></p>
+	    <p id="view_Requests"></p>
+	    <div id="view_Div" style="border: 1px solid black; width:1000px; height:600px;"></div><br/>
+	    Legend:<br/><div id="view_Legend" style="display: inline-block; max-width: 1000px;"></div>
+	</div>
+	<script type="text/javascript">
+		// set the margins of the graph
+		var svgMargin = {top: 20, right: 20, bottom: 100, left: 80};
+		var graphViews=null;
+		var disableEvents=false;
+		var currentView=-1;
+		var selectedFrom;
+		var selectedTo;
+			
+		$(function(){
+			$("#previousRange").button();
+			$("#previousRange").tooltip();
+			$("#rangeFrom").datepicker({dateFormat: "d.m.yy"});
+			$("#nextRange").button();
+			$("#nextRange").tooltip();
+			$("#rangeTo").datepicker({dateFormat: "d.m.yy"});
+								
+			disableEvents=true;
+			$("#rangeFrom").datepicker("option","onSelect",function(dateText,inst){
+				let from=$("#rangeFrom").datepicker("getDate");
+				let to=$("#rangeTo").datepicker("getDate");
+				if(from>to) $("#rangeTo").datepicker("setDate", from);
+				if(!disableEvents) RefreshViews();});
+			$("#rangeTo").datepicker("option","onSelect",function(dateText,inst){
+				let from=$("#rangeFrom").datepicker("getDate");
+				let to=$("#rangeTo").datepicker("getDate");
+				if(from>to) $("#rangeFrom").datepicker("setDate", to);
+				if(!disableEvents) RefreshViews();});
+			$("#rangeFrom").change(function(){
+				$("#rangeFrom").datepicker("setDate", $("#rangeFrom").val());
+				let from=$("#rangeFrom").datepicker("getDate");
+				let to=$("#rangeTo").datepicker("getDate");
+				if(from>to) $("#rangeTo").datepicker("setDate", from);
+				if(!disableEvents) RefreshViews();});
+			$("#rangeTo").change(function(){
+				$("#rangeTo").datepicker("setDate", $("#rangeTo").val());
+				let from=$("#rangeFrom").datepicker("getDate");
+				let to=$("#rangeTo").datepicker("getDate");
+				if(from>to) $("#rangeFrom").datepicker("setDate", to);
+				if(!disableEvents) RefreshViews();});
+				
+			$("#previousRange").click(function(){
+				let from=$("#rangeFrom").datepicker("getDate");
+				let to=$("#rangeTo").datepicker("getDate");
+				let milliRange=(to-from);
+				let newTo=from.valueOf()-24*60*60*1000; // substract one day
+				from=new Date(newTo-milliRange);
+				to=new Date(newTo);
+				$("#rangeFrom").datepicker("setDate", from);
+				$("#rangeTo").datepicker("setDate", to);
+				if(!disableEvents) RefreshViews();
+                return false;
+			});
+			$("#nextRange").click(function(){
+				let from=$("#rangeFrom").datepicker("getDate");
+				let to=$("#rangeTo").datepicker("getDate");
+				let milliRange=to-from;
+				let newTo=to.valueOf()+24*60*60*1000; // add one day
+				from=new Date(newTo);
+				to=new Date(newTo+milliRange);
+				$("#rangeFrom").datepicker("setDate", from);
+				$("#rangeTo").datepicker("setDate", to);
+				if(!disableEvents) RefreshViews();
+                return false;
+			});
+			$("#view_Names").change(function(){
+				if(!disableEvents)
+				{
+					let newView=parseInt($(this).find("option:selected").val(),10);
+					if(newView!==currentView)
+					{
+						if(graphViews!=null && newView>=0 && newView<graphViews.views.length)
+						{
+							currentView=newView;
+							DrawSelectedView();
+						}
+					}
+				}});
+
+			InitDefaults("<%=(RevigoWeb.Global.MinStatTicks>0)?(new DateTime(RevigoWeb.Global.MinStatTicks)).ToString("d.M.yyyy"):"" %>", 
+                "<%=(RevigoWeb.Global.MaxStatTicks>0)?(new DateTime(RevigoWeb.Global.MaxStatTicks)).ToString("d.M.yyyy"):"" %>", 
+                "<%=(RevigoWeb.Global.MaxStatTicks>0 && RevigoWeb.Global.MinStatTicks>0)?(((new DateTime(RevigoWeb.Global.MaxStatTicks)).AddMonths(-1).Ticks<RevigoWeb.Global.MinStatTicks)?(new DateTime(RevigoWeb.Global.MinStatTicks)):(new DateTime(RevigoWeb.Global.MaxStatTicks)).AddMonths(-1)).ToString("d.M.yyyy"):"" %>", 
+                "<%=(RevigoWeb.Global.MaxStatTicks>0)?(new DateTime(RevigoWeb.Global.MaxStatTicks)).ToString("d.M.yyyy"):"" %>");
+			GetViews();
+			disableEvents=false;
+		});
+			
+		function InitDefaults(minDate, maxDate, dateFrom, dateTo)
+		{
+			$("#rangeFrom").datepicker("option", "minDate", minDate);
+			$("#rangeFrom").datepicker("option", "maxDate", maxDate);
+			$("#rangeFrom").datepicker("setDate", dateFrom);
+			selectedFrom=dateFrom;
+			$("#rangeTo").datepicker("option", "minDate", minDate);
+			$("#rangeTo").datepicker("option", "maxDate", maxDate);
+			$("#rangeTo").datepicker("setDate", dateTo);
+			selectedTo=dateTo;
+			$("#view_Requests").text("");
+			$("#view_Legend").children().remove();
+				
+			let mainDiv=$("#view_Div");
+			let divWidth = mainDiv.width();
+			let divHeight = mainDiv.height();
+
+			// append the svg object to our main element
+			let mainSVG=d3.select("#view_Div")
+				.append("svg")
+					.attr("width", divWidth)
+					.attr("height", divHeight);
+
+			let textblock=mainSVG.append("g")
+				.append("text")
+					.attr("id", "view_SVGMessage")
+					.attr("fill", "red")
+					.style("text-align", "center")
+					.style("text-anchor", "middle")
+					.style("font-size:", "larger")
+					.attr("x", divWidth/2)
+					.attr("y", divHeight/2)
+					.text("");
+
+			mainSVG
+				.append("g")
+					.attr("id", "view_SVGContainer")
+					.attr("transform", "translate(" + svgMargin.left + "," + svgMargin.top + ")");
+		}
+			
+		function RefreshViews()
+		{
+			// compare dates
+			let newFrom=$("#rangeFrom").val();
+			let newTo=$("#rangeTo").val();
+				
+			if(newFrom!==selectedFrom || newTo!=selectedTo)
+			{
+				selectedFrom=newFrom;
+				selectedTo=newTo;
+					
+				GetViews();
+			}
+		}
+			
+		function GetViews()
+		{
+			let textblock=d3.select("#view_SVGMessage");
+
+            $("#view_Requests").text("");
+			$("#view_Legend").children().remove();
+			$("#view_SVGContainer").children().remove();
+			textblock.text("Loading data, please wait...");
+				
+			$.get("/Admin/GetRevigoStats.aspx?from="+selectedFrom+"&to="+selectedTo, 
+			function (data, status)
+			{
+				if (status === "success")
+				{
+					// parse the data
+					graphViews = data;
+						
+					if (graphViews)
+					{
+						if(graphViews.error==="")
+						{
+							// update the views
+							textblock.text("");
+							$("#view_Requests").text("Total requests for this date range: "+graphViews.requestCount);
+							// update maxdate
+							$("#rangeFrom").datepicker("option", "maxDate", graphViews.maxDate);
+							$("#rangeTo").datepicker("option", "maxDate", graphViews.maxDate);
+							let viewNames=$("#view_Names");
+							let selectedView=Math.min(Math.max(0,viewNames.find("option:selected").val()), graphViews.views.length-1);
+							viewNames.children().remove();
+							for(let i=0;i<graphViews.views.length;i++)
+							{
+								let newSelect=document.createElement("option");
+								newSelect.setAttribute("value", i.toString());
+								newSelect.innerHTML=graphViews.views[i].name;
+								if(selectedView===i)
+								{
+									newSelect.setAttribute("selected", "");
+									currentView=i;
+								}
+								viewNames[0].appendChild(newSelect);
+							}
+								
+							DrawSelectedView();
+						}
+						else
+						{
+							textblock.text(graphViews.error);
+						}
+					}
+					else
+					{
+						textblock.text("Error parsing JSON data");
+					}
+				}
+				else
+				{
+					textblock.text("Error getting data from server");
+				}
+			});
+		}
+			
+		function DrawSelectedView()
+		{
+			if(currentView>=0 && currentView<graphViews.views.length)
+			{
+				let mainDiv=$("#view_Div");
+				let divWidth = mainDiv.width();
+				let divHeight = mainDiv.height();
+				let width = divWidth - svgMargin.left - svgMargin.right;
+				let height = divHeight - svgMargin.top - svgMargin.bottom;
+				let svg=d3.select("#view_SVGContainer");
+				$("#view_SVGContainer").children().remove();
+					
+				let view=graphViews.views[currentView];
+				let viewData=view.data;
+				let colNames=view.columns.slice(1);
+				let cols=colNames.length;
+				let bar=view.type!=="stack";
+					
+				// construct color scale, one color per column
+				let palette=(cols<10)?d3.schemeCategory10:d3.schemeSet3.concat(d3.schemeSet1).concat(d3.schemePastel1).concat(d3.schemePastel2);
+				let colorScale = d3.scaleOrdinal().domain([0, cols]).range(palette);
+
+				// construct legend
+				let legend=$("#view_Legend");
+				legend.children().remove();
+				for(let i=0;i<cols;i++)
+				{
+					let newdiv2=document.createElement("div");
+					newdiv2.setAttribute("style", "vertical-align: middle; display: inline-block; margin: 5px 20px 5px 0; font-size: small;");
+					let newdiv3=document.createElement("div");
+					newdiv3.setAttribute("style", "border: 1px solid black; background-color:"+colorScale(i)+"; width: 20px; height: 15px; display: inline-block; margin: auto 10px auto 0;");
+					newdiv2.appendChild(newdiv3);
+					newdiv2.innerHTML+=colNames[i]+((typeof view.distribution[i+1]==="string")?"":" ("+view.distribution[i+1]+"%)");
+					legend.append(newdiv2);
+				}
+
+				// X axis
+				let bandDomain=[];
+				if(bar)
+				{
+					for(let i=0;i<viewData.length;i++)
+					{
+						let tempPos=i*cols;
+						for(let j=0;j<cols;j++)
+							bandDomain.push(tempPos+j);
+					}
+				}
+				else
+					bandDomain=viewData.map(function(d,i){return i;})
+						
+				let xBands = d3.scaleBand().range([1,width+1]).domain(bandDomain).padding((width/viewData.length)<5?0:0.2);
+				let xAxis = d3.scaleLinear().range([0, width]).domain([0, viewData.length-1]);
+				let xNumTicks=Math.min(viewData.length, Math.ceil(width/30)); // determine number of x axis ticks
+				svg.append("g")
+					.attr("transform", "translate(0," + height + ")")
+					.call(d3.axisBottom(xAxis).ticks(xNumTicks).tickSizeOuter(0).tickFormat(function(d,i){return viewData[d][0];}))
+					.selectAll("text")
+						.attr("transform", "translate(-8,5)rotate(-45)")
+						.style("text-anchor", "end")
+						.style("font-family", "sans-serif")
+						.style("font-size", "10px");
+
+				// Y axis
+				let maxY;
+				if(bar)
+					maxY = Math.max(...viewData.map(function(d){let max=0; for(let i=0; i<cols; i++) {max=Math.max(max, d[i+1]);} return max;}));
+				else
+					maxY = Math.max(...viewData.map(function(d){let sum=0; for(let i=0; i<cols; i++) {sum+=d[i+1];} return sum;}));
+				let yAxis = d3.scaleLinear().range([height,0]).domain([0,maxY]).nice();
+				svg.append("g").call(d3.axisLeft(yAxis));
+					
+				// stack the data by rows, and then group them by columns
+				let rectWidth=xBands.bandwidth();
+				for(let i=0;i<viewData.length;i++)
+				{
+					if(bar)
+					{
+						let row=viewData[i];
+						let gContainer=svg.append("g");
+						let yPos=yAxis(0);
+							
+						// first column is x axis title, skip that
+						for(let j=1;j<row.length;j++)
+						{
+							let xPos=xBands(i*cols+(j-1));
+							let rectHeight=yPos-yAxis(row[j]);
+							gContainer.append("rect")
+								.attr("x", xPos)
+								.attr("y", yPos-rectHeight)
+								.attr("height", rectHeight)
+								.attr("width", rectWidth)
+								.attr("fill", colorScale(j-1));
+						}
+					}
+					else
+					{
+						let row=viewData[i];
+						let xPos=xBands(i);
+						let gContainer=svg.append("g");
+						let yValue=0;
+							
+						// first column is x axis title, skip that
+						for(let j=1;j<row.length;j++)
+						{
+							// we don't want to render empty rectangles
+							if(row[j]!=0)
+							{
+								let yPos=yAxis(yValue);
+								let newYValue=yValue+row[j];
+								let rectHeight=yPos-yAxis(newYValue);
+								gContainer.append("rect")
+									.attr("x", xPos)
+									.attr("y", yPos-rectHeight)
+									.attr("height", rectHeight)
+									.attr("width", rectWidth)
+									.attr("fill", colorScale(j-1));
+								yValue=newYValue;
+							}
+						}
+					}
+				}
+			}
+		}
+	</script>
+</asp:Content>
