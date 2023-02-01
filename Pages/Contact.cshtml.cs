@@ -2,7 +2,9 @@ using IRB.Revigo;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Net;
+using System.Net.Http;
 using System.Net.Mail;
+using System.Net.Sockets;
 using System.Text;
 using System.Web;
 
@@ -10,6 +12,7 @@ namespace IRB.RevigoWeb.Pages
 {
     public class ContactModel : PageModel
     {
+		private static HttpClient oHttpClient = new HttpClient();
 		public string ErrorMessage = "";
 		public bool SeccessfullySent = false;
 
@@ -121,29 +124,25 @@ namespace IRB.RevigoWeb.Pages
 		{
 			try
 			{
-				HttpWebRequest oRequest = (HttpWebRequest)WebRequest.Create("https://www.google.com/recaptcha/api/siteverify");
-				oRequest.Timeout = 30000; // 30 seconds
-				oRequest.Method = "POST";
-				oRequest.ContentType = "application/x-www-form-urlencoded";
+				oHttpClient.Timeout = new TimeSpan(0, 0, 30);
+				HttpRequestMessage oRequest = new HttpRequestMessage(HttpMethod.Post, "https://www.google.com/recaptcha/api/siteverify");
+				oRequest.Method = HttpMethod.Post;
 
-				using (Stream requestStream = oRequest.GetRequestStream())
+				IPAddress? address = Request.HttpContext.Connection.RemoteIpAddress;
+				if (address == null)
 				{
-					IPAddress? address = Request.HttpContext.Connection.RemoteIpAddress;
-					if (address == null)
-					{
-						return CaptchaErrorEnum.VerificationFailed;
-					}
-					byte[] buffer = Encoding.ASCII.GetBytes(string.Format("secret={0}&response={1}&remoteip={2}",
-					HttpUtility.HtmlEncode(privateKey),
-					HttpUtility.HtmlEncode(WebUtilities.TypeConverter.ToString(Request.Form["g-recaptcha-response"])),
-					HttpUtility.HtmlEncode(address.ToString())));
-					requestStream.Write(buffer, 0, buffer.Length);
+					return CaptchaErrorEnum.Unavailable;
 				}
+				oRequest.Content = new StringContent(string.Format("secret={0}&response={1}&remoteip={2}",
+				HttpUtility.HtmlEncode(privateKey),
+				HttpUtility.HtmlEncode(WebUtilities.TypeConverter.ToString(Request.Form["g-recaptcha-response"])),
+				HttpUtility.HtmlEncode(address.ToString())), Encoding.UTF8, "application/x-www-form-urlencoded");
+
 				// Get the response from the server
-				HttpWebResponse oResponse = (HttpWebResponse)oRequest.GetResponse();
+				HttpResponseMessage oResponse = oHttpClient.Send(oRequest);
 				if (oResponse.StatusCode == HttpStatusCode.OK)
 				{
-					StreamReader reader = new StreamReader(oResponse.GetResponseStream());
+					StreamReader reader = new StreamReader(oResponse.Content.ReadAsStream());
 					// parse JSON response
 					while (!reader.EndOfStream)
 					{
