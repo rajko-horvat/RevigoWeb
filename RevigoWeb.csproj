@@ -2,8 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Title>REVIGO (REduce + VIsualize Gene Ontology) Web service</Title>
+    <Version>1.8.0</Version>
+    <Authors>FranSupek, rajko-horvat</Authors>
+    <Company>IRB</Company>
+    <Copyright>Copyright (c) 2011-2023, Ruđer Bošković Institite</Copyright>
+    <PackageProjectUrl>https://github.com/rajko-horvat/RevigoWeb</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/rajko-horvat/RevigoWeb</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <RootNamespace>IRB.RevigoWeb</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

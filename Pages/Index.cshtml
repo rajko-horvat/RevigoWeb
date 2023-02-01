@@ -1,0 +1,307 @@
+﻿@page
+@using IRB.Revigo.Core;
+@using IRB.Revigo.Databases;
+@using IRB.RevigoWeb;
+@using RevigoWeb;
+@using System.Globalization;
+@model RevigoWeb.Pages.IndexModel
+@{
+    Layout = "_MasterLayout";
+    ViewData["Title"] = "Revigo Home page";
+    ViewData["RequireGDPR"] = true;
+    GDPRTypeEnum eGDPRType = GDPR.GetGDPRState(HttpContext);
+}
+@section HeaderCSS {
+    <style type="text/css">
+        .ui-tooltip-content {
+            font-size: 13px;
+        }
+        .ui-tooltip {
+            max-width:400px;
+            background-color: LightYellow;
+        }
+        /* select with custom icons */
+        .ui-selectmenu-button.ui-button {
+            text-align: left;
+            white-space: nowrap;
+            width: 20em;
+        }
+        .ui-widget {
+            font-size: 0.8rem;
+            color:black;
+        }
+        .ui-selectmenu-menu .ui-menu.customicons .ui-menu-item-wrapper {
+            padding: 0.1em;
+        }
+    </style>
+}
+
+<form id="form1" method="post">
+    <div style="width:950px; margin-left: auto; margin-right: auto">
+        <p>
+            Welcome, Revigo can take long lists of Gene Ontology terms and summarize them by removing redundant GO terms.
+            Read more about Revigo on our <a href='@Url.Content("~/FAQ#q01")'>Frequently Asked Questions</a> page.
+        </p>
+        <p>
+            Please enter a list of Gene Ontology IDs below, each on its own line. The GO IDs
+            may be followed by a separator (space, tab) and value which describes the GO term in a way meaningful to you.
+            The value(s) must have a dot '.' for a decimal separator.
+            <img id="tooltip1" title="For instance, you may provide a p-value (statistical significance), a fold change, enrichment, or some directly measured quantity such as average signal intensity from microarrays, ion count from mass spec, or read count from RNA-seq. You may also provide more than one value per line, although only the first value will be used in GO term selection/clustering."
+                 alt="For instance, you may provide a p-value (statistical significance), a fold change, enrichment, or some directly measured quantity such as average signal intensity from microarrays, ion count from mass spec, or read count from RNA-seq. You may also provide more than one value per line, although only the first value will be used in GO term selection/clustering."
+                 src="@Url.Content("~/Images/dialog-information.png")" style="vertical-align:middle;" />
+            <span style="font-size:smaller">(Hoover with a mouse over an icon for additional info)</span>
+        </p>
+
+        <script type="text/javascript">
+            function fetchExample(n)
+            {
+                $.get("@Url.Content("~/Examples/")example" + n + ".txt", function (data, status)
+                {
+                    if (status === "success")
+                    {
+                        $('#txtGOInput').val(data);
+                    }
+                });
+                return false;
+            }
+        </script>
+        <em style="color:gray">Examples:</em>
+        <ul style="margin-top: 0;">
+            <li>
+                <a title="Highly expressed genes across all bacterial genomes, where expression level is predicted by codon usage." href="#"
+                   onclick="return fetchExample(1);">Example #1</a>
+                (<a href="http://www.plosgenetics.org/article/info:doi/10.1371/journal.pgen.1001004" target="_blank">Supek et al. (2010) PLoS Genet</a>),
+            </li>
+            <li>
+                <a title="Genes diferentially expressed in HeLa and Hep-2 human tumor cell lines, in comparison to other cell lines." href="#"
+                   onclick="return fetchExample(2);">Example #2</a>
+                (<a href="http://www.springerlink.com/content/b615211p833j4626/" target="_blank">Ester et al. (2010) Inv New Drug</a>),
+            </li>
+            <li>
+                <a title="Differentially expressed genes between breast cancer patients with poor vs. good prognosis." href="#"
+                   onclick="return fetchExample(3);">Example #3</a>
+                (<a href="http://www.nature.com/nature/journal/v415/n6871/full/415530a.html" target="_blank">Van&#39;t Veer et al. (2002) Nature</a>)
+            </li>
+        </ul>
+        <p>
+            <asp:Label ID="lblError" ForeColor="Red" Font-Size="Large" runat="server" Visible="False"></asp:Label>
+        </p>
+        <textarea id="txtGOInput" name="txtGOInput" rows="20" cols="20" style="width:100%"></textarea>
+        <p/>
+
+        <p>
+            How large would you like the resulting list to be:
+            <input type="radio" id="chkSimilarity0_9" name="cutoff" value="0.9" />
+            <label for="chkSimilarity0_9">Large (0.9)</label>
+            <input type="radio" id="chkSimilarity0_7" name="cutoff" value="0.7" checked="checked" />
+            <label for="chkSimilarity0_7">Medium (0.7)</label>
+            <input type="radio" id="chkSimilarity0_5" name="cutoff" value="0.5" />
+            <label for="chkSimilarity0_5">Small (0.5)</label>
+            <span id="tooltip2" title="Warning! This setting may remove some GO terms which are not redundant. Please consider a more conservative setting before using this one.">
+                <input type="radio" id="chkSimilarity0_4" name="cutoff" value="0.4" />
+                <label for="chkSimilarity0_4">Tiny (0.4)</label>
+                <img src="@Url.Content("~/Images/dialog-warning.png")" alt="Warning" style="vertical-align:middle;" />
+            </span>
+        </p>
+
+        <p>
+            If provided, the values associated with GO terms represent:
+            <select id="lstValueType" name="lstValueType">
+                <option selected="selected" value="PValue">P value</option>
+                <option value="Higher">Higher value is better</option>
+                <option value="Lower">Lower value is better</option>
+                <option value="HigherAbsolute">Higher absolute value is better</option>
+                <option value="HigherAbsLog2">Higher absolute log2 value is better</option>
+            </select>
+        </p>
+
+        <h2>Advanced options:</h2>
+
+        <p>
+            Would you like to remove obsolete GO terms: 
+            <input type="radio" id="lstRemoveObsolete0" name="removeObsolete" value="true" checked="checked" />
+            <label for="lstRemoveObsolete0">Yes (default)</label>
+            <input type="radio" id="lstRemoveObsolete1" name="removeObsolete" value="false" />
+            <label for="lstRemoveObsolete1">No</label>
+            <img id="tooltip5" src="@Url.Content("~/Images/dialog-information.png")" alt="Remove obsolete GO terms" title="When the GO term is marked as obsolete it indicates that the term has been deprecated and should not be used. A GO term is obsoleted when it is out of scope, misleadingly named or defined, or describes a concept that would be better represented in another way and needs to be removed from the published ontology. In these cases, the term and ID still persist in the ontology, but the term is tagged as obsolete, and all relationships to other terms are removed. A comment is added to the term detailing the reason for the obsoletion and replacement terms are suggested, if possible." style="vertical-align:middle;" />
+        </p>
+        <p>
+            What species would you like to work with:
+            <select id="lstSpecies" name="lstSpecies">
+                @{
+                    // fill species list
+                    //sTemp = this.lstSpecies.SelectedValue;
+
+                    if (Global.SpeciesAnnotations != null)
+			        {
+				        for (int i = 0; i < Global.SpeciesAnnotations.Items.Count; i++)
+				        {
+					        SpeciesAnnotations annotations = Global.SpeciesAnnotations.Items[i];
+					        string sValue = annotations.TaxonID.ToString();
+					        if (annotations.TaxonID == 0)
+					        {
+                                <option value="@sValue" data-src="@Url.Content(string.Format("~/Images/Species/{0}.jpg", sValue))">@annotations.SpeciesName</option>
+					        }
+					        else
+					        {
+                                <option value="@sValue" data-src="@Url.Content(string.Format("~/Images/Species/{0}.jpg", sValue))">@string.Format("{0} ({1})", annotations.SpeciesName, sValue)</option>
+					        }
+					        /*if (!string.IsNullOrEmpty(sTemp))
+					        {
+						        if (sTemp.Equals(sValue))
+							        this.lstSpecies.SelectedIndex = i;
+					        }
+					        else if (annotations.TaxonID == 0)
+					        {
+						        this.lstSpecies.SelectedIndex = i;
+					        }*/
+				        }
+			        }
+			        else
+			        {
+                        <option selected="selected" value="-1">Species annotations not loaded</option>
+			        }
+                }
+            </select>&nbsp;&nbsp;
+            <img id="tooltip3" alt="Species" title="The chosen species is used to find the size of each GO term i.e. the percentage of genes annotated with the term. This quantity determines the size of bubbles in the vizualizations, thus indicating a more general GO term (larger) or a more specific one (smaller). The choice of database also has some influence on the GO term clustering/selection process, and on the bubble placement in the visualizations. If your organism is not available, select the closest relative, e.g. human or mouse should work for any mammal. The default choice (Whole UniProt database) should also suffice in most cases."
+                 src="@Url.Content("~/Images/dialog-information.png")" style="vertical-align:middle;" />
+        </p>
+
+        <p>
+            What semantic similarity measure would you like to use:
+            <select id="lstMeasures" name="lstMeasures">
+                @{
+                    // fill measure list
+                    int iTemp = 0;
+                    //string sTemp = this.lstMeasures.SelectedValue;
+                    foreach (SemanticSimilarityScore value in SemanticSimilarityScore.Values)
+                    {
+                        string sValue = value.EnumValue.ToString();
+                        <option value="@sValue" data-src="@Url.Content(string.Format("~/Images/Species/{0}.jpg", sValue))">@value.ToString()</option>
+                        /*if (!string.IsNullOrEmpty(sTemp) && sTemp.Equals(sValue))
+                        {
+                            this.lstMeasures.SelectedIndex = iTemp;
+                        }*/
+                        iTemp++;
+                    }
+                    /*if (string.IsNullOrEmpty(sTemp))
+                        this.lstMeasures.SelectedIndex = 0;*/
+                }
+            </select>&nbsp;&nbsp;
+            <a href="http://funsimmat.bioinf.mpi-inf.mpg.de/help3.php" target="_blank">
+                <img id="tooltip4" title="The default is normally a sensible choice. Click the icon to view a web page with detailed information on how these measures are computed."
+                     alt="Semantic similarity measure"
+                     src="@Url.Content("~/Images/dialog-information.png")" style="vertical-align:middle;" />
+            </a>
+        </p>
+
+        <input type="submit" id="btnStart" name="btnStart" value="Start Revigo" />
+
+        <div style="margin-top: 35px">
+            Revigo uses these databases which are periodically updated:
+            <ul>
+                <li>
+                    The Gene Ontology database
+                    @if (Global.Ontology != null)
+			        {
+				        string link = Global.Ontology.Link;
+				        if (!string.IsNullOrEmpty(link))
+				        {
+                            string[] aLink = link.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                            <text>(</text><a href="@link" target="_blank">@aLink[aLink.Length - 1]</a><text>) </text>
+                        }
+                        else
+                        {
+                            <text>() </text>
+                        }
+                        @string.Format("which is dated {0}", Global.Ontology.Date.ToString("D", CultureInfo.GetCultureInfo("en-US")))<text>.</text>
+			        }
+                    else
+                    {
+                        <text>(Ontology is not loaded).</text>
+                    }
+                </li>
+                <li>
+                    The UniProt-to-GO mapping database from the EBI GOA project
+                    @if (Global.SpeciesAnnotations != null)
+                    {
+                        string link = Global.SpeciesAnnotations.Link;
+                        if (!string.IsNullOrEmpty(link))
+                        {
+                            string[] aLink = link.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                            <text>(</text><a href="@link" target="_blank">@aLink[aLink.Length - 1]</a><text>) </text>
+                        }
+                        else
+                        {
+                            <text>() </text>
+                        }
+                        @string.Format("which is dated {0}", Global.SpeciesAnnotations.Date.ToString("D", CultureInfo.GetCultureInfo("en-US")))<text>.</text>
+                    }
+                    else
+                    {
+                        <text>(Species annotations are not loaded).</text>
+                    }
+                </li>
+            </ul>
+        </div>
+        <p />
+
+        <div class="tinybox">
+            <p style="font-size: 0.9rem;">
+                <strong>If you found Revigo useful in your work, please cite the following reference:</strong><br />
+                Supek F, Bošnjak M, Škunca N, Šmuc T. &quot;<em>REVIGO summarizes and visualizes long lists of Gene Ontology terms</em>&quot;<br />
+                PLoS ONE 2011. <a href="http://dx.doi.org/10.1371/journal.pone.0021800" target="_blank">doi:10.1371/journal.pone.0021800</a>
+            </p>
+            <p>
+                Revigo is an iProject funded by the <a href="http://iprojekti.mzos.hr/arh_iprojekata.asp" target="_blank">
+                    Ministry of Science and Education, Republic of Croatia (2008-057)
+                </a> and <a href="http://www.irb.hr/eng" target="_blank">Ruđer Bošković Institute</a>.<br />
+                The Revigo project was implemented at the
+                <a href="https://www.irb.hr/eng/Divisions/Division-of-Electronics" target="_blank">Division of electronics</a>,
+                <a href="http://www.irb.hr/eng" target="_blank">Ruđer Bošković Institute</a>.
+            </p>
+        </div>
+        <div style="display:table; width:100%; text-align:center; margin-top: 20px;">Did you find Revigo useful in your work? Please share it with your colleagues.<br /><div style="margin-top:5px;" class="addthis_inline_share_toolbox"></div></div>
+        <script type="text/javascript">
+            $(function ()
+            {
+                $.widget("custom.iconselectmenu", $.ui.selectmenu, {
+                    _resizeMenu: function ()
+                    {
+                        $(this.menu).css("max-width", "550px");
+                        $(this.menu).css("max-height", "300px");
+                    },
+                    _renderItem: function (ul, item)
+                    {
+                        var li = $("<li>");
+                        var wrapper = $("<div>");
+                        var imgwrapper = $("<div>", { style: "width:110px; text-align:center; display:inline-block;" });
+                        $("<img>", { style: "vertical-align:middle;", src: item.element.attr("data-src"), title: item.label }).appendTo(imgwrapper);
+                        wrapper.append(imgwrapper);
+                        wrapper.append(item.label);
+
+                        if (item.disabled)
+                        {
+                            li.addClass("ui-state-disabled");
+                        }
+
+                        return li.append(wrapper).appendTo(ul);
+                    }
+                });
+
+                $("#lstSpecies").iconselectmenu();
+            });
+
+            $("#btnStart").button();
+            $("#tooltip1").tooltip();
+            $("#tooltip2").tooltip();
+            $("#tooltip3").tooltip();
+            $("#tooltip4").tooltip();
+            $("#tooltip5").tooltip();
+        </script>
+    </div>
+    @if (eGDPRType == GDPRTypeEnum.Full)
+    {
+        <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-601aabd7f2793f3b"></script>
+    }
+</form>

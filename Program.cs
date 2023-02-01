@@ -1,3 +1,5 @@
+using RevigoWeb;
+
 internal class Program
 {
 	private static void Main(string[] args)
@@ -18,10 +20,15 @@ internal class Program
 
 		app.UseRouting();
 
-		app.UseAuthorization();
+		//app.UseAuthorization();
 
 		app.MapRazorPages();
 
+		// intialize allication global state
+		Global.ApplicationStart(app.Configuration);
+
 		app.Run();
+
+		Global.ApplicationEnd();
 	}
 }
