@@ -16,14 +16,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="appsettings.example" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="appsettings.example" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\RevigoCore\RevigoCore.csproj" />
   </ItemGroup>
 
