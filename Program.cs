@@ -1,4 +1,5 @@
-using RevigoWeb;
+using Microsoft.AspNetCore.Rewrite;
+using IRB.RevigoWeb;
 
 internal class Program
 {
@@ -11,8 +12,12 @@ internal class Program
 
 		var app = builder.Build();
 
-		// Configure the HTTP request pipeline.
-		if (!app.Environment.IsDevelopment())
+        var options = new RewriteOptions();
+        options.Rules.Add(new RewriteAspxUrl());
+        app.UseRewriter(options);
+
+        // Configure the HTTP request pipeline.
+        if (!app.Environment.IsDevelopment())
 		{
 			app.UseExceptionHandler("/Error");
 		}

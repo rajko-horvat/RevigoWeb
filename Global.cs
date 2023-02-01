@@ -4,15 +4,12 @@ using System.Net;
 using System.Net.Mail;
 using System.Text;
 using IRB.Collections.Generic;
-using IRB.Revigo;
 using IRB.Revigo.Core;
 using IRB.Revigo.Databases;
 using IRB.Revigo.Worker;
-using IRB.RevigoWeb;
-using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 
-namespace RevigoWeb
+namespace IRB.RevigoWeb
 {
     public class Global
     {
@@ -31,8 +28,10 @@ namespace RevigoWeb
         private static string sEmailCc = "";
         private static TimeSpan tsSessionTimeout = new TimeSpan(0, 30, 0);
         private static TimeSpan tsJobTimeout = new TimeSpan(0, 15, 0);
+		private static string sRecaptchaPublicKey = "";
+		private static string sRecaptchaPrivateKey = "";
 
-        public static void ApplicationStart(IConfiguration configuration)
+		public static void ApplicationStart(IConfiguration configuration)
         {
             // initialize log file
             try
@@ -110,9 +109,17 @@ namespace RevigoWeb
             }
             catch { }
 
-            // try to load and intialize ontology object
-            try
-            {
+			try
+			{
+				sRecaptchaPublicKey = configuration.GetSection("AppSettings")["RecaptchaPublicKey"];
+				sRecaptchaPrivateKey = configuration.GetSection("AppSettings")["RecaptchaPrivateKey"];
+
+			}
+			catch { }
+
+			// try to load and intialize ontology object
+			try
+			{
                 string sPath = configuration.GetSection("AppSettings")["PathToGO"];
                 if (!string.IsNullOrEmpty(sPath))
                 {
@@ -276,7 +283,17 @@ namespace RevigoWeb
             }
         }
 
-        public static int CreateNewJob(RequestSourceEnum requestSource, string data, double cutoff, 
+		public static string RecaptchaPublicKey
+		{
+			get { return sRecaptchaPublicKey; }
+		}
+
+		public static string RecaptchaSecretKey
+		{
+			get { return sRecaptchaPrivateKey; }
+		}
+
+		public static int CreateNewJob(RequestSourceEnum requestSource, string data, double cutoff, 
             ValueTypeEnum valueType, SpeciesAnnotations annotations, SemanticSimilarityScoreEnum measure, bool removeObsolete)
         {
             int iJobID = -1;

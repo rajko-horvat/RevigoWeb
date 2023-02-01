@@ -8,5 +8,7 @@ namespace IRB.RevigoWeb.Pages
         public void OnGet()
         {
         }
+
+        public void OnPost() { }
     }
 }

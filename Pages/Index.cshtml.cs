@@ -5,8 +5,12 @@ namespace RevigoWeb.Pages
 {
     public class IndexModel : PageModel
     {
+        public string ErrorMessage = "";
+
         public void OnGet()
         {
         }
+
+        public void OnPost() { }
     }
 }

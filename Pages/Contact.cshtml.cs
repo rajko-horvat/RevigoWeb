@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace IRB.RevigoWeb.Pages
 {
-    public class TermsOfUseModel : PageModel
+    public class ContactModel : PageModel
     {
-        public void OnGet()
+		public string ErrorMessage = "";
+		public bool SeccessfullySent = false;
+
+		public void OnGet()
         {
         }
-
-        public void OnPost() { }
     }
 }

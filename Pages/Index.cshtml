@@ -83,9 +83,10 @@
                 (<a href="http://www.nature.com/nature/journal/v415/n6871/full/415530a.html" target="_blank">Van&#39;t Veer et al. (2002) Nature</a>)
             </li>
         </ul>
-        <p>
-            <asp:Label ID="lblError" ForeColor="Red" Font-Size="Large" runat="server" Visible="False"></asp:Label>
-        </p>
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <p style="color:red; font-size:large">@Model.ErrorMessage</p>
+        }
         <textarea id="txtGOInput" name="txtGOInput" rows="20" cols="20" style="width:100%"></textarea>
         <p/>
 
@@ -195,7 +196,7 @@
             </a>
         </p>
 
-        <input type="submit" id="btnStart" name="btnStart" value="Start Revigo" />
+		<input id="cmdStart" name="cmdStart" type="submit" role="button" value="Start Revigo" formmethod="post" />
 
         <div style="margin-top: 35px">
             Revigo uses these databases which are periodically updated:
@@ -292,7 +293,7 @@
                 $("#lstSpecies").iconselectmenu();
             });
 
-            $("#btnStart").button();
+            $("#cmdStart").button();
             $("#tooltip1").tooltip();
             $("#tooltip2").tooltip();
             $("#tooltip3").tooltip();
