@@ -365,3 +365,5 @@ FodyWeavers.xsd
 Messages.log
 appsettings.json
 appsettings.Development.json
+/appsettings.json
+/appsettings.Development.json
