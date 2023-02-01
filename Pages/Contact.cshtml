@@ -13,50 +13,50 @@
 		<script type="text/jscript" src="https://www.google.com/recaptcha/api.js" async defer></script>
 	}
 }
-<form id="form1" method="post">
+<form method="post">
+	@Html.AntiForgeryToken()
 	<div style="max-width:950px; margin-left: auto; margin-right: auto">
 		@if (!string.IsNullOrEmpty(Model.ErrorMessage))
 		{
 			<p style="color:red; font-size:large">@Model.ErrorMessage</p>
 		}
-
 		@if (!Model.SeccessfullySent)
 		{
 			<div class="contactForm-container contactForm-container-full">
 				<noscript class="contactForm-error-noscript">Please enable JavaScript in your browser to complete this form.</noscript>
 				<div class="contactForm-field-container">
 					<div class="contactForm-field">
-						<input id="txtName" name="txtName" type="text" class="contactForm-field-medium"/>
+						<input id="txtName" name="txtName" type="text" class="contactForm-field-medium" value="@Model.txtName"/>
 						<label for="txtName" class="contactForm-field-label">Your name <span class="contactForm-required-label">*</span></label>
 					</div>
 					<div class="contactForm-field">
-						<input id="txtEmail" name="txtEmail" type="text" class="contactForm-field-medium" />
+						<input id="txtEmail" name="txtEmail" type="text" class="contactForm-field-medium" value="@Model.txtEmail" />
 						<label for="txtEmail" class="contactForm-field-label">E-mail address <span class="contactForm-required-label">*</span></label>
 					</div>
 					<div class="contactForm-field">
-						<textarea id="txtMessage" name="txtMessage" type="text" class="contactForm-field-medium" rows="10"></textarea>
+						<textarea id="txtMessage" name="txtMessage" type="text" class="contactForm-field-medium" rows="10">@Model.txtMessage</textarea>
 						<label for="txtMessage" class="contactForm-field-label">Message <span class="contactForm-required-label">*</span></label>
 					</div>
 					<div class="contactForm-field">
 						<div class="contactForm-field-label">GDPR consent <span class="contactForm-required-label">*</span></div>
-						<input id="chkGDPR" name="chkGDPR" type="checkbox" class="contactForm-field-medium" />
+						<input id="chkGDPR" name="chkGDPR" type="checkbox" class="contactForm-field-medium"/>
 						<label for="chkGDPR">I agree that this web page can process and store my personal information to be able to answer my inquiry.</label>
 					</div>
 				</div>
-				<div class="contactForm-recaptcha-container">
-					<div class="g-recaptcha" data-sitekey='@Global.RecaptchaPublicKey'></div>
-				</div>
+				@if (!string.IsNullOrEmpty(Global.RecaptchaPublicKey))
+				{
+					<div class="contactForm-recaptcha-container">
+						<div class="g-recaptcha" data-sitekey='@Global.RecaptchaPublicKey'></div>
+					</div>
+				}
 				<div class="contactForm-submit-container">
 					<input id="cmdSend" name="cmdSend" type="submit" role="button" value="Send" />
 				</div>
 			</div>
 			<script type="text/javascript">
 				$("#cmdSend").button();
+				$("#txtName").focus();
 			</script>
-		}
-		else
-		{
-			<p style="color:red; font-size:large">Your message has been sent successfully.</p>
 		}
 	</div>
 </form>

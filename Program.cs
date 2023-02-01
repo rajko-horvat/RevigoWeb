@@ -25,7 +25,7 @@ internal class Program
 
 		app.UseRouting();
 
-		//app.UseAuthorization();
+		app.UseAuthorization();
 
 		app.MapRazorPages();
 

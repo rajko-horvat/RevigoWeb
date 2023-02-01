@@ -1,0 +1,21 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "DatabaseServer": { "ConnectionString": "" },
+  "AppSettings": {
+    "EmailServer": "",
+    "DeveloperEmailTo": "",
+    "DeveloperEmailCC": "",
+    "RecaptchaPublicKey": "",
+    "RecaptchaPrivateKey": "",
+    "PathToGO": ".\\wwwroot\\Databases\\GeneOntology.xml.gz",
+    "PathToSpeciesAnnotations": ".\\wwwroot\\Databases\\SpeciesAnnotations.xml.gz",
+    "JobTimeout": "00:20:00",
+    "SessionTimeout": "01:00:00"
+  }
+}

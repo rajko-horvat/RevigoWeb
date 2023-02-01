@@ -25,7 +25,7 @@ namespace IRB.RevigoWeb
         private static object oConnectionLock = new object();
         private static string sEmailServer = "";
         private static string sEmailTo = "";
-        private static string sEmailCc = "";
+        private static string sEmailCC = "";
         private static TimeSpan tsSessionTimeout = new TimeSpan(0, 30, 0);
         private static TimeSpan tsJobTimeout = new TimeSpan(0, 15, 0);
 		private static string sRecaptchaPublicKey = "";
@@ -97,7 +97,7 @@ namespace IRB.RevigoWeb
             {
                 sEmailServer = configuration.GetSection("AppSettings")["EmailServer"];
                 sEmailTo = configuration.GetSection("AppSettings")["DeveloperEmailTo"];
-                sEmailCc = configuration.GetSection("AppSettings")["DeveloperEmailCC"];
+                sEmailCC = configuration.GetSection("AppSettings")["DeveloperEmailCC"];
 
             }
             catch { }
@@ -282,6 +282,21 @@ namespace IRB.RevigoWeb
                 return tsJobTimeout;
             }
         }
+
+		public static string EmailServer
+		{ 
+			get{return sEmailServer; }
+		}
+
+		public static string EmailTo
+		{
+			get { return sEmailTo; }
+		}
+
+		public static string EmailCC
+		{
+			get { return sEmailCC; }
+		}
 
 		public static string RecaptchaPublicKey
 		{
@@ -652,8 +667,8 @@ namespace IRB.RevigoWeb
                 SmtpClient client = new SmtpClient(sEmailServer);
                 client.EnableSsl = false;
                 MailMessage message = new MailMessage(sEmailTo, sEmailTo, "Notice from Revigo", sMessage.ToString());
-                if (!string.IsNullOrEmpty(sEmailCc))
-                    message.CC.Add(sEmailCc);
+                if (!string.IsNullOrEmpty(sEmailCC))
+                    message.CC.Add(sEmailCC);
 
                 try
                 {
@@ -698,8 +713,8 @@ namespace IRB.RevigoWeb
                 SmtpClient client = new SmtpClient(sEmailServer);
                 client.EnableSsl = false;
                 MailMessage message = new MailMessage(sEmailTo, sEmailTo, "Notice from Revigo", sMessage.ToString());
-                if (!string.IsNullOrEmpty(sEmailCc))
-                    message.CC.Add(sEmailCc);
+                if (!string.IsNullOrEmpty(sEmailCC))
+                    message.CC.Add(sEmailCC);
                 MemoryStream oStream = new MemoryStream(Encoding.UTF8.GetBytes(worker.Data));
                 message.Attachments.Add(new Attachment(oStream, "dataset.txt", "text/plain;charset=UTF-8"));
 

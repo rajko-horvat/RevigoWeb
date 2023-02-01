@@ -36,7 +36,8 @@
     </style>
 }
 
-<form id="form1" method="post">
+<form method="post">
+	@Html.AntiForgeryToken()
     <div style="width:950px; margin-left: auto; margin-right: auto">
         <p>
             Welcome, Revigo can take long lists of Gene Ontology terms and summarize them by removing redundant GO terms.
