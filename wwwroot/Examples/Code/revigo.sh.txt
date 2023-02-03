@@ -4,15 +4,15 @@
 # revigo.sh example.csv
 
 # Submit job to Revigo
-jobid=$(curl "http://revigo.irb.hr/StartJob" -X POST --silent --data-urlencode "cutoff=0.7" --data-urlencode "valueType=pvalue" --data-urlencode "speciesTaxon=0" --data-urlencode "measure=SIMREL" --data-urlencode "goList@$1" --header "Content-Type: application/x-www-form-urlencoded" | jq '.jobid')
+jobid=$(curl "http://revigo.irb.hr/StartJob" -X GET --silent --data-urlencode "cutoff=0.7" --data-urlencode "valueType=pvalue" --data-urlencode "speciesTaxon=0" --data-urlencode "measure=SIMREL" --data-urlencode "goList@$1" --header "Content-Type: application/x-www-form-urlencoded" | jq '.jobid')
 
 # Check job status
 running=1
 while [ $running -ne 0 ]
 do
-    running=$(curl "http://revigo.irb.hr/QueryJob" -X POST --silent --data-urlencode "jobid=$jobid" --data-urlencode "type=jstatus" | jq '.running')
+    running=$(curl "http://revigo.irb.hr/QueryJob" -X GET --silent --data-urlencode "jobid=$jobid" --data-urlencode "type=jstatus" | jq '.running')
     sleep 1
 done
 
 # Fetch results
-curl "http://revigo.irb.hr/QueryJob" -X POST --silent --data-urlencode "jobid=$jobid" --data-urlencode "namespace=1" --data-urlencode "type=table"
+curl "http://revigo.irb.hr/QueryJob" -X GET --silent --data-urlencode "jobid=$jobid" --data-urlencode "namespace=1" --data-urlencode "type=table"

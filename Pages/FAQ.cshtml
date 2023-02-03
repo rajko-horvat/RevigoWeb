@@ -205,7 +205,12 @@
                 'QueryJob' method, the deprecated methods worked untill December 12 2022 when we made some changes to Revigo core and
                 divided the Table, 2D Scatterplot and 3D Scatterplot data into separate entities: 'table', 'scatterplot' and 'scatterplot3d' methods.
                 So, please, update your scripts accordingly.</p>
-            <p>The process of submitting jobs is divided into three stages:</p>
+			<p style="color:red;font-size:larger;">As of February 4 2023 the Revigo has changed proprietary ASP.NET platform to an Open Source 
+				ASP.NET Core platform. Some programming languages and interfaces may not work properly with redirects.
+				Every Url that ended with '.aspx' extension is now invoked without that extension. 
+				For example: '/StartJob.aspx' is now simply '/StartJob' without ending '.aspx'.
+			</p>
+					<p><b>Each query needs to be posted as a html form (&quot;application/x-www-form-urlencoded&quot;).</b> The process of submitting jobs is divided into three stages:</p>
             <h4>1) Submit the job to the server</h4>
             Submit the job at http://revigo.irb.hr/StartJob with the following parameters:<br />
             <ul>

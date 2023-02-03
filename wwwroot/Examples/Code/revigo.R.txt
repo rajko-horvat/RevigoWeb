@@ -18,7 +18,7 @@ if (length(args)>=2) {
 }
 
 # Submit job to Revigo
-httr::POST(
+httr::GET(
   url = "http://revigo.irb.hr/StartJob",
   body = list(
     cutoff = "0.7",
@@ -43,7 +43,7 @@ if(typeof(dat)!="list")
 # Check job status
 running <- "1"
 while (running != "0" ) {
-    httr::POST(
+    httr::GET(
       url = "http://revigo.irb.hr/QueryJob",
       query = list( jobid = jobid, type="jstatus" )
     ) -> res2
@@ -59,7 +59,7 @@ while (running != "0" ) {
 }
 
 # Fetch results
-httr::POST(
+httr::GET(
   url = "http://revigo.irb.hr/QueryJob",
   query = list(
     jobid = jobid, 
