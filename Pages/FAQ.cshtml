@@ -57,7 +57,7 @@
         <div><p>If the species you work on is not available in the list you can select (genetically speaking) its closest relative. 
             For example, for the chimpanzee, pig or other genetic relative, you can select human. The same applies to the plant family.
             For other cases the default value of the whole UniProt database is sufficient. You can request a new species to be added. Just send us a message via 
-            <asp:HyperLink ID="HyperLink2" runat="server" NavigateUrl="~/Contact.aspx">Contact form</asp:HyperLink>.</p>
+            <a href="@Url.Content("~/Contact")">Contact form</a>.</p>
         The list of currently supported species:<br />
         <table style="border: 1px solid black">
             <thead>
@@ -176,7 +176,7 @@
             <p>After you submit the job via this method depending on the autoStart variable the user will be presented with filled input page (false) or results page (true).</p>
             </div>
             <h3>The simple RESTful API method</h3>
-            <div>Post a form to the server at http://revigo.irb.hr/Revigo.aspx with the following parameters:<br />
+            <div>Post a form to the server at http://revigo.irb.hr/Revigo with the following parameters:<br />
             <ul>
                 <li>"goList" - Your data (this value is required)</li>
                 <li>"cutoff" - [ 0.4 - 0.9 ] (if the value is not provided 0.7 will be assumed)</li>
@@ -207,7 +207,7 @@
                 So, please, update your scripts accordingly.</p>
             <p>The process of submitting jobs is divided into three stages:</p>
             <h4>1) Submit the job to the server</h4>
-            Submit the job at http://revigo.irb.hr/StartJob.aspx with the following parameters:<br />
+            Submit the job at http://revigo.irb.hr/StartJob with the following parameters:<br />
             <ul>
                 <li>"goList" - Your data (this value is required)</li>
                 <li>"cutoff" - [ 0.4 - 0.9 ] (if the value is not provided 0.7 will be assumed)</li>
@@ -225,7 +225,7 @@
             </ul>
             <br />
             <h4>2) Wait for the job to complete</h4>
-            Query the job status at http://revigo.irb.hr/QueryJob.aspx?jobid=...&type=jstatus with the following parameters:<br />
+            Query the job status at http://revigo.irb.hr/QueryJob?jobid=...&type=jstatus with the following parameters:<br />
             <ul>
                 <li>"jobid" - Job ID that you collected from the previous step.</li>
                 <li>"type" - jstatus .</li>
@@ -239,7 +239,7 @@
             </ul>
             <br />
             <h4>3) Gather the results</h4>
-            Gather the job results at http://revigo.irb.hr/QueryJob.aspx?jobid=...&... with the following parameters:<br />
+            Gather the job results at http://revigo.irb.hr/QueryJob?jobid=...&... with the following parameters:<br />
             <ul>
                 <li>"jobid" - Job ID that you collected in the first step.</li>
                 <li>"namespace" - [1, 2, 3] The namespace for which you are collecting results. 1 represents BIOLOGICAL_PROCESS, 2 represents CELLULAR_COMPONENT, 3 represents MOLECULAR_FUNCTION.</li>

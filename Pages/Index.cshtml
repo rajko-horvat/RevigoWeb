@@ -46,7 +46,7 @@
         <p>
             Please enter a list of Gene Ontology IDs below, each on its own line. The GO IDs
             may be followed by a separator (space, tab) and value which describes the GO term in a way meaningful to you.
-            The value(s) must have a dot '.' for a decimal separator.
+            The value must have a dot '.' for a decimal separator.
             <img id="tooltip1" title="For instance, you may provide a p-value (statistical significance), a fold change, enrichment, or some directly measured quantity such as average signal intensity from microarrays, ion count from mass spec, or read count from RNA-seq. You may also provide more than one value per line, although only the first value will be used in GO term selection/clustering."
                  alt="For instance, you may provide a p-value (statistical significance), a fold change, enrichment, or some directly measured quantity such as average signal intensity from microarrays, ion count from mass spec, or read count from RNA-seq. You may also provide more than one value per line, although only the first value will be used in GO term selection/clustering."
                  src="@Url.Content("~/Images/dialog-information.png")" style="vertical-align:middle;" />
@@ -88,19 +88,23 @@
         {
             <p style="color:red; font-size:large">@Model.ErrorMessage</p>
         }
-        <textarea id="txtGOInput" name="txtGOInput" rows="20" cols="20" style="width:100%"></textarea>
+		<textarea id="txtGOInput" name="txtGOInput" rows="20" cols="20" style="width:100%">@Model.txtGOInput</textarea>
         <p/>
 
         <p>
             How large would you like the resulting list to be:
-            <input type="radio" id="chkSimilarity0_9" name="cutoff" value="0.9" />
+			<input type="radio" id="chkSimilarity0_9" name="chkCutOff" value="0.9" 
+				@((!string.IsNullOrEmpty(Model.chkCutOff) && Model.chkCutOff.Equals("0.9"))?"checked=\"\"":"") />
             <label for="chkSimilarity0_9">Large (0.9)</label>
-            <input type="radio" id="chkSimilarity0_7" name="cutoff" value="0.7" checked="checked" />
+			<input type="radio" id="chkSimilarity0_7" name="chkCutOff" value="0.7"
+				@((string.IsNullOrEmpty(Model.chkCutOff) || Model.chkCutOff.Equals("0.7"))?"checked=\"\"":"") />
             <label for="chkSimilarity0_7">Medium (0.7)</label>
-            <input type="radio" id="chkSimilarity0_5" name="cutoff" value="0.5" />
+			<input type="radio" id="chkSimilarity0_5" name="chkCutOff" value="0.5" 
+				@((!string.IsNullOrEmpty(Model.chkCutOff) && Model.chkCutOff.Equals("0.5"))?"checked=\"\"":"") />
             <label for="chkSimilarity0_5">Small (0.5)</label>
             <span id="tooltip2" title="Warning! This setting may remove some GO terms which are not redundant. Please consider a more conservative setting before using this one.">
-                <input type="radio" id="chkSimilarity0_4" name="cutoff" value="0.4" />
+				<input type="radio" id="chkSimilarity0_4" name="chkCutOff" value="0.4" 
+					@((!string.IsNullOrEmpty(Model.chkCutOff) && Model.chkCutOff.Equals("0.4"))?"checked=\"\"":"") />
                 <label for="chkSimilarity0_4">Tiny (0.4)</label>
                 <img src="@Url.Content("~/Images/dialog-warning.png")" alt="Warning" style="vertical-align:middle;" />
             </span>
@@ -109,21 +113,28 @@
         <p>
             If provided, the values associated with GO terms represent:
             <select id="lstValueType" name="lstValueType">
-                <option selected="selected" value="PValue">P value</option>
-                <option value="Higher">Higher value is better</option>
-                <option value="Lower">Lower value is better</option>
-                <option value="HigherAbsolute">Higher absolute value is better</option>
-                <option value="HigherAbsLog2">Higher absolute log2 value is better</option>
+				<option value="PValue" 
+					@((string.IsNullOrEmpty(Model.lstValueType) || Model.lstValueType.Equals("PValue"))?"selected=\"\"":"")>P value</option>
+                <option value="Higher"
+					@((!string.IsNullOrEmpty(Model.lstValueType) && Model.lstValueType.Equals("Higher"))?"selected=\"\"":"")>Higher value is better</option>
+				<option value="Lower"
+					@((!string.IsNullOrEmpty(Model.lstValueType) && Model.lstValueType.Equals("Lower"))?"selected=\"\"":"")>Lower value is better</option>
+				<option value="HigherAbsolute"
+					@((!string.IsNullOrEmpty(Model.lstValueType) && Model.lstValueType.Equals("HigherAbsolute"))?"selected=\"\"":"")>Higher absolute value is better</option>
+				<option value="HigherAbsLog2"
+					@((!string.IsNullOrEmpty(Model.lstValueType) && Model.lstValueType.Equals("HigherAbsLog2"))?"selected=\"\"":"")>Higher absolute log2 value is better</option>
             </select>
         </p>
 
         <h2>Advanced options:</h2>
 
         <p>
-            Would you like to remove obsolete GO terms: 
-            <input type="radio" id="lstRemoveObsolete0" name="removeObsolete" value="true" checked="checked" />
+            Would you like to remove obsolete GO terms:
+			<input type="radio" id="chkRemoveObsolete0" name="chkRemoveObsolete" value="true"
+				@((string.IsNullOrEmpty(Model.chkRemoveObsolete) || Model.chkRemoveObsolete.Equals("true"))?"checked=\"\"":"") />
             <label for="lstRemoveObsolete0">Yes (default)</label>
-            <input type="radio" id="lstRemoveObsolete1" name="removeObsolete" value="false" />
+			<input type="radio" id="chkRemoveObsolete1" name="chkRemoveObsolete" value="false" 
+				@((!string.IsNullOrEmpty(Model.chkRemoveObsolete) && Model.chkRemoveObsolete.Equals("false"))?"checked=\"\"":"") />
             <label for="lstRemoveObsolete1">No</label>
             <img id="tooltip5" src="@Url.Content("~/Images/dialog-information.png")" alt="Remove obsolete GO terms" title="When the GO term is marked as obsolete it indicates that the term has been deprecated and should not be used. A GO term is obsoleted when it is out of scope, misleadingly named or defined, or describes a concept that would be better represented in another way and needs to be removed from the published ontology. In these cases, the term and ID still persist in the ontology, but the term is tagged as obsolete, and all relationships to other terms are removed. A comment is added to the term detailing the reason for the obsoletion and replacement terms are suggested, if possible." style="vertical-align:middle;" />
         </p>
@@ -132,7 +143,7 @@
             <select id="lstSpecies" name="lstSpecies">
                 @{
                     // fill species list
-                    //sTemp = this.lstSpecies.SelectedValue;
+                    string sTemp = Model.lstSpecies;
 
                     if (Global.SpeciesAnnotations != null)
 			        {
@@ -142,21 +153,14 @@
 					        string sValue = annotations.TaxonID.ToString();
 					        if (annotations.TaxonID == 0)
 					        {
-                                <option value="@sValue" data-src="@Url.Content(string.Format("~/Images/Species/{0}.jpg", sValue))">@annotations.SpeciesName</option>
+                                <option value="@sValue" data-src="@Url.Content(string.Format("~/Images/Species/{0}.jpg", sValue))"
+									@((string.IsNullOrEmpty(sTemp) || sTemp.Equals(sValue))?"selected=\"\"":"")>@annotations.SpeciesName</option>
 					        }
 					        else
 					        {
-                                <option value="@sValue" data-src="@Url.Content(string.Format("~/Images/Species/{0}.jpg", sValue))">@string.Format("{0} ({1})", annotations.SpeciesName, sValue)</option>
+                                <option value="@sValue" data-src="@Url.Content(string.Format("~/Images/Species/{0}.jpg", sValue))"
+									@((!string.IsNullOrEmpty(sTemp) && sTemp.Equals(sValue))?"selected=\"\"":"")>@string.Format("{0} ({1})", annotations.SpeciesName, sValue)</option>
 					        }
-					        /*if (!string.IsNullOrEmpty(sTemp))
-					        {
-						        if (sTemp.Equals(sValue))
-							        this.lstSpecies.SelectedIndex = i;
-					        }
-					        else if (annotations.TaxonID == 0)
-					        {
-						        this.lstSpecies.SelectedIndex = i;
-					        }*/
 				        }
 			        }
 			        else
@@ -175,15 +179,22 @@
                 @{
                     // fill measure list
                     int iTemp = 0;
-                    //string sTemp = this.lstMeasures.SelectedValue;
+                    sTemp = Model.lstMeasures;
                     foreach (SemanticSimilarityScore value in SemanticSimilarityScore.Values)
                     {
                         string sValue = value.EnumValue.ToString();
-                        <option value="@sValue" data-src="@Url.Content(string.Format("~/Images/Species/{0}.jpg", sValue))">@value.ToString()</option>
-                        /*if (!string.IsNullOrEmpty(sTemp) && sTemp.Equals(sValue))
-                        {
-                            this.lstMeasures.SelectedIndex = iTemp;
-                        }*/
+						<option value="@sValue" 
+							@if(string.IsNullOrEmpty(sTemp))
+							{
+								if(iTemp == 0)
+								{
+									<text>selected=""</text>
+								}
+							}
+							else if(sTemp.Equals(sValue))
+							{
+								<text>selected=""</text>
+							}>@value.ToString()</option>
                         iTemp++;
                     }
                     /*if (string.IsNullOrEmpty(sTemp))

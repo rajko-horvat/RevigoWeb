@@ -21,12 +21,11 @@ internal class Program
 		{
 			app.UseExceptionHandler("/Error");
 		}
+
 		app.UseStaticFiles();
-
+		//app.UseCookiePolicy();
 		app.UseRouting();
-
-		app.UseAuthorization();
-
+		//app.UseAuthorization();
 		app.MapRazorPages();
 
 		// intialize allication global state

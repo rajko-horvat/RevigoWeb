@@ -12,7 +12,7 @@ userData = open(sys.argv[1],'r').read()
 
 # Submit job to Revigo
 payload = {'cutoff':'0.7', 'valueType':'pvalue', 'speciesTaxon':'0', 'measure':'SIMREL', 'goList':userData}
-r = requests.post("http://revigo.irb.hr/Revigo.aspx", data=payload)
+r = requests.post("http://revigo.irb.hr/Revigo", data=payload)
 
 # Write results to a file - if file name is not provided the default is result.csv
 with open(sys.argv[2] if len(sys.argv)>=3 else 'result.csv','w') as f:

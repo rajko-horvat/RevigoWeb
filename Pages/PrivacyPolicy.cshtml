@@ -17,7 +17,7 @@
 
     <p>This privacy policy applies to anyone who uses our Revigo webpage and its services.</p>
 
-    <p>Please carefully review this Privacy Policy and more generally our <asp:HyperLink ID="HyperLink1" runat="server" NavigateUrl="~/TermsOfUse.aspx">Terms of Use</asp:HyperLink> relating to our services. Your use of Revigo web site and its services signifies your consent to our Privacy Policy and our Terms of Use.</p>
+    <p>Please carefully review this Privacy Policy and more generally our <a href="@Url.Content("~/TermsOfUse")">Terms of Use</a> relating to our services. Your use of Revigo web site and its services signifies your consent to our Privacy Policy and our Terms of Use.</p>
 
     <h2>What data do we collect?</h2>
     <ul>
@@ -71,7 +71,7 @@
         <li>The right to data portability - You have the right to request that we transfer the data that we have collected to another organization, or directly to you, under certain conditions.</li>
     </ul>
 
-    <p>If you make a request, we have one month to respond to you. If you would like to exercise any of these rights, please <asp:HyperLink ID="HyperLink2" runat="server" NavigateUrl="~/Contact.aspx">Contact Us</asp:HyperLink>.</p>
+    <p>If you make a request, we have one month to respond to you. If you would like to exercise any of these rights, please <a href="@Url.Content("~/Contact")">Contact Us</a>.</p>
 
     <h2>What are cookies?</h2>
 
@@ -128,8 +128,8 @@
 
     <h2>How to contact us</h2>
 
-    <p>If you have any questions about our privacy policy, the data we hold on you or you would like to exercise one of your data protection rights, please do not hesitate to <asp:HyperLink 
-        HyperLink3" runat="server" NavigateUrl="~/Contact.aspx">Contact Us</asp:HyperLink>.</p>
+    <p>If you have any questions about our privacy policy, the data we hold on you or you would like to exercise one of your data protection rights, please do not hesitate to 
+		<a href="@Url.Content("~/Contact")">Contact Us</a>.</p>
 </div>
 @if (eGDPRType != GDPRTypeEnum.None)
 {

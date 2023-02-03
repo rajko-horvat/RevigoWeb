@@ -1,0 +1,102 @@
+﻿@page
+@using System.Data;
+@model IRB.RevigoWeb.Pages.RevigoModel
+@{
+}
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>Revigo RESTful results</title>
+</head>
+<body>
+	<div id="ErrorMessage" name="ErrorMessage">@((string.IsNullOrEmpty(Model.ErrorMessage))?"":Model.ErrorMessage)</div>
+	@if (Model.oWorker.HasBPVisualizer && Model.BPTable != null)
+	{
+		<table id="BiologicalProcess">
+			<tr>
+				@for (int i = 0; i < Model.BPTable.Columns.Count; i++)
+				{
+					DataColumn column = Model.BPTable.Columns[i];
+					if (!column.ColumnName.StartsWith("?"))
+					{
+						<th>@column.ColumnName</th>
+					}
+				}
+			</tr>
+			@for(int i=0;i<Model.BPTable.Rows.Count;i++)
+			{
+				DataRow row = Model.BPTable.Rows[i];
+				<tr>
+					<td>@row["Term ID"]</td>
+					<td>@row["Name"]</td>
+					<td>@Convert.ToDouble(row["Frequency"]).ToString("#####0.000", System.Globalization.CultureInfo.InvariantCulture)%</td>
+					<td>@Convert.ToDouble(row["Value"]).ToString("#####0.0000", System.Globalization.CultureInfo.InvariantCulture)</td>
+					<td>@Convert.ToDouble(row["Uniqueness"]).ToString("#####0.00", System.Globalization.CultureInfo.InvariantCulture)</td>
+					<td>@Convert.ToDouble(row["Dispensability"]).ToString("#####0.00", System.Globalization.CultureInfo.InvariantCulture)</td>
+					<td>@row["Eliminated"]</td>
+					<td>@row["Representative"]</td>
+				</tr>
+			}
+		</table>
+	}
+	@if (Model.oWorker.HasCCVisualizer && Model.CCTable != null)
+	{
+		<table id="CellularComponent">
+			<tr>
+				@for (int i = 0; i < Model.CCTable.Columns.Count; i++)
+				{
+					DataColumn column = Model.CCTable.Columns[i];
+					if (!column.ColumnName.StartsWith("?"))
+					{
+						<th>@column.ColumnName</th>
+					}
+				}
+			</tr>
+			@for(int i=0;i<Model.CCTable.Rows.Count;i++)
+			{
+				DataRow row = Model.CCTable.Rows[i];
+				<tr>
+					<td>@row["Term ID"]</td>
+					<td>@row["Name"]</td>
+					<td>@Convert.ToDouble(row["Frequency"]).ToString("#####0.000", System.Globalization.CultureInfo.InvariantCulture)%</td>
+					<td>@Convert.ToDouble(row["Value"]).ToString("#####0.0000", System.Globalization.CultureInfo.InvariantCulture)</td>
+					<td>@Convert.ToDouble(row["Uniqueness"]).ToString("#####0.00", System.Globalization.CultureInfo.InvariantCulture)</td>
+					<td>@Convert.ToDouble(row["Dispensability"]).ToString("#####0.00", System.Globalization.CultureInfo.InvariantCulture)</td>
+					<td>@row["Eliminated"]</td>
+					<td>@row["Representative"]</td>
+				</tr>
+			}
+		</table>
+	}
+	@if (Model.oWorker.HasMFVisualizer && Model.MFTable != null)
+	{
+		<table id="MolecularFunction">
+			<tr>
+				@for (int i = 0; i < Model.MFTable.Columns.Count; i++)
+				{
+					DataColumn column = Model.MFTable.Columns[i];
+					if (!column.ColumnName.StartsWith("?"))
+					{
+						<th>@column.ColumnName</th>
+					}
+				}
+			</tr>
+			@for(int i=0;i<Model.MFTable.Rows.Count;i++)
+			{
+				DataRow row = Model.MFTable.Rows[i];
+				<tr>
+					<td>@row["Term ID"]</td>
+					<td>@row["Name"]</td>
+					<td>@Convert.ToDouble(row["Frequency"]).ToString("#####0.000", System.Globalization.CultureInfo.InvariantCulture)%</td>
+					<td>@Convert.ToDouble(row["Value"]).ToString("#####0.0000", System.Globalization.CultureInfo.InvariantCulture)</td>
+					<td>@Convert.ToDouble(row["Uniqueness"]).ToString("#####0.00", System.Globalization.CultureInfo.InvariantCulture)</td>
+					<td>@Convert.ToDouble(row["Dispensability"]).ToString("#####0.00", System.Globalization.CultureInfo.InvariantCulture)</td>
+					<td>@row["Eliminated"]</td>
+					<td>@row["Representative"]</td>
+				</tr>
+			}
+		</table>
+	}
+</body>
+</html>

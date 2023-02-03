@@ -29,7 +29,7 @@
                 }
                 CookieOptions cookieOptions = new CookieOptions();
                 cookieOptions.Expires = DateTime.Now.AddDays(30);
-                cookieOptions.SameSite = SameSiteMode.Strict;
+                cookieOptions.SameSite = SameSiteMode.Lax;
                 context.Response.Cookies.Append("RevigoCookie", cookieValue, cookieOptions);
             }
 

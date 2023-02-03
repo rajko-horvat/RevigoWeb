@@ -12,19 +12,19 @@ userData = open(sys.argv[1],'r').read()
 
 # Submit job to Revigo
 payload = {'cutoff':'0.7', 'valueType':'pvalue', 'speciesTaxon':'0', 'measure':'SIMREL', 'goList':userData}
-r = requests.post("http://revigo.irb.hr/StartJob.aspx", data=payload)
+r = requests.post("http://revigo.irb.hr/StartJob", data=payload)
 
 jobid = r.json()['jobid']
 
 # Check job status
 running = 1
 while (running!=0):
-    r = requests.post("http://revigo.irb.hr/QueryJob.aspx", data={'jobid':jobid,'type':'jstatus'})
+    r = requests.post("http://revigo.irb.hr/QueryJob", data={'jobid':jobid,'type':'jstatus'})
     running = r.json()['running']
     time.sleep(1)
 
 # Fetch results
-r = requests.post("http://revigo.irb.hr/QueryJob.aspx", data={'jobid':jobid, 'namespace':'1', 'type':'table'})
+r = requests.post("http://revigo.irb.hr/QueryJob", data={'jobid':jobid, 'namespace':'1', 'type':'table'})
 
 # Write results to a file - if file name is not provided the default is result.csv
 with open(sys.argv[2] if len(sys.argv)>=3 else 'result.csv','w') as f:

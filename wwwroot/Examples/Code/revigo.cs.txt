@@ -25,7 +25,7 @@ namespace RevigoIntegrationTest
 			dataReader.Close();
 
 			// First stage - Submit the job to the server
-			HttpWebRequest oRequest = (HttpWebRequest)WebRequest.Create(sBaseURL + "/StartJob.aspx");
+			HttpWebRequest oRequest = (HttpWebRequest)WebRequest.Create(sBaseURL + "/StartJob");
 			oRequest.ContentType = "application/x-www-form-urlencoded";
 			oRequest.Method = "POST";
 
@@ -55,7 +55,7 @@ namespace RevigoIntegrationTest
 			while (bWorking)
 			{
 				// request Job status from the server
-				oRequest = (HttpWebRequest)WebRequest.Create(sBaseURL + "/QueryJob.aspx");
+				oRequest = (HttpWebRequest)WebRequest.Create(sBaseURL + "/QueryJob");
 				oRequest.ContentType = "application/x-www-form-urlencoded";
 				oRequest.Method = "POST";
 
@@ -83,7 +83,7 @@ namespace RevigoIntegrationTest
 
 			// Third stage - Gather the results
 			// request result table for the BIOLOGICAL_PROCESS namespace
-			oRequest = (HttpWebRequest)WebRequest.Create(sBaseURL + "/QueryJob.aspx");
+			oRequest = (HttpWebRequest)WebRequest.Create(sBaseURL + "/QueryJob");
 			oRequest.ContentType = "application/x-www-form-urlencoded";
 			oRequest.Method = "POST";
 

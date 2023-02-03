@@ -13,7 +13,7 @@ namespace IRB.RevigoWeb.Pages
     public class ContactModel : PageModel
     {
 		private static HttpClient oHttpClient = new HttpClient();
-		public string ErrorMessage = "";
+		public string ErrorMessage = null;
 		public bool SeccessfullySent = false;
 
 		[BindProperty]

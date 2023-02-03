@@ -19,7 +19,7 @@ if (length(args)>=2) {
 
 # Submit job to Revigo
 httr::POST(
-  url = "http://revigo.irb.hr/Revigo.aspx",
+  url = "http://revigo.irb.hr/Revigo",
   body = list(
     cutoff = "0.7",
     valueType = "pvalue",

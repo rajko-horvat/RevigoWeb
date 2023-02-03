@@ -25,7 +25,7 @@ namespace RevigoIntegrationTest
 			dataReader.Close();
 
 			// First stage - Submit the job to the server
-			HttpWebRequest oRequest = (HttpWebRequest)WebRequest.Create(sBaseURL + "/Revigo.aspx");
+			HttpWebRequest oRequest = (HttpWebRequest)WebRequest.Create(sBaseURL + "/Revigo");
 			oRequest.ContentType = "application/x-www-form-urlencoded";
 			oRequest.Method = "POST";
 

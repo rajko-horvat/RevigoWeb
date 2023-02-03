@@ -23,13 +23,13 @@ namespace IRB.RevigoWeb
         private static BDictionary<int, RevigoJob> oJobs = new BDictionary<int, RevigoJob>();
         private static object oJobLock = new object();
         private static object oConnectionLock = new object();
-        private static string sEmailServer = "";
-        private static string sEmailTo = "";
-        private static string sEmailCC = "";
+        private static string sEmailServer = null;
+        private static string sEmailTo = null;
+        private static string sEmailCC = null;
         private static TimeSpan tsSessionTimeout = new TimeSpan(0, 30, 0);
         private static TimeSpan tsJobTimeout = new TimeSpan(0, 15, 0);
-		private static string sRecaptchaPublicKey = "";
-		private static string sRecaptchaPrivateKey = "";
+		private static string sRecaptchaPublicKey = null;
+		private static string sRecaptchaPrivateKey = null;
 
 		public static void ApplicationStart(IConfiguration configuration)
         {

@@ -1,9 +1,8 @@
 ﻿@using IRB.RevigoWeb;
 @{
     bool bRequireGRPR = WebUtilities.TypeConverter.ToBoolean(ViewData["RequireGDPR"]);
-    GDPRTypeEnum eGDPRType = GDPR.GetGDPRState(Context);
+	GDPRTypeEnum eGDPRType = GDPR.GetGDPRState(Context);
 }
-
 <!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -108,84 +107,104 @@
                             <a style="margin-right: 30px;" href="@Url.Content("~/FAQ")">FAQ</a>
                             <a style="margin-right: 30px;" href="@Url.Content("~/TermsOfUse")">Terms Of Use</a>
                             <a style="margin-right: 30px;" href="@Url.Content("~/PrivacyPolicy")">Privacy Policy</a>
-                            <a style="margin-right: 30px;" href="@Url.Content("~/Contact.aspx")">Contact Us</a>
+                            <a style="margin-right: 30px;" href="@Url.Content("~/Contact")">Contact Us</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    @if (bRequireGRPR && eGDPRType == GDPRTypeEnum.None)
-    {
-        <div ID="pnlGDPR" title="Revigo values your privacy">
-            <p style="font-size: 10pt;"><strong>Why are you seeing this</strong></p>
-            <p>
-                Revigo needs your consent for data-processing purposes. These purposes include to store and/or
-                access information on a device, like cookie management, to process your anonymous data by our service,
-                and to process personal data such as standard information sent by a device and other unique
-                identifiers for content and content measurement, audience insights and development.
-            </p>
-            <p>
-                You may consent to the processing described above or access more detailed information on our
-                <asp:HyperLink ID="HyperLink8" TabIndex="-1" runat="server" NavigateUrl="~/PrivacyPolicy.aspx">Privacy Policy</asp:HyperLink>
-                and <asp:HyperLink ID="HyperLink9" TabIndex="-1" runat="server" NavigateUrl="~/TermsOfUse.aspx">Terms Of Use</asp:HyperLink> pages.
-            </p>
-            <p>
-                The given consent will apply to this site only. Please take into consideration that some of
-                your personal data processing rely on legitimate interest which does not require your
-                consent but you have a right to object to this.
-            </p>
-            <p>
-                You can choose only basic functionality, or you can allow us to collect additional data about
-                your visit.
-            </p>
-        </div>
-        <script type="text/javascript">
-            $('#pnlGDPR').dialog({
-                dialogClass: "no-close",
-                resizable: false,
-                draggable: false,
-                height: "auto",
-                width: 600,
-                modal: true,
-                create: function (event, ui)
-                {
-                    $(event.target).parent().css('position', 'fixed');
-                },
-                buttons: [
-                    {
-                        text: "Accept only basic cookies",
-                        tabindex: -2,
-                        style: "float:left;",
-                        click: function ()
-                        {
-                            $(this).dialog("close");
-                            // document.getElementById('<% =this.btnAcceptBasic.ClientID %>').click();
-                            document.cookie = "RevigoCookie=basic; path=/";
-                            location.reload();
-                        }
-                    },
-                    {
-                        text: "Accept all cookies",
-                        tabindex: -1,
-                        style: "float:right;",
-                        click: function ()
-                        {
-                            $(this).dialog("close");
-                            // document.getElementById('<% =this.btnAcceptAll.ClientID %>').click();
-                            document.cookie = "RevigoCookie=full; path=/";
-                            location.reload();
-                        }
-                    }
-                ]
-            });
-            window.addEventListener('resize', function ()
-            {
-                $('#pnlGDPR').dialog("option", "position", { my: "center", at: "center", of: window });
-            });
-        </script>
-    }
-    <script type="text/javascript">
+    <div ID="pnlGDPR" title="Revigo values your privacy" style="display:none;">
+        <p style="font-size: 10pt;"><strong>Why are you seeing this</strong></p>
+        <p>
+            Revigo needs your consent for data-processing purposes. These purposes include to store and/or
+            access information on a device, like cookie management, to process your anonymous data by our service,
+            and to process personal data such as standard information sent by a device and other unique
+            identifiers for content and content measurement, audience insights and development.
+        </p>
+        <p>
+            You may consent to the processing described above or access more detailed information on our
+            <a href="@Url.Content("~/PrivacyPolicy")">Privacy Policy</a>
+            and <a href="@Url.Content("~/TermsOfUse")">Terms Of Use</a> pages.
+        </p>
+        <p>
+            The given consent will apply to this site only. Please take into consideration that some of
+            your personal data processing rely on legitimate interest which does not require your
+            consent but you have a right to object to this.
+        </p>
+        <p>
+            You can choose only basic functionality, or you can allow us to collect additional data about
+            your visit.
+        </p>
+    </div>
+	@if (bRequireGRPR)
+	{
+		<script type="text/javascript">
+			$.get('@Url.Content("~/GetCookieInfo")')
+				.done(function (status)
+				{
+					if (status == undefined || (status.toString().toLowerCase() != "full" && status.toString().toLowerCase() != "basic"))
+					{
+						ShowGDPR();
+					}
+				})
+				.fail(function ()
+				{
+					ShowGDPR();
+				});
+
+			function ShowGDPR()
+			{
+				$('#pnlGDPR').css("display","");
+				$('#pnlGDPR').dialog({
+					dialogClass: "no-close",
+					resizable: false,
+					draggable: false,
+					height: "auto",
+					width: 600,
+					modal: true,
+					create: function (event, ui)
+					{
+						$(event.target).parent().css('position', 'fixed');
+					},
+					buttons: [
+					{
+						text: "Accept only basic cookies",
+						tabindex: -2,
+						style: "float:left;",
+						click: function ()
+						{
+							$(this).dialog("close");
+							document.cookie = "RevigoCookie=basic; path=/";
+							@if (ViewData["GDPRNoReload"] == null || !WebUtilities.TypeConverter.ToBoolean(ViewData["GDPRNoReload"]))
+							{
+								<text>location.reload(); </text>
+							}
+						}
+					},
+					{
+						text: "Accept all cookies",
+						tabindex: -1,
+						style: "float:right;",
+						click: function ()
+						{
+							$(this).dialog("close");
+							document.cookie = "RevigoCookie=full; path=/";
+							@if (ViewData["GDPRNoReload"] == null || !WebUtilities.TypeConverter.ToBoolean(ViewData["GDPRNoReload"]))
+							{
+								<text>location.reload(); </text>
+							}
+						}
+					}]
+				});
+				window.addEventListener('resize', function ()
+				{
+					$('#pnlGDPR').dialog("option", "position", { my: "center", at: "center", of: window });
+				});
+			}
+		</script>
+	}
+	<script type="text/javascript">
         $("#IRBLogo").tooltip();
     </script>
     @RenderSection("Scripts", required: false)

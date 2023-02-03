@@ -128,7 +128,7 @@ public class DBConnection : IDisposable
 				this.bReconnect = false;
 				this.oConnection = new MySqlConnection(this.sConnection);
 				this.oConnection.Open();
-				this.sError = "";
+				this.sError = null;
 			}
 			catch (Exception ex)
 			{
@@ -155,7 +155,7 @@ public class DBConnection : IDisposable
 			catch
 			{ }
 			this.oConnection = null;
-			this.sError = "";
+			this.sError = null;
 			this.bReconnect = true;
 			this.dtReconnect = DateTime.Now;
 		}

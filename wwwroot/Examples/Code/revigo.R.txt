@@ -19,7 +19,7 @@ if (length(args)>=2) {
 
 # Submit job to Revigo
 httr::POST(
-  url = "http://revigo.irb.hr/StartJob.aspx",
+  url = "http://revigo.irb.hr/StartJob",
   body = list(
     cutoff = "0.7",
     valueType = "pvalue",
@@ -44,7 +44,7 @@ if(typeof(dat)!="list")
 running <- "1"
 while (running != "0" ) {
     httr::POST(
-      url = "http://revigo.irb.hr/QueryJob.aspx",
+      url = "http://revigo.irb.hr/QueryJob",
       query = list( jobid = jobid, type="jstatus" )
     ) -> res2
     dat2 <- httr::content(res2, encoding = "UTF-8")
@@ -60,7 +60,7 @@ while (running != "0" ) {
 
 # Fetch results
 httr::POST(
-  url = "http://revigo.irb.hr/QueryJob.aspx",
+  url = "http://revigo.irb.hr/QueryJob",
   query = list(
     jobid = jobid, 
     namespace = "1",
