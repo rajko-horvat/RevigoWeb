@@ -7,7 +7,7 @@ using IRB.Collections.Generic;
 using IRB.Revigo.Core;
 using IRB.Revigo.Databases;
 using IRB.Revigo.Worker;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 
 namespace IRB.RevigoWeb
 {

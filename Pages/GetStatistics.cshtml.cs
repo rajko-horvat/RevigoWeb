@@ -1,13 +1,11 @@
 using IRB.Revigo.Core;
 using IRB.Revigo.Databases;
 using IRB.Revigo.Worker;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 using System.Data;
 using System.Globalization;
-using System.Net.Mime;
 using System.Reflection;
 using System.Text;
 

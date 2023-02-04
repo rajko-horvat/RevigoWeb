@@ -16,13 +16,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\source\repos\MySqlConnector-2.1\MySqlConnector\MySqlConnector.csproj" />
     <ProjectReference Include="..\RevigoCore\RevigoCore.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="MySql.Data">
-      <HintPath>..\..\Libraries\MySql.Data.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>
