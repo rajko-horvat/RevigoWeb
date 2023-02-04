@@ -9,7 +9,8 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace IRB.RevigoWeb.Pages
 {
-    public class StartJobModel : PageModel
+	[IgnoreAntiforgeryToken]
+	public class StartJobModel : PageModel
     {
         public ContentResult OnGet()
         {

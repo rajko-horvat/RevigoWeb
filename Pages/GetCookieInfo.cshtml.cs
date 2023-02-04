@@ -4,7 +4,7 @@ using System.Text;
 
 namespace IRB.RevigoWeb.Pages
 {
-    public class GetCookieInfoModel : PageModel
+	public class GetCookieInfoModel : PageModel
     {
         public ContentResult OnGet()
         {

@@ -22,6 +22,8 @@ internal class Program
 			app.UseExceptionHandler("/Error");
 		}
 
+		app.UseStatusCodePagesWithReExecute("/ErrorCode", "?StatusCode={0}");
+
 		app.UseStaticFiles();
 		//app.UseCookiePolicy();
 		app.UseRouting();

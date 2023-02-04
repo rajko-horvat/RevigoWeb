@@ -24,12 +24,14 @@ namespace IRB.RevigoWeb
         private static object oJobLock = new object();
         private static object oConnectionLock = new object();
         private static string sEmailServer = null;
-        private static string sEmailTo = null;
+		private static string sEmailFrom = null;
+		private static string sEmailTo = null;
         private static string sEmailCC = null;
         private static TimeSpan tsSessionTimeout = new TimeSpan(0, 30, 0);
         private static TimeSpan tsJobTimeout = new TimeSpan(0, 15, 0);
 		private static string sRecaptchaPublicKey = null;
 		private static string sRecaptchaPrivateKey = null;
+		private static string sStatisticsKey = null;
 
 		public static void ApplicationStart(IConfiguration configuration)
         {
@@ -96,8 +98,9 @@ namespace IRB.RevigoWeb
             try
             {
                 sEmailServer = configuration.GetSection("AppSettings")["EmailServer"];
-                sEmailTo = configuration.GetSection("AppSettings")["DeveloperEmailTo"];
-                sEmailCC = configuration.GetSection("AppSettings")["DeveloperEmailCC"];
+				sEmailTo = configuration.GetSection("AppSettings")["EmailFrom"];
+				sEmailTo = configuration.GetSection("AppSettings")["EmailTo"];
+                sEmailCC = configuration.GetSection("AppSettings")["EmailCC"];
 
             }
             catch { }
@@ -113,6 +116,13 @@ namespace IRB.RevigoWeb
 			{
 				sRecaptchaPublicKey = configuration.GetSection("AppSettings")["RecaptchaPublicKey"];
 				sRecaptchaPrivateKey = configuration.GetSection("AppSettings")["RecaptchaPrivateKey"];
+
+			}
+			catch { }
+
+			try
+			{
+				sStatisticsKey = configuration.GetSection("AppSettings")["StatisticsKey"];
 
 			}
 			catch { }
@@ -154,34 +164,6 @@ namespace IRB.RevigoWeb
                 WriteToSystemLog(typeof(Global).Name, "Error loading Species Annotations: " + ex.Message);
             }
         }
-
-        /*void Application_Error(object sender, EventArgs e)
-        {
-            Exception ex = Server.GetLastError();
-
-            if (ex is HttpRequestValidationException)
-            {
-                Server.ClearError();
-                Response.Redirect("/Errors/RequestValidationError.html", false);
-            }
-            else if (ex.Message.StartsWith("The file ") && ex.Message.EndsWith(" does not exist."))
-            {
-                Server.ClearError();
-                Response.Redirect("/Errors/Error404.aspx", false);
-            }
-            else
-            {
-                if (!ex.Message.Contains("Request timed out") &&
-                    !ex.Message.Contains("invalid webresource request") &&
-                    !ex.Message.Contains("potentially dangerous"))
-                {
-                    SendEmailNotification(ex);
-                }
-
-                Server.ClearError();
-                Response.Redirect("/Errors/GenericErrorPage.html", false);
-            }
-        }*/
 
         /*protected void Session_End(object sender, EventArgs e)
         {
@@ -288,6 +270,11 @@ namespace IRB.RevigoWeb
 			get{return sEmailServer; }
 		}
 
+		public static string EmailFrom
+		{
+			get { return sEmailFrom; }
+		}
+
 		public static string EmailTo
 		{
 			get { return sEmailTo; }
@@ -306,6 +293,11 @@ namespace IRB.RevigoWeb
 		public static string RecaptchaSecretKey
 		{
 			get { return sRecaptchaPrivateKey; }
+		}
+
+		public static string StatisticsKey
+		{
+			get { return sStatisticsKey; }
 		}
 
 		public static int CreateNewJob(RequestSourceEnum requestSource, string data, double cutoff, 
@@ -513,7 +505,7 @@ namespace IRB.RevigoWeb
                 // for debugging
                 if (worker.HasDeveloperWarnings || worker.HasDeveloperErrors)
                 {
-                    SendEmailNotification(worker);
+                    WebUtilities.Email.SendEmailNotification(worker);
                 }
             }
         }
@@ -645,198 +637,6 @@ namespace IRB.RevigoWeb
                     oConnection.Close();
                 }
             }
-        }
-
-        private static void SendEmailNotification(Exception ex)
-        {
-            if (!string.IsNullOrEmpty(sEmailServer) && !string.IsNullOrEmpty(sEmailTo))
-            {
-                StringBuilder sMessage = new StringBuilder();
-                sMessage.AppendFormat("Error occured in the Revigo application ({0}).", ex.GetType().FullName);
-                sMessage.AppendLine();
-                sMessage.AppendLine();
-                sMessage.AppendLine();
-
-                sMessage.AppendFormat("Error message: {0}", ex.Message);
-                sMessage.AppendLine();
-                sMessage.AppendLine();
-
-                sMessage.AppendFormat("Stack trace: {0}", ex.StackTrace);
-                sMessage.AppendLine();
-
-                SmtpClient client = new SmtpClient(sEmailServer);
-                client.EnableSsl = false;
-                MailMessage message = new MailMessage(sEmailTo, sEmailTo, "Notice from Revigo", sMessage.ToString());
-                if (!string.IsNullOrEmpty(sEmailCC))
-                    message.CC.Add(sEmailCC);
-
-                try
-                {
-                    client.Send(message);
-                }
-                catch (Exception ex1)
-                {
-                    Global.WriteToSystemLog(typeof(Global).FullName, ex1.Message);
-                }
-            }
-            else
-            {
-                Global.WriteToSystemLog(typeof(Global).FullName, string.Format("Error occured in the Revigo application. Error message: '{0}'. Stack trace: '{1}'.",
-                    ex.Message, ex.StackTrace));
-            }
-        }
-
-        private static void SendEmailNotification(RevigoWorker worker)
-        {
-            if (!string.IsNullOrEmpty(sEmailServer) && !string.IsNullOrEmpty(sEmailTo))
-            {
-                StringBuilder sMessage = new StringBuilder();
-                sMessage.AppendLine("Warning(s) and/or error(s) occured during processing of user data on http://revigo.irb.hr.");
-                sMessage.AppendLine("The user data set has been attached.");
-                sMessage.AppendLine();
-                sMessage.AppendFormat("Parameters: CutOff = {0}, ValueType = {1}, SpeciesTaxon = {2}, Measure = {3}, RemoveObsolete = {4}",
-                    worker.CutOff, worker.ValueType, worker.Annotations.TaxonID, worker.Measure, worker.RemoveObsolete);
-                sMessage.AppendLine();
-                if (worker.HasDeveloperWarnings)
-                {
-                    sMessage.AppendLine();
-                    sMessage.AppendFormat("Warnings: {0}", JoinStringArray(worker.DeveloperWarnings));
-                    sMessage.AppendLine();
-                }
-                if (worker.HasDeveloperErrors)
-                {
-                    sMessage.AppendLine();
-                    sMessage.AppendFormat("Errors: {0}", JoinStringArray(worker.DeveloperErrors));
-                    sMessage.AppendLine();
-                }
-
-                SmtpClient client = new SmtpClient(sEmailServer);
-                client.EnableSsl = false;
-                MailMessage message = new MailMessage(sEmailTo, sEmailTo, "Notice from Revigo", sMessage.ToString());
-                if (!string.IsNullOrEmpty(sEmailCC))
-                    message.CC.Add(sEmailCC);
-                MemoryStream oStream = new MemoryStream(Encoding.UTF8.GetBytes(worker.Data));
-                message.Attachments.Add(new Attachment(oStream, "dataset.txt", "text/plain;charset=UTF-8"));
-
-                try
-                {
-                    client.Send(message);
-                }
-                catch (Exception ex)
-                {
-                    Global.WriteToSystemLog(typeof(Global).FullName, ex.Message);
-                }
-
-                oStream.Close();
-            }
-            else
-            {
-                Global.WriteToSystemLog(typeof(Global).FullName, string.Format("Warning(s) and/or error(s) occured during processing of user data on http://revigo.irb.hr; " +
-                    "CutOff = {0}, ValueType = {1}, SpeciesTaxon = {2}, Measure = {3}; RemoveObsolete = {4}; Warnings: {5}; Errors: {6}; Dataset: {7}",
-                    worker.CutOff, worker.ValueType, worker.Annotations.TaxonID, worker.Measure, worker.RemoveObsolete,
-                    JoinStringArray(worker.DeveloperWarnings), JoinStringArray(worker.DeveloperErrors), worker.Data));
-            }
-        }
-
-        public static string DoubleToJSON(double value)
-        {
-            if (double.IsNaN(value))
-            {
-                return "\"NaN\"";
-            }
-
-            return value.ToString(CultureInfo.InvariantCulture);
-        }
-
-        public static string StringToJSON(string text)
-        {
-            StringBuilder result = new StringBuilder();
-
-            for (int i = 0; i < text.Length; i++)
-            {
-                char ch = text[i];
-                if (ch < '\x20')
-                {
-                    switch (ch)
-                    {
-                        case '\b':
-                            result.Append("\\b");
-                            break;
-                        case '\f':
-                            result.Append("\\f");
-                            break;
-                        case '\n':
-                            result.Append("\\n");
-                            break;
-                        case '\r':
-                            result.Append("\\r");
-                            break;
-                        case '\t':
-                            result.Append("\\t");
-                            break;
-                        default:
-                            result.AppendFormat("\\u{0:x4}", (int)ch);
-                            break;
-                    }
-                }
-                else if (ch > '\xff')
-                {
-                    result.AppendFormat("\\u{0:x4}", (int)ch);
-                }
-                else
-                {
-                    switch (ch)
-                    {
-                        case '\"':
-                            result.Append("\\\"");
-                            break;
-                        case '/':
-                            result.Append("\\/");
-                            break;
-                        case '\\':
-                            result.Append("\\\\");
-                            break;
-                        default:
-                            result.Append(ch);
-                            break;
-                    }
-                }
-            }
-
-            return result.ToString();
-        }
-
-        public static string JoinStringArray(List<string> lines)
-        {
-            StringBuilder sbTemp = new StringBuilder();
-
-            for (int i = 0; i < lines.Count; i++)
-            {
-                sbTemp.AppendLine(lines[i]);
-            }
-
-            return sbTemp.ToString();
-        }
-
-        public static string StringArrayToJSON(List<string> lines)
-        {
-            StringBuilder sbTemp = new StringBuilder();
-
-            sbTemp.Append("[");
-            for (int i = 0; i < lines.Count; i++)
-            {
-                if (i > 0)
-                    sbTemp.Append(",");
-                sbTemp.AppendFormat("\"{0}\"", Global.StringToJSON(lines[i]));
-            }
-            sbTemp.Append("]");
-
-            return sbTemp.ToString();
-        }
-
-        public static string HtmlEncode(string text)
-        {
-            return WebUtility.HtmlEncode(text.Replace('\"', '\'').Replace("\n", "\\n").Replace("\r", "\\r"));
         }
 
         public static void WriteToSystemLog(string source, string message)

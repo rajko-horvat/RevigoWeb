@@ -209,69 +209,13 @@ namespace IRB.RevigoWeb.Pages
 				}
 				else
 				{
-					ShowError(Global.JoinStringArray(oWorker.UserErrors));
+					ShowError(WebUtilities.TypeConverter.JoinStringArray(oWorker.UserErrors));
 				}
 
 				if (oWorker.HasDeveloperWarnings || oWorker.HasDeveloperErrors)
 				{
-					SendEmailNotification();
+					WebUtilities.Email.SendEmailNotification(oWorker);
 				}
-			}
-		}
-
-		private void SendEmailNotification()
-		{
-			string sEmailServer = Global.EmailServer;
-			string sEmailTo = Global.EmailTo;
-			string sEmailCc = Global.EmailCC;
-
-			if (!string.IsNullOrEmpty(sEmailServer) && !string.IsNullOrEmpty(sEmailTo))
-			{
-				StringBuilder sMessage = new StringBuilder();
-				sMessage.AppendLine("Warning(s) and/or error(s) occured during processing of user data on http://revigo.irb.hr.");
-				sMessage.AppendLine("The user data set has been attached.");
-				sMessage.AppendLine();
-				sMessage.AppendFormat("Parameters: CutOff = {0}, ValueType = {1}, SpeciesTaxon = {2}, Measure = {3}, RemoveObsolete = {4}",
-					oWorker.CutOff, oWorker.ValueType, oWorker.Annotations.TaxonID, oWorker.Measure, oWorker.RemoveObsolete);
-				sMessage.AppendLine();
-				if (oWorker.HasDeveloperWarnings)
-				{
-					sMessage.AppendLine();
-					sMessage.AppendFormat("Warnings: {0}", Global.JoinStringArray(oWorker.DeveloperWarnings));
-					sMessage.AppendLine();
-				}
-				if (oWorker.HasDeveloperErrors)
-				{
-					sMessage.AppendLine();
-					sMessage.AppendFormat("Errors: {0}", Global.JoinStringArray(oWorker.DeveloperErrors));
-					sMessage.AppendLine();
-				}
-
-				SmtpClient client = new SmtpClient(sEmailServer);
-				client.EnableSsl = false;
-				MailMessage message = new MailMessage(sEmailTo, sEmailTo, "Notice from Revigo", sMessage.ToString());
-				if (!string.IsNullOrEmpty(sEmailCc))
-					message.CC.Add(sEmailCc);
-				MemoryStream oStream = new MemoryStream(Encoding.UTF8.GetBytes(oWorker.Data));
-				message.Attachments.Add(new Attachment(oStream, "dataset.txt", "text/plain;charset=UTF-8"));
-
-				try
-				{
-					client.Send(message);
-				}
-				catch (Exception ex)
-				{
-					Global.WriteToSystemLog(this.GetType().FullName, ex.Message);
-				}
-
-				oStream.Close();
-			}
-			else
-			{
-				Global.WriteToSystemLog(this.GetType().FullName, string.Format("Warning(s) and/or error(s) occured during processing of user data on http://revigo.irb.hr; " +
-					"CutOff = {0}, ValueType = {1}, SpeciesTaxon = {2}, Measure = {3}; Warnings: {4}; Errors: {5}; Dataset: {6}",
-					oWorker.CutOff, oWorker.ValueType, oWorker.Annotations.TaxonID, oWorker.Measure,
-					Global.JoinStringArray(oWorker.DeveloperWarnings), Global.JoinStringArray(oWorker.DeveloperErrors), oWorker.Data));
 			}
 		}
 

@@ -9,7 +9,8 @@ using System.Text;
 
 namespace IRB.RevigoWeb.Pages
 {
-    public class QueryJobModel : PageModel
+	[IgnoreAntiforgeryToken]
+	public class QueryJobModel : PageModel
     {
 		private int iJobID = -1;
 		private RevigoWorker oWorker = null;
@@ -85,7 +86,7 @@ namespace IRB.RevigoWeb.Pages
 						writer.AppendFormat("{{\"running\":{0},\"progress\":{1},\"message\":\"{2}\"}}",
 							oWorker.IsRunning || !oWorker.IsFinished ? 1 : 0,
 							oWorker.Progress.ToString("##0.00", CultureInfo.InvariantCulture),
-							string.IsNullOrEmpty(oWorker.ProgressText) ? "" : Global.StringToJSON(oWorker.ProgressText));
+							string.IsNullOrEmpty(oWorker.ProgressText) ? "" : WebUtilities.TypeConverter.StringToJSON(oWorker.ProgressText));
 						#endregion
 						return Content(writer.ToString(), "application/json", Encoding.UTF8);
 
@@ -101,8 +102,8 @@ namespace IRB.RevigoWeb.Pages
 							"\"HasCC\":{5},\"CCCount\":{6}," +
 							"\"HasMF\":{7},\"MFCount\":{8}," +
 							"\"HasClouds\":{9}}}",
-							oWorker.HasUserWarnings ? Global.StringArrayToJSON(oWorker.UserWarnings) : "[]",
-							oWorker.HasUserErrors ? Global.StringArrayToJSON(oWorker.UserErrors) : "[]",
+							oWorker.HasUserWarnings ? WebUtilities.TypeConverter.StringArrayToJSON(oWorker.UserWarnings) : "[]",
+							oWorker.HasUserErrors ? WebUtilities.TypeConverter.StringArrayToJSON(oWorker.UserErrors) : "[]",
 							(long)(oWorker.ExecutingTime.TotalSeconds),
 							oWorker.HasBPVisualizer ? 1 : 0, oWorker.HasBPVisualizer ? oWorker.BPVisualizer.Terms.Length : 0,
 							oWorker.HasCCVisualizer ? 1 : 0, oWorker.HasCCVisualizer ? oWorker.CCVisualizer.Terms.Length : 0,
@@ -203,15 +204,15 @@ namespace IRB.RevigoWeb.Pages
 
 							writer.Append("{");
 							writer.AppendFormat("\"ID\":{0},", oTerm.ID);
-							writer.AppendFormat("\"Term ID\":\"{0}\",", Global.StringToJSON(oTerm.FormattedID));
-							writer.AppendFormat("\"Name\":\"{0}\",", Global.StringToJSON(oTerm.Name));
-							writer.AppendFormat("\"Description\":\"{0}\",", Global.StringToJSON(oTerm.Description));
+							writer.AppendFormat("\"Term ID\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(oTerm.FormattedID));
+							writer.AppendFormat("\"Name\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(oTerm.Name));
+							writer.AppendFormat("\"Description\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(oTerm.Description));
 							writer.AppendFormat("\"Pin Term\":{0},", oProperties.Pinned ? 0 : (oProperties.Representative <= 0 ? -1 : oTerm.ID));
-							writer.AppendFormat("\"Value\":{0},", Global.DoubleToJSON(oProperties.Value));
-							writer.AppendFormat("\"LogSize\":{0},", Global.DoubleToJSON(oProperties.LogAnnotationSize));
-							writer.AppendFormat("\"Frequency\":{0},", Global.DoubleToJSON(oProperties.AnnotationFrequency * 100.0));
-							writer.AppendFormat("\"Uniqueness\":{0},", Global.DoubleToJSON(oProperties.Uniqueness));
-							writer.AppendFormat("\"Dispensability\":{0},", Global.DoubleToJSON(oProperties.Dispensability));
+							writer.AppendFormat("\"Value\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.Value));
+							writer.AppendFormat("\"LogSize\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.LogAnnotationSize));
+							writer.AppendFormat("\"Frequency\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.AnnotationFrequency * 100.0));
+							writer.AppendFormat("\"Uniqueness\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.Uniqueness));
+							writer.AppendFormat("\"Dispensability\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.Dispensability));
 							writer.AppendFormat("\"Representative\":{0}", oProperties.Representative);
 							writer.Append("}");
 						}
@@ -304,21 +305,21 @@ namespace IRB.RevigoWeb.Pages
 
 							writer.Append("{");
 							writer.AppendFormat("\"ID\":{0},", oTerm.ID);
-							writer.AppendFormat("\"Term ID\":\"{0}\",", Global.StringToJSON(oTerm.FormattedID));
-							writer.AppendFormat("\"Name\":\"{0}\",", Global.StringToJSON(oTerm.Name));
-							writer.AppendFormat("\"Description\":\"{0}\",", Global.StringToJSON(oTerm.Description));
+							writer.AppendFormat("\"Term ID\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(oTerm.FormattedID));
+							writer.AppendFormat("\"Name\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(oTerm.Name));
+							writer.AppendFormat("\"Description\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(oTerm.Description));
 							writer.AppendFormat("\"Pin Term\":{0},", oProperties.Pinned ? 0 : (oProperties.Representative <= 0 ? -1 : oTerm.ID));
-							writer.AppendFormat("\"Value\":{0},", Global.DoubleToJSON(oProperties.Value));
-							writer.AppendFormat("\"LogSize\":{0},", Global.DoubleToJSON(oProperties.LogAnnotationSize));
-							writer.AppendFormat("\"Frequency\":{0},", Global.DoubleToJSON(oProperties.AnnotationFrequency * 100.0));
-							writer.AppendFormat("\"Uniqueness\":{0},", Global.DoubleToJSON(oProperties.Uniqueness));
-							writer.AppendFormat("\"Dispensability\":{0},", Global.DoubleToJSON(oProperties.Dispensability));
+							writer.AppendFormat("\"Value\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.Value));
+							writer.AppendFormat("\"LogSize\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.LogAnnotationSize));
+							writer.AppendFormat("\"Frequency\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.AnnotationFrequency * 100.0));
+							writer.AppendFormat("\"Uniqueness\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.Uniqueness));
+							writer.AppendFormat("\"Dispensability\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.Dispensability));
 
 							// 2D
 							writer.AppendFormat("\"PC_0\":{0},", (oProperties.PC.Count > 0) ?
-								Global.DoubleToJSON(oProperties.PC[0]) : "0");
+								WebUtilities.TypeConverter.DoubleToJSON(oProperties.PC[0]) : "0");
 							writer.AppendFormat("\"PC_1\":{0},", (oProperties.PC.Count > 1) ?
-								Global.DoubleToJSON(oProperties.PC[1]) : "0");
+								WebUtilities.TypeConverter.DoubleToJSON(oProperties.PC[1]) : "0");
 							writer.AppendFormat("\"Selected\":{0},", (oProperties.Dispensability <= 0.05) ? 1 : 0);
 
 							writer.AppendFormat("\"Representative\":{0}", oProperties.Representative);
@@ -566,23 +567,23 @@ namespace IRB.RevigoWeb.Pages
 
 							writer.Append("{");
 							writer.AppendFormat("\"ID\":{0},", oTerm.ID);
-							writer.AppendFormat("\"Term ID\":\"{0}\",", Global.StringToJSON(oTerm.FormattedID));
-							writer.AppendFormat("\"Name\":\"{0}\",", Global.StringToJSON(oTerm.Name));
-							writer.AppendFormat("\"Description\":\"{0}\",", Global.StringToJSON(oTerm.Description));
+							writer.AppendFormat("\"Term ID\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(oTerm.FormattedID));
+							writer.AppendFormat("\"Name\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(oTerm.Name));
+							writer.AppendFormat("\"Description\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(oTerm.Description));
 							writer.AppendFormat("\"Pin Term\":{0},", oProperties.Pinned ? 0 : (oProperties.Representative <= 0 ? -1 : oTerm.ID));
-							writer.AppendFormat("\"Value\":{0},", Global.DoubleToJSON(oProperties.Value));
-							writer.AppendFormat("\"LogSize\":{0},", Global.DoubleToJSON(oProperties.LogAnnotationSize));
-							writer.AppendFormat("\"Frequency\":{0},", Global.DoubleToJSON(oProperties.AnnotationFrequency * 100.0));
-							writer.AppendFormat("\"Uniqueness\":{0},", Global.DoubleToJSON(oProperties.Uniqueness));
-							writer.AppendFormat("\"Dispensability\":{0},", Global.DoubleToJSON(oProperties.Dispensability));
+							writer.AppendFormat("\"Value\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.Value));
+							writer.AppendFormat("\"LogSize\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.LogAnnotationSize));
+							writer.AppendFormat("\"Frequency\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.AnnotationFrequency * 100.0));
+							writer.AppendFormat("\"Uniqueness\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.Uniqueness));
+							writer.AppendFormat("\"Dispensability\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.Dispensability));
 
 							// 3D
 							writer.AppendFormat("\"PC3_0\":{0},", (oProperties.PC3.Count > 0) ?
-								Global.DoubleToJSON(oProperties.PC3[0]) : "0");
+								WebUtilities.TypeConverter.DoubleToJSON(oProperties.PC3[0]) : "0");
 							writer.AppendFormat("\"PC3_1\":{0},", (oProperties.PC3.Count > 1) ?
-								Global.DoubleToJSON(oProperties.PC3[1]) : "0");
+								WebUtilities.TypeConverter.DoubleToJSON(oProperties.PC3[1]) : "0");
 							writer.AppendFormat("\"PC3_2\":{0},", (oProperties.PC3.Count > 2) ?
-								Global.DoubleToJSON(oProperties.PC3[2]) : "0");
+								WebUtilities.TypeConverter.DoubleToJSON(oProperties.PC3[2]) : "0");
 
 							writer.AppendFormat("\"Representative\":{0}", oProperties.Representative);
 							writer.Append("}");
@@ -683,20 +684,20 @@ namespace IRB.RevigoWeb.Pages
 								}
 								iCurrentRepresentativeID = curTerm.ID;
 								writer.AppendFormat("{{\"id\":\"{0}\",\"name\":\"{1}\",\"children\":[",
-									curTerm.FormattedID.Replace(":", ""), Global.StringToJSON(curTerm.Name));
+									curTerm.FormattedID.Replace(":", ""), WebUtilities.TypeConverter.StringToJSON(curTerm.Name));
 								bFirst = true;
 							}
 							if (!bFirst)
 								writer.Append(", ");
 							bFirst = false;
 							writer.AppendFormat("{{\"id\":\"{0}\",\"name\":\"{1}\",",
-								curTerm.FormattedID.Replace(":", ""), Global.StringToJSON(curTerm.Name));
+								curTerm.FormattedID.Replace(":", ""), WebUtilities.TypeConverter.StringToJSON(curTerm.Name));
 							writer.AppendFormat("\"value\":{0},",
 								oWorker.TermsWithValuesCount == 0 ?
-								Global.DoubleToJSON(oProperties.Uniqueness) :
-								Global.DoubleToJSON(oProperties.TransformedValue)); // was * 100.0 intially
+								WebUtilities.TypeConverter.DoubleToJSON(oProperties.Uniqueness) :
+								WebUtilities.TypeConverter.DoubleToJSON(oProperties.TransformedValue)); // was * 100.0 intially
 							writer.AppendFormat("\"logSize\":{0}}}",
-								Global.DoubleToJSON(oProperties.LogAnnotationSize));
+								WebUtilities.TypeConverter.DoubleToJSON(oProperties.LogAnnotationSize));
 						}
 						if (iCurrentRepresentativeID >= 0)
 						{
@@ -963,9 +964,9 @@ namespace IRB.RevigoWeb.Pages
 
 							writer.AppendFormat("{{\"data\":{{\"id\":\"GO:{0:d7}\",\"label\":\"{1}\",\"value\":{2},\"color\":\"{3}\",\"log_size\":{4}}}}}",
 								graph.nodes[i].ID,
-								Global.StringToJSON(graph.nodes[i].properties.GetValueByKey("description").ToString().Replace("'", "")),
-								Global.DoubleToJSON(Math.Round((double)graph.nodes[i].properties.GetValueByKey("value"), 3)),
-								Global.StringToJSON(graph.nodes[i].properties.GetValueByKey("color").ToString()),
+								WebUtilities.TypeConverter.StringToJSON(graph.nodes[i].properties.GetValueByKey("description").ToString().Replace("'", "")),
+								WebUtilities.TypeConverter.DoubleToJSON(Math.Round((double)graph.nodes[i].properties.GetValueByKey("value"), 3)),
+								WebUtilities.TypeConverter.StringToJSON(graph.nodes[i].properties.GetValueByKey("color").ToString()),
 								10 + (int)Math.Floor(((double)graph.nodes[i].properties.GetValueByKey("LogSize") - minSize) * sizeMult));
 						}
 						for (int i = 0; i < graph.edges.Count; ++i)
@@ -1096,7 +1097,7 @@ namespace IRB.RevigoWeb.Pages
 										writer.Append(",");
 
 									int size = (int)Math.Ceiling(MIN_UNIT_SIZE + Math.Round(((dFrequency - minFreq) * RANGE_UNIT_SIZE) / range));
-									writer.AppendFormat("{{\"Word\":\"{0}\",\"Size\":{1}}}", Global.StringToJSON(sWord), size);
+									writer.AppendFormat("{{\"Word\":\"{0}\",\"Size\":{1}}}", WebUtilities.TypeConverter.StringToJSON(sWord), size);
 									bFirst = false;
 								}
 							}
@@ -1149,7 +1150,7 @@ namespace IRB.RevigoWeb.Pages
 										writer.Append(",");
 
 									int size = (int)Math.Ceiling(MIN_UNIT_SIZE + Math.Round(((dFrequency - minFreq) * RANGE_UNIT_SIZE) / range));
-									writer.AppendFormat("{{\"Word\":\"{0}\",\"Size\":{1}}}", Global.StringToJSON(sWord), size);
+									writer.AppendFormat("{{\"Word\":\"{0}\",\"Size\":{1}}}", WebUtilities.TypeConverter.StringToJSON(sWord), size);
 									bFirst = false;
 								}
 							}
@@ -1167,7 +1168,7 @@ namespace IRB.RevigoWeb.Pages
 			catch (ThreadAbortException) { throw; /* propagate */ }
 			catch (Exception ex)
 			{
-				SendEmailNotification(oWorker, ex, sType);
+				WebUtilities.Email.SendEmailNotification(oWorker, ex, sType);
 				return ReturnError("Undefined error occured while querying the job.");
 			}
 		}
@@ -1230,61 +1231,6 @@ namespace IRB.RevigoWeb.Pages
 			return null;
 		}
 
-		private void SendEmailNotification(RevigoWorker worker, Exception ex, string qType)
-		{
-			string sEmailServer = Global.EmailServer;
-			string sEmailTo = Global.EmailTo;
-			string sEmailCc = Global.EmailCC;
-
-			if (!string.IsNullOrEmpty(sEmailServer) && !string.IsNullOrEmpty(sEmailTo))
-			{
-				StringBuilder sMessage = new StringBuilder();
-				sMessage.AppendLine("Error occured during exporting of the job results on http://revigo.irb.hr.");
-				sMessage.AppendLine("The user data set has been attached.");
-				sMessage.AppendLine();
-				sMessage.AppendFormat("Query type: '{0}'", Convert.ToString(qType));
-				sMessage.AppendLine();
-				sMessage.AppendLine();
-				sMessage.AppendFormat("Parameters: CutOff = {0}, ValueType = {1}, SpeciesTaxon = {2}, Measure = {3}, RemoveObsolete = {4}",
-					worker.CutOff, worker.ValueType, worker.Annotations.TaxonID, worker.Measure, worker.RemoveObsolete);
-				sMessage.AppendLine();
-				sMessage.AppendLine();
-
-				sMessage.AppendFormat("Error message: {0}", ex.Message);
-				sMessage.AppendLine();
-				sMessage.AppendLine();
-
-				sMessage.AppendFormat("Stack trace: {0}", ex.StackTrace);
-				sMessage.AppendLine();
-
-				SmtpClient client = new SmtpClient(sEmailServer);
-				client.EnableSsl = false;
-				MailMessage message = new MailMessage(sEmailTo, sEmailTo, "Notice from Revigo", sMessage.ToString());
-				if (!string.IsNullOrEmpty(sEmailCc))
-					message.CC.Add(sEmailCc);
-				MemoryStream oStream = new MemoryStream(Encoding.UTF8.GetBytes(worker.Data));
-				message.Attachments.Add(new Attachment(oStream, "dataset.txt", "text/plain;charset=UTF-8"));
-
-				try
-				{
-					client.Send(message);
-				}
-				catch (Exception ex1)
-				{
-					Global.WriteToSystemLog(this.GetType().FullName, ex1.Message);
-				}
-
-				oStream.Close();
-			}
-			else
-			{
-				Global.WriteToSystemLog(this.GetType().FullName, string.Format("Error occured during exporting of the job results on http://revigo.irb.hr; " +
-					"CutOff = {0}, ValueType = {1}, SpeciesTaxon = {2}, Measure = {3}; Warnings: {4}; Errors: {5}; Dataset: {6}",
-					worker.CutOff, worker.ValueType, worker.Annotations.TaxonID, worker.Measure,
-					Global.JoinStringArray(worker.DeveloperWarnings), Global.JoinStringArray(worker.DeveloperErrors), worker.Data));
-			}
-		}
-
 		private ContentResult ReturnError(string message)
 		{
 			StringBuilder writer = new StringBuilder();
@@ -1296,7 +1242,7 @@ namespace IRB.RevigoWeb.Pages
 				if (message.StartsWith("["))
 					writer.AppendFormat("\"error\":{0}", message);
 				else
-					writer.AppendFormat("\"error\":[\"{0}\"]", Global.StringToJSON(message));
+					writer.AppendFormat("\"error\":[\"{0}\"]", WebUtilities.TypeConverter.StringToJSON(message));
 				writer.Append("}");
 			}
 			else
