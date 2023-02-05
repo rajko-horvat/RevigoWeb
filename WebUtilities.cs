@@ -12,7 +12,7 @@ namespace IRB.RevigoWeb
 		{
 			public static void SendEmailNotification(Exception ex)
 			{
-				if (!string.IsNullOrEmpty(Global.EmailServer) && !string.IsNullOrEmpty(Global.EmailTo))
+				if (!string.IsNullOrEmpty(Global.EmailServer) && !string.IsNullOrEmpty(Global.EmailFrom) && !string.IsNullOrEmpty(Global.EmailTo))
 				{
 					StringBuilder sMessage = new StringBuilder();
 					sMessage.AppendFormat("Error occured in the Revigo application ({0}).", ex.GetType().FullName);
@@ -51,7 +51,7 @@ namespace IRB.RevigoWeb
 
 			public static void SendEmailNotification(RevigoWorker worker)
 			{
-				if (!string.IsNullOrEmpty(Global.EmailServer) && !string.IsNullOrEmpty(Global.EmailTo))
+				if (!string.IsNullOrEmpty(Global.EmailServer) && !string.IsNullOrEmpty(Global.EmailFrom) && !string.IsNullOrEmpty(Global.EmailTo))
 				{
 					StringBuilder sMessage = new StringBuilder();
 					sMessage.AppendLine("Warning(s) and/or error(s) occured during processing of user data on http://revigo.irb.hr.");
@@ -107,7 +107,7 @@ namespace IRB.RevigoWeb
 				string sEmailTo = Global.EmailTo;
 				string sEmailCc = Global.EmailCC;
 
-				if (!string.IsNullOrEmpty(sEmailServer) && !string.IsNullOrEmpty(sEmailTo))
+				if (!string.IsNullOrEmpty(sEmailServer) && !string.IsNullOrEmpty(Global.EmailFrom) && !string.IsNullOrEmpty(sEmailTo))
 				{
 					StringBuilder sMessage = new StringBuilder();
 					sMessage.AppendLine("Error occured during exporting of the job results on http://revigo.irb.hr.");

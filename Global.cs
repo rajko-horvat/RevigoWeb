@@ -120,7 +120,7 @@ namespace IRB.RevigoWeb
 			try
 			{
 				sEmailServer = configuration.GetSection("AppSettings")["EmailServer"];
-				sEmailTo = configuration.GetSection("AppSettings")["EmailFrom"];
+				sEmailFrom = configuration.GetSection("AppSettings")["EmailFrom"];
 				sEmailTo = configuration.GetSection("AppSettings")["EmailTo"];
 				sEmailCC = configuration.GetSection("AppSettings")["EmailCC"];
 

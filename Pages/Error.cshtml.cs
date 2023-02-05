@@ -9,8 +9,19 @@ namespace IRB.RevigoWeb.Pages
 	public class ErrorModel : PageModel
     {
 		public string ErrorMessage { get; set; }
+
         public void OnGet()
         {
+			HandleError();
+		}
+
+		public void OnPost()
+		{
+			HandleError();
+		}
+
+		private void HandleError()
+		{
 			var exceptionHandler = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
 			this.ErrorMessage = "Oops, something went wrong.";
 
@@ -26,5 +37,5 @@ namespace IRB.RevigoWeb.Pages
 				}
 			}
 		}
-    }
+	}
 }

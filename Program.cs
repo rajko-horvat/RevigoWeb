@@ -21,6 +21,7 @@ internal class Program
 		{
 			app.UseExceptionHandler("/Error");
 		}
+		//app.UseExceptionHandler("/Error");
 
 		app.UseStatusCodePagesWithReExecute("/ErrorCode", "?StatusCode={0}");
 
