@@ -16,12 +16,16 @@ internal class Program
         options.Rules.Add(new RewriteAspxUrl());
         app.UseRewriter(options);
 
-        // Configure the HTTP request pipeline.
-        if (!app.Environment.IsDevelopment())
+		// Configure the HTTP request pipeline.
+		if (!app.Environment.IsDevelopment())
 		{
 			app.UseExceptionHandler("/Error");
 		}
-		//app.UseExceptionHandler("/Error");
+		else
+		{
+			//app.UseExceptionHandler("/Error");
+			app.UseDeveloperExceptionPage();
+		}
 
 		app.UseStatusCodePagesWithReExecute("/ErrorCode", "?StatusCode={0}");
 
