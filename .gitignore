@@ -399,3 +399,5 @@ appsettings.Development.json
 /wwwroot/js/jquery-ui-1.13.1/jquery-ui.structure.css
 /wwwroot/js/jquery-ui-1.13.1/jquery-ui.min.css
 /wwwroot/js/jquery-ui-1.13.1/jquery-ui.min.js
+/wwwroot/js/jquery-ui-1.13.1/jquery-ui.structure.min.css
+/wwwroot/js/jquery-ui-1.13.1/jquery-ui.theme.min.css
