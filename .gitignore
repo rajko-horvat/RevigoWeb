@@ -395,3 +395,7 @@ appsettings.Development.json
 /wwwroot/js/jquery-ui-1.13.1/images/ui-bg_glass_65_ffffff_1x400.png
 /wwwroot/js/jquery-ui-1.13.1/images/ui-bg_glass_55_fbf9ee_1x400.png
 /wwwroot/js/jquery-ui-1.13.1/external/jquery/jquery.js
+/wwwroot/js/jquery-ui-1.13.1/jquery-ui.theme.css
+/wwwroot/js/jquery-ui-1.13.1/jquery-ui.structure.css
+/wwwroot/js/jquery-ui-1.13.1/jquery-ui.min.css
+/wwwroot/js/jquery-ui-1.13.1/jquery-ui.min.js
