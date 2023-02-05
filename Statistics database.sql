@@ -1,10 +1,3 @@
--- --------------------------------------------------------
--- Host:                         mysql.zel.lo
--- Server version:               10.1.48-MariaDB-0+deb9u2 - Debian 9.13
--- Server OS:                    debian-linux-gnu
--- HeidiSQL Version:             12.3.0.6589
--- --------------------------------------------------------
-
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
