@@ -376,7 +376,8 @@ appsettings.Development.json
 /wwwroot/js/lc_switch-2.0.3.js
 /wwwroot/js/x3dom-1.8.3.css
 /wwwroot/js/x3dom-full-1.8.3.min.js
-/wwwroot/js/jquery-ui-1.13.1/
+
+wwwroot/js/jquery-ui-1.13.1/
 /wwwroot/js/jquery-ui-1.13.1/package.json
 /wwwroot/js/jquery-ui-1.13.1/LICENSE.txt
 /wwwroot/js/jquery-ui-1.13.1/jquery-ui.js
