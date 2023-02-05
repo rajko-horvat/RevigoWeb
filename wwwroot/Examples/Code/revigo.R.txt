@@ -18,7 +18,7 @@ if (length(args)>=2) {
 }
 
 # Submit job to Revigo
-httr::GET(
+httr::POST(
   url = "http://revigo.irb.hr/StartJob",
   body = list(
     cutoff = "0.7",

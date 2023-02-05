@@ -10,10 +10,10 @@
     <title>@ViewData["Title"]</title>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script type="text/javascript" src="@Url.Content("~/js/jquery-3.6.0.min.js")"></script>
-    <link href="@Url.Content("~/js/jquery-ui-1.13.1/jquery-ui.css")" rel="stylesheet" />
-    <script type="text/javascript" src="@Url.Content("~/js/jquery-ui-1.13.1/jquery-ui.js")"></script>
-    <link href="@Url.Content("~/css/styles.css")" rel="stylesheet" type="text/css" />
+	<link type="text/css" href="@Url.Content(Global.PathToCSS)" rel="stylesheet" />
+	<link type="text/css" href="@Url.Content(Global.PathToJQueryUICSS)" rel="stylesheet" />
+    <script type="text/javascript" src="@Url.Content(Global.PathToJQuery)"></script>
+    <script type="text/javascript" src="@Url.Content(Global.PathToJQueryUI)"></script>
     @RenderSection("HeaderScripts", required: false)
     <style type="text/css">
         .no-close .ui-dialog-titlebar-close {

@@ -11,126 +11,172 @@ using MySqlConnector;
 
 namespace IRB.RevigoWeb
 {
-    public class Global
-    {
-        private static bool bDisposing = false;
-        private static string sConnectionString = null;
-        private static long lMinStatTicks = 0;
-        private static long lMaxStatTicks = 0;
-        private static GeneOntology oOntology = null;
-        private static StreamWriter oLog = null;
-        private static SpeciesAnnotationsList oSpeciesAnnotations = null;
-        private static BDictionary<int, RevigoJob> oJobs = new BDictionary<int, RevigoJob>();
-        private static object oJobLock = new object();
-        private static object oConnectionLock = new object();
-        private static string sEmailServer = null;
+	public class Global
+	{
+		private static bool bDisposing = false;
+		private static string sConnectionString = null;
+		private static long lMinStatTicks = 0;
+		private static long lMaxStatTicks = 0;
+		private static GeneOntology oOntology = null;
+		private static StreamWriter oLog = null;
+		private static SpeciesAnnotationsList oSpeciesAnnotations = null;
+		private static BDictionary<int, RevigoJob> oJobs = new BDictionary<int, RevigoJob>();
+		private static object oJobLock = new object();
+		private static object oConnectionLock = new object();
+		private static string sEmailServer = null;
 		private static string sEmailFrom = null;
 		private static string sEmailTo = null;
-        private static string sEmailCC = null;
-        private static TimeSpan tsSessionTimeout = new TimeSpan(0, 30, 0);
-        private static TimeSpan tsJobTimeout = new TimeSpan(0, 15, 0);
+		private static string sEmailCC = null;
+		private static TimeSpan tsSessionTimeout = new TimeSpan(0, 30, 0);
+		private static TimeSpan tsJobTimeout = new TimeSpan(0, 15, 0);
 		private static string sRecaptchaPublicKey = null;
 		private static string sRecaptchaPrivateKey = null;
 		private static string sStatisticsKey = null;
 
+		// JS control paths
+		private static string sPathToJQuery = null;
+		private static string sPathToJQueryUI = null;
+		private static string sPathToJQueryUICSS = null;
+		private static string sPathToD3 = null;
+		private static string sPathToX3Dom = null;
+		private static string sPathToX3DomCSS = null;
+		private static string sPathToLCSwitch = null;
+		private static string sPathToCytoscape = null;
+		// Revigo JS control paths
+		private static string sPathToCSS = null;
+		private static string sPathToBubbleChart = null;
+		private static string sPathToBubbleChartCSS = null;
+		private static string sPathToTable = null;
+		private static string sPathToTableCSS = null;
+		private static string sPathToTreeMap = null;
+		private static string sPathToX3DScatterplot = null;
+		private static string sPathToCloudCSS = null;
+
+		// Path to AddThis control
+		private static string sPathToAddThis = null;
+
 		public static void ApplicationStart(IConfiguration configuration)
-        {
-            // initialize log file
-            try
-            {
-                oLog = new StreamWriter(new FileStream("Messages.log", FileMode.Append, FileAccess.Write, FileShare.ReadWrite), Encoding.UTF8);
-            }
-            catch
-            {
-                oLog = null;
-            }
-
-            try
-            {
-                sConnectionString = configuration.GetSection("DatabaseServer")["ConnectionString"];
-            }
-            catch { }
-
-            DBConnection oConnection = new DBConnection(sConnectionString);
-            if (oConnection != null && oConnection.IsConnected)
-            {
-                // try to reopen connection if its closed
-                // try 10 times to open connection
-                for (int i = 0; i < 10; i++)
-                {
-                    if (oConnection.IsConnected)
-                    {
-                        // cache minTicks and maxTicks
-                        try
-                        {
-                            MySqlDataAdapter oAdapter = new MySqlDataAdapter("select Min(DateTimeTicks), Max(DateTimeTicks) from stats_h;", oConnection.Connection);
-                            DataTable dtData = new DataTable();
-                            oAdapter.Fill(dtData);
-                            oAdapter.Dispose();
-
-                            if (dtData.Rows.Count > 0 && dtData.Columns.Count >= 2)
-                            {
-                                lMinStatTicks = WebUtilities.TypeConverter.ToInt64(dtData.Rows[0][0]);
-                                lMaxStatTicks = WebUtilities.TypeConverter.ToInt64(dtData.Rows[0][1]);
-                            }
-                            break;
-                        }
-                        catch (Exception ex)
-                        {
-                            WriteToSystemLog(typeof(Global).Name, "Error establishing connection: " + ex.Message);
-                            lMinStatTicks = 0;
-                            lMaxStatTicks = 0;
-                        }
-                    }
-
-                    Thread.Sleep(100);
-
-                    try
-                    {
-                        oConnection.Close();
-                        oConnection.Open();
-                    }
-                    catch
-                    { }
-                }
-            }
-
-            try
-            {
-                sEmailServer = configuration.GetSection("AppSettings")["EmailServer"];
-				sEmailTo = configuration.GetSection("AppSettings")["EmailFrom"];
-				sEmailTo = configuration.GetSection("AppSettings")["EmailTo"];
-                sEmailCC = configuration.GetSection("AppSettings")["EmailCC"];
-
-            }
-            catch { }
-
-            try
-            {
-                tsJobTimeout = TimeSpan.Parse(configuration.GetSection("AppSettings")["JobTimeout"]);
-                tsSessionTimeout = TimeSpan.Parse(configuration.GetSection("AppSettings")["SessionTimeout"]);
-            }
-            catch { }
+		{
+			// initialize log file
+			try
+			{
+				oLog = new StreamWriter(new FileStream("Messages.log", FileMode.Append, FileAccess.Write, FileShare.ReadWrite), Encoding.UTF8);
+			}
+			catch
+			{
+				oLog = null;
+			}
 
 			try
 			{
-				sRecaptchaPublicKey = configuration.GetSection("AppSettings")["RecaptchaPublicKey"];
-				sRecaptchaPrivateKey = configuration.GetSection("AppSettings")["RecaptchaPrivateKey"];
+				sConnectionString = configuration.GetSection("DatabaseServer")["ConnectionString"];
+			}
+			catch { }
+
+			DBConnection oConnection = new DBConnection(sConnectionString);
+			if (oConnection != null && oConnection.IsConnected)
+			{
+				// try to reopen connection if its closed
+				// try 10 times to open connection
+				for (int i = 0; i < 10; i++)
+				{
+					if (oConnection.IsConnected)
+					{
+						// cache minTicks and maxTicks
+						try
+						{
+							MySqlDataAdapter oAdapter = new MySqlDataAdapter("select Min(DateTimeTicks), Max(DateTimeTicks) from stats_h;", oConnection.Connection);
+							DataTable dtData = new DataTable();
+							oAdapter.Fill(dtData);
+							oAdapter.Dispose();
+
+							if (dtData.Rows.Count > 0 && dtData.Columns.Count >= 2)
+							{
+								lMinStatTicks = WebUtilities.TypeConverter.ToInt64(dtData.Rows[0][0]);
+								lMaxStatTicks = WebUtilities.TypeConverter.ToInt64(dtData.Rows[0][1]);
+							}
+							break;
+						}
+						catch (Exception ex)
+						{
+							WriteToSystemLog(typeof(Global).Name, "Error establishing connection: " + ex.Message);
+							lMinStatTicks = 0;
+							lMaxStatTicks = 0;
+						}
+					}
+
+					Thread.Sleep(100);
+
+					try
+					{
+						oConnection.Close();
+						oConnection.Open();
+					}
+					catch
+					{ }
+				}
+			}
+
+			try
+			{
+				sEmailServer = configuration.GetSection("AppSettings")["EmailServer"];
+				sEmailTo = configuration.GetSection("AppSettings")["EmailFrom"];
+				sEmailTo = configuration.GetSection("AppSettings")["EmailTo"];
+				sEmailCC = configuration.GetSection("AppSettings")["EmailCC"];
 
 			}
 			catch { }
 
 			try
 			{
-				sStatisticsKey = configuration.GetSection("AppSettings")["StatisticsKey"];
+				tsJobTimeout = TimeSpan.Parse(configuration.GetSection("AppSettings")["JobTimeout"]);
+				tsSessionTimeout = TimeSpan.Parse(configuration.GetSection("AppSettings")["SessionTimeout"]);
+			}
+			catch { }
 
+			try
+			{
+				sRecaptchaPublicKey = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppSettings")["RecaptchaPublicKey"]);
+				sRecaptchaPrivateKey = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppSettings")["RecaptchaPrivateKey"]);
+
+			}
+			catch { }
+
+			try
+			{
+				sStatisticsKey = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppSettings")["StatisticsKey"]);
+
+			}
+			catch { }
+
+			try
+			{
+				sPathToJQuery = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToJQuery"]);
+				sPathToJQueryUI = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToJQueryUI"]);
+				sPathToJQueryUICSS = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToJQueryUICSS"]);
+				sPathToD3 = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToD3"]);
+				sPathToX3Dom = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToX3Dom"]);
+				sPathToX3DomCSS = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToX3DomCSS"]);
+				sPathToLCSwitch = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToLCSwitch"]);
+				sPathToCytoscape = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToCytoscape"]);
+
+				sPathToCSS = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToCSS"]);
+				sPathToBubbleChart = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToBubbleChart"]);
+				sPathToBubbleChartCSS = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToBubbleChartCSS"]);
+				sPathToTable = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToTable"]);
+				sPathToTableCSS = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToTableCSS"]);
+				sPathToTreeMap = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToTreeMap"]);
+				sPathToX3DScatterplot = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToX3DScatterplot"]);
+				sPathToCloudCSS = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToCloudCSS"]);
+
+				sPathToAddThis = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToAddThis"]);
 			}
 			catch { }
 
 			// try to load and intialize ontology object
 			try
 			{
-                string sPath = configuration.GetSection("AppSettings")["PathToGO"];
+                string sPath = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToGO"]);
                 if (!string.IsNullOrEmpty(sPath))
                 {
                     oOntology = GeneOntology.Deserialize(sPath);
@@ -149,7 +195,7 @@ namespace IRB.RevigoWeb
             // try to load and initialize Species annotations object
             try
             {
-                string sPath = configuration.GetSection("AppSettings")["PathToSpeciesAnnotations"];
+                string sPath = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToSpeciesAnnotations"]);
                 if (!string.IsNullOrEmpty(sPath))
                 {
                     oSpeciesAnnotations = SpeciesAnnotationsList.Deserialize(sPath);
@@ -299,6 +345,29 @@ namespace IRB.RevigoWeb
 		{
 			get { return sStatisticsKey; }
 		}
+
+		// JS control paths
+		public static string PathToJQuery { get { return sPathToJQuery; } }
+		public static string PathToJQueryUI { get { return sPathToJQueryUI; } }
+		public static string PathToJQueryUICSS { get { return sPathToJQueryUICSS; } }
+		public static string PathToD3 { get { return sPathToD3; } }
+		public static string PathToX3Dom { get { return sPathToX3Dom; } }
+		public static string PathToX3DomCSS { get { return sPathToX3DomCSS; } }
+		public static string PathToLCSwitch { get { return sPathToLCSwitch; } }
+		public static string PathToCytoscape { get { return sPathToCytoscape; } }
+
+		// Revigo JS control paths
+		public static string PathToCSS { get { return sPathToCSS; } }
+		public static string PathToBubbleChart { get { return sPathToBubbleChart; } }
+		public static string PathToBubbleChartCSS { get { return sPathToBubbleChartCSS; } }
+		public static string PathToTable { get { return sPathToTable; } }
+		public static string PathToTableCSS { get { return sPathToTableCSS; } }
+		public static string PathToTreeMap { get { return sPathToTreeMap; } }
+		public static string PathToX3DScatterplot { get { return sPathToX3DScatterplot; } }
+		public static string PathToCloudCSS { get { return sPathToCloudCSS; } }
+
+		// Path to AddThis control
+		public static string PathToAddThis { get { return sPathToAddThis; } }
 
 		public static int CreateNewJob(RequestSourceEnum requestSource, string data, double cutoff, 
             ValueTypeEnum valueType, SpeciesAnnotations annotations, SemanticSimilarityScoreEnum measure, bool removeObsolete)

@@ -27,7 +27,7 @@ namespace RevigoIntegrationTest
 			// First stage - Submit the job to the server
 			HttpWebRequest oRequest = (HttpWebRequest)WebRequest.Create(sBaseURL + "/StartJob");
 			oRequest.ContentType = "application/x-www-form-urlencoded";
-			oRequest.Method = "GET";
+			oRequest.Method = "POST";
 
 			// send parameters to the server
 			StreamWriter writer = new StreamWriter(oRequest.GetRequestStream());

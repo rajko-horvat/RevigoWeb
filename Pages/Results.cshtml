@@ -10,17 +10,17 @@
 	GDPRTypeEnum eGDPRType = GDPR.GetGDPRState(HttpContext);
 }
 @section HeaderScripts {
-	<link href="@Url.Content("~/css/tc.css")" rel="stylesheet" type="text/css" />
-	<link href="@Url.Content("~/css/revigoBubbleChart-1.1.css")" rel="stylesheet" type="text/css" />
-	<link href="@Url.Content("~/css/revigoTable-1.0.4.css")" rel="stylesheet" type="text/css" />
-	<link href="@Url.Content("~/css/x3dom-1.8.3.css")" rel="stylesheet" type="text/css" />
-	<script type="text/javascript" src="@Url.Content("~/js/d3-7.4.5.min.js")"></script>
-	<script type="text/javascript" src="@Url.Content("~/js/revigoBubbleChart-1.1.js")"></script>
-	<script type="text/javascript" src="@Url.Content("~/js/revigoTreeMap-1.2.js")"></script>
-	<script type="text/javascript" src="@Url.Content("~/js/revigoTable-1.0.5.js")"></script>
-	<script type="text/javascript" src="@Url.Content("~/js/revigox3dScatterplot-1.0.js")"></script>
-	<script type="text/javascript" src="@Url.Content("~/js/cytoscape-3.20.3.min.js")"></script>
-	<script type="text/javascript" src="@Url.Content("~/js/x3dom-full-1.8.3.min.js")"></script>
+	<link href="@Url.Content(Global.PathToX3DomCSS)" rel="stylesheet" type="text/css" />
+	<link href="@Url.Content(Global.PathToBubbleChartCSS)" rel="stylesheet" type="text/css" />
+	<link href="@Url.Content(Global.PathToTableCSS)" rel="stylesheet" type="text/css" />
+	<link href="@Url.Content(Global.PathToCloudCSS)" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="@Url.Content(Global.PathToD3)"></script>
+	<script type="text/javascript" src="@Url.Content(Global.PathToX3Dom)"></script>
+	<script type="text/javascript" src="@Url.Content(Global.PathToBubbleChart)"></script>
+	<script type="text/javascript" src="@Url.Content(Global.PathToTreeMap)"></script>
+	<script type="text/javascript" src="@Url.Content(Global.PathToTable)"></script>
+	<script type="text/javascript" src="@Url.Content(Global.PathToX3DScatterplot)"></script>
+	<script type="text/javascript" src="@Url.Content(Global.PathToCytoscape)"></script>
 }
 @section HeaderCSS {
 	<style type="text/css">
@@ -794,7 +794,7 @@
 	</div>
 	@if (eGDPRType == GDPRTypeEnum.Full)
 	{
-		<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-601aabd7f2793f3b"></script>
+		<script type="text/javascript" src="@Global.PathToAddThis"></script>
 	}
 </form>
 
