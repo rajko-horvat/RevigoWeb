@@ -24,7 +24,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\source\repos\MySqlConnector-2.1\MySqlConnector\MySqlConnector.csproj" />
+    <ProjectReference Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(DefineConstants), '^(.*;)*STATISTICS(;.*)*$'))" Include="..\..\..\..\..\source\repos\MySqlConnector-2.1\MySqlConnector\MySqlConnector.csproj" />
     <ProjectReference Include="..\RevigoCore\RevigoCore.csproj" />
   </ItemGroup>
 

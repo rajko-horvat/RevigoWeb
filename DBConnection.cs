@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if STATISTICS
+using System;
 using System.Data;
 using MySqlConnector;
 using RevigoWeb;
@@ -199,3 +200,4 @@ public class DBConnection : IDisposable
 		}
 	}
 }
+#endif

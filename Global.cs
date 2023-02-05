@@ -7,7 +7,9 @@ using IRB.Collections.Generic;
 using IRB.Revigo.Core;
 using IRB.Revigo.Databases;
 using IRB.Revigo.Worker;
+#if STATISTICS
 using MySqlConnector;
+#endif
 
 namespace IRB.RevigoWeb
 {
@@ -73,50 +75,54 @@ namespace IRB.RevigoWeb
 			}
 			catch { }
 
-			DBConnection oConnection = new DBConnection(sConnectionString);
-			if (oConnection != null && oConnection.IsConnected)
+#if STATISTICS
+			lock (oConnectionLock)
 			{
-				// try to reopen connection if its closed
-				// try 10 times to open connection
-				for (int i = 0; i < 10; i++)
+				DBConnection oConnection = new DBConnection(sConnectionString);
+				if (oConnection != null && oConnection.IsConnected)
 				{
-					if (oConnection.IsConnected)
+					// try to reopen connection if its closed
+					// try 10 times to open connection
+					for (int i = 0; i < 10; i++)
 					{
-						// cache minTicks and maxTicks
+						if (oConnection.IsConnected)
+						{
+							// cache minTicks and maxTicks
+							try
+							{
+								MySqlDataAdapter oAdapter = new MySqlDataAdapter("select Min(DateTimeTicks), Max(DateTimeTicks) from stats_h;", oConnection.Connection);
+								DataTable dtData = new DataTable();
+								oAdapter.Fill(dtData);
+								oAdapter.Dispose();
+
+								if (dtData.Rows.Count > 0 && dtData.Columns.Count >= 2)
+								{
+									lMinStatTicks = WebUtilities.TypeConverter.ToInt64(dtData.Rows[0][0]);
+									lMaxStatTicks = WebUtilities.TypeConverter.ToInt64(dtData.Rows[0][1]);
+								}
+								break;
+							}
+							catch (Exception ex)
+							{
+								WriteToSystemLog(typeof(Global).Name, "Error establishing connection: " + ex.Message);
+								lMinStatTicks = 0;
+								lMaxStatTicks = 0;
+							}
+						}
+
+						Thread.Sleep(100);
+
 						try
 						{
-							MySqlDataAdapter oAdapter = new MySqlDataAdapter("select Min(DateTimeTicks), Max(DateTimeTicks) from stats_h;", oConnection.Connection);
-							DataTable dtData = new DataTable();
-							oAdapter.Fill(dtData);
-							oAdapter.Dispose();
-
-							if (dtData.Rows.Count > 0 && dtData.Columns.Count >= 2)
-							{
-								lMinStatTicks = WebUtilities.TypeConverter.ToInt64(dtData.Rows[0][0]);
-								lMaxStatTicks = WebUtilities.TypeConverter.ToInt64(dtData.Rows[0][1]);
-							}
-							break;
+							oConnection.Close();
+							oConnection.Open();
 						}
-						catch (Exception ex)
-						{
-							WriteToSystemLog(typeof(Global).Name, "Error establishing connection: " + ex.Message);
-							lMinStatTicks = 0;
-							lMaxStatTicks = 0;
-						}
+						catch
+						{ }
 					}
-
-					Thread.Sleep(100);
-
-					try
-					{
-						oConnection.Close();
-						oConnection.Open();
-					}
-					catch
-					{ }
 				}
 			}
-
+#endif
 			try
 			{
 				sEmailServer = configuration.GetSection("AppSettings")["EmailServer"];
@@ -211,22 +217,6 @@ namespace IRB.RevigoWeb
             }
         }
 
-        /*protected void Session_End(object sender, EventArgs e)
-        {
-            // remove old jobs
-            lock (oJobLock)
-            {
-                for (int i = 0; i < oJobs.Count; i++)
-                {
-                    if ((DateTime.Now - oJobs[i].Value.Expiration).TotalMinutes > 0)
-                    {
-                        oJobs.RemoveAt(i);
-                        i--;
-                    }
-                }
-            }
-        }*/
-
         public static void ApplicationEnd()
         {
             bDisposing = true;
@@ -250,101 +240,35 @@ namespace IRB.RevigoWeb
             }
         }
 
-        public static string ConnectionString
-        {
-            get { return sConnectionString; }
-        }
+        public static string ConnectionString { get { return sConnectionString; } }
 
-        public static long MinStatTicks
-        {
-            get
-            {
-                return lMinStatTicks;
-            }
-        }
+        public static long MinStatTicks { get { return lMinStatTicks; } }
 
-        public static long MaxStatTicks
-        {
-            get
-            {
-                return lMaxStatTicks;
-            }
-        }
+        public static long MaxStatTicks { get { return lMaxStatTicks; } }
 
-        public static GeneOntology Ontology
-        {
-            get
-            {
-                return oOntology;
-            }
-        }
+        public static GeneOntology Ontology { get { return oOntology; } }
 
-        public static SpeciesAnnotationsList SpeciesAnnotations
-        {
-            get
-            {
-                return oSpeciesAnnotations;
-            }
-        }
+        public static SpeciesAnnotationsList SpeciesAnnotations { get { return oSpeciesAnnotations; } }
 
-        public static BDictionary<int, RevigoJob> Jobs
-        {
-            get
-            {
-                return oJobs;
-            }
-        }
+        public static BDictionary<int, RevigoJob> Jobs { get { return oJobs; } }
 
-        public static TimeSpan SessionTimeout
-        {
-            get
-            {
-                return tsSessionTimeout;
-            }
-        }
+        public static TimeSpan SessionTimeout { get { return tsSessionTimeout; } }
 
-        public static TimeSpan JobTimeout
-        {
-            get
-            {
-                return tsJobTimeout;
-            }
-        }
+        public static TimeSpan JobTimeout { get { return tsJobTimeout; } }
 
-		public static string EmailServer
-		{ 
-			get{return sEmailServer; }
-		}
+		public static string EmailServer { get{return sEmailServer; } }
 
-		public static string EmailFrom
-		{
-			get { return sEmailFrom; }
-		}
+		public static string EmailFrom { get { return sEmailFrom; } }
 
-		public static string EmailTo
-		{
-			get { return sEmailTo; }
-		}
+		public static string EmailTo { get { return sEmailTo; } }
 
-		public static string EmailCC
-		{
-			get { return sEmailCC; }
-		}
+		public static string EmailCC { get { return sEmailCC; } }
 
-		public static string RecaptchaPublicKey
-		{
-			get { return sRecaptchaPublicKey; }
-		}
+		public static string RecaptchaPublicKey { get { return sRecaptchaPublicKey; } }
 
-		public static string RecaptchaSecretKey
-		{
-			get { return sRecaptchaPrivateKey; }
-		}
+		public static string RecaptchaSecretKey { get { return sRecaptchaPrivateKey; } }
 
-		public static string StatisticsKey
-		{
-			get { return sStatisticsKey; }
-		}
+		public static string StatisticsKey { get { return sStatisticsKey; } }
 
 		// JS control paths
 		public static string PathToJQuery { get { return sPathToJQuery; } }
@@ -453,7 +377,8 @@ namespace IRB.RevigoWeb
             {
                 RevigoWorker worker = (RevigoWorker)sender;
 
-                lock (oConnectionLock)
+#if STATISTICS
+				lock (oConnectionLock)
                 {
                     DBConnection oConnection = new DBConnection(sConnectionString);
                     if (oConnection != null && oConnection.IsConnected)
@@ -570,9 +495,10 @@ namespace IRB.RevigoWeb
                         oConnection.Close();
                     }
                 }
+#endif
 
-                // for debugging
-                if (worker.HasDeveloperWarnings || worker.HasDeveloperErrors)
+				// for debugging
+				if (worker.HasDeveloperWarnings || worker.HasDeveloperErrors)
                 {
                     WebUtilities.Email.SendEmailNotification(worker);
                 }
@@ -584,7 +510,8 @@ namespace IRB.RevigoWeb
             string sNamespace = null;
             int iNamespace = -1;
 
-            lock (oConnectionLock)
+#if STATISTICS
+			lock (oConnectionLock)
             {
                 DBConnection oConnection = new DBConnection(sConnectionString);
                 if (oConnection != null && oConnection.IsConnected)
@@ -706,7 +633,8 @@ namespace IRB.RevigoWeb
                     oConnection.Close();
                 }
             }
-        }
+#endif
+		}
 
         public static void WriteToSystemLog(string source, string message)
         {
