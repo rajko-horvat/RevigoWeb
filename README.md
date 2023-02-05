@@ -8,7 +8,7 @@
 	or build your databases with <a href="https://github.com/rajko-horvat/RevigoGenerateDatabases">RevigoGenerateDatabases command line utility</a>.<br />
 	The following JavaScript libraries are also needed: 
 	<a href="https://jquery.com/download/">JQuery</a>, 
-	<a href="https://jqueryui.com/download/">JQuery-UI (with Accordion, Button, Tabs, Dialog, Datepicker, Selectmenu and Tooltip widgets)</a>, 
+	<a href="https://jqueryui.com/download/">JQuery-UI</a> (with Accordion, Button, Tabs, Dialog, Datepicker, Selectmenu and Tooltip widgets), 
 	<a href="https://d3js.org/">D3</a>, <a href="https://www.x3dom.org/nodes/">X3Dom</a>, <a href="https://github.com/LCweb-ita/LC-switch">LCSwitch</a> and 
 	<a href="https://github.com/cytoscape/cytoscape.js">Cytoscape</a>.<br />
 	For the Statistics functionality you also need the <a href="https://github.com/mysql-net/MySqlConnector/tree/v2.1">MySqlConnector 2.1 library</a> 
