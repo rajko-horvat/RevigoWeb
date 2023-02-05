@@ -15,6 +15,14 @@
     <RootNamespace>IRB.RevigoWeb</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>$(DefineConstants);STATISTICS</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>$(DefineConstants);STATISTICS</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\source\repos\MySqlConnector-2.1\MySqlConnector\MySqlConnector.csproj" />
     <ProjectReference Include="..\RevigoCore\RevigoCore.csproj" />
