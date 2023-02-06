@@ -1,45 +1,78 @@
 using Microsoft.AspNetCore.Rewrite;
 using IRB.RevigoWeb;
+#if WINDOWS_SERVICE
+using System.ServiceProcess;
+#endif
 
 internal class Program
 {
+#if WORKER_SERVICE
+
+#elif WINDOWS_SERVICE
+
+	private static void Main()
+	{
+		Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName));
+
+		ServiceBase[] ServicesToRun;
+		ServicesToRun = new ServiceBase[]
+		{
+			new RevigoWebService()
+		};
+		ServiceBase.Run(ServicesToRun);
+	}
+#else
+
+	private static WebApplication oWebApplication;
+
 	private static void Main(string[] args)
 	{
+		Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName));
+
 		var builder = WebApplication.CreateBuilder(args);
 
 		// Add services to the container.
 		builder.Services.AddRazorPages();
 
-		var app = builder.Build();
+		oWebApplication = builder.Build();
 
         var options = new RewriteOptions();
         options.Rules.Add(new RewriteAspxUrl());
-        app.UseRewriter(options);
+		oWebApplication.UseRewriter(options);
 
 		// Configure the HTTP request pipeline.
-		if (!app.Environment.IsDevelopment())
+		if (!oWebApplication.Environment.IsDevelopment())
 		{
-			app.UseExceptionHandler("/Error");
+			oWebApplication.UseExceptionHandler("/Error");
 		}
 		else
 		{
 			//app.UseExceptionHandler("/Error");
-			app.UseDeveloperExceptionPage();
+			oWebApplication.UseDeveloperExceptionPage();
 		}
 
-		app.UseStatusCodePagesWithReExecute("/ErrorCode", "?StatusCode={0}");
+		oWebApplication.UseStatusCodePagesWithReExecute("/ErrorCode", "?StatusCode={0}");
 
-		app.UseStaticFiles();
+		oWebApplication.UseStaticFiles();
 		//app.UseCookiePolicy();
-		app.UseRouting();
+		oWebApplication.UseRouting();
 		//app.UseAuthorization();
-		app.MapRazorPages();
+		oWebApplication.MapRazorPages();
 
-		// intialize allication global state
-		Global.ApplicationStart(app.Configuration);
+		oWebApplication.Lifetime.ApplicationStarted.Register(OnStarted);
+		oWebApplication.Lifetime.ApplicationStopped.Register(OnStopped);
 
-		app.Run();
-
-		Global.ApplicationEnd();
+		oWebApplication.Run();
 	}
+
+	private static void OnStarted()
+	{
+		Global.StartApplication(oWebApplication.Configuration);
+	}
+
+	private static void OnStopped()
+	{
+		Global.StopApplication();
+	}
+#endif
 }

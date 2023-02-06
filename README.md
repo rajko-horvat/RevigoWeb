@@ -12,7 +12,8 @@
 	<a href="https://d3js.org/">D3</a>, <a href="https://www.x3dom.org/nodes/">X3Dom</a>, <a href="https://github.com/LCweb-ita/LC-switch">LCSwitch</a> and 
 	<a href="https://github.com/cytoscape/cytoscape.js">Cytoscape</a>.</p>
 	<p>For the Statistics functionality you also need the <a href="https://github.com/mysql-net/MySqlConnector/tree/v2.1">MySqlConnector 2.1 library</a> 
-	(Under project -> Buld -> Compilation Symbols the 'STATISTICS' keyword needs to be defined).</p>
+	(Under project -> Buld -> Compilation Symbols the 'WEB_STATISTICS' keyword needs to be defined).</p>
+	<p>The web server can be run as a command line utility, worker service or windows service by specifying 'WINDOWS_SERVICE' or 'WORKER_SERVICE' symbols.</p>
 	<p>The 'appsettings.json' (Rename from 'appsettings.example.json') also needs to be configured properly, specifically 'AppSettings' and 'AppPaths' section.</p>
 
 ## About REVIGO (REduce + VIsualize Gene Ontology) project

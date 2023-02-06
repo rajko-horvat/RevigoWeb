@@ -7,7 +7,7 @@ using IRB.Collections.Generic;
 using IRB.Revigo.Core;
 using IRB.Revigo.Databases;
 using IRB.Revigo.Worker;
-#if STATISTICS
+#if WEB_STATISTICS
 using MySqlConnector;
 #endif
 
@@ -19,8 +19,9 @@ namespace IRB.RevigoWeb
 		private static string sConnectionString = null;
 		private static long lMinStatTicks = 0;
 		private static long lMaxStatTicks = 0;
-		private static GeneOntology oOntology = null;
+		private static string sPathToLog = null;
 		private static StreamWriter oLog = null;
+		private static GeneOntology oOntology = null;
 		private static SpeciesAnnotationsList oSpeciesAnnotations = null;
 		private static BDictionary<int, RevigoJob> oJobs = new BDictionary<int, RevigoJob>();
 		private static object oJobLock = new object();
@@ -57,12 +58,21 @@ namespace IRB.RevigoWeb
 		// Path to AddThis control
 		private static string sPathToAddThis = null;
 
-		public static void ApplicationStart(IConfiguration configuration)
+		public static void StartApplication(IConfiguration configuration)
 		{
 			// initialize log file
 			try
 			{
-				oLog = new StreamWriter(new FileStream("Messages.log", FileMode.Append, FileAccess.Write, FileShare.ReadWrite), Encoding.UTF8);
+				sPathToLog = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToLog"]);
+			}
+			catch { }
+
+			try
+			{
+				if (!string.IsNullOrEmpty(sPathToLog))
+				{
+					oLog = new StreamWriter(new FileStream(sPathToLog, FileMode.Append, FileAccess.Write, FileShare.ReadWrite), Encoding.UTF8);
+				}
 			}
 			catch
 			{
@@ -75,7 +85,7 @@ namespace IRB.RevigoWeb
 			}
 			catch { }
 
-#if STATISTICS
+#if WEB_STATISTICS
 			lock (oConnectionLock)
 			{
 				DBConnection oConnection = new DBConnection(sConnectionString);
@@ -217,7 +227,7 @@ namespace IRB.RevigoWeb
             }
         }
 
-        public static void ApplicationEnd()
+        public static void StopApplication()
         {
             bDisposing = true;
 
@@ -240,7 +250,7 @@ namespace IRB.RevigoWeb
             }
         }
 
-        public static string ConnectionString { get { return sConnectionString; } }
+		public static string ConnectionString { get { return sConnectionString; } }
 
         public static long MinStatTicks { get { return lMinStatTicks; } }
 
@@ -377,7 +387,7 @@ namespace IRB.RevigoWeb
             {
                 RevigoWorker worker = (RevigoWorker)sender;
 
-#if STATISTICS
+#if WEB_STATISTICS
 				lock (oConnectionLock)
                 {
                     DBConnection oConnection = new DBConnection(sConnectionString);
@@ -507,10 +517,10 @@ namespace IRB.RevigoWeb
 
         public static void UpdateJobUsageStats(RevigoWorker worker, string type, string ns)
         {
-            string sNamespace = null;
+#if WEB_STATISTICS
+			string sNamespace = null;
             int iNamespace = -1;
 
-#if STATISTICS
 			lock (oConnectionLock)
             {
                 DBConnection oConnection = new DBConnection(sConnectionString);

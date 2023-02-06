@@ -1,12 +1,4 @@
 ﻿{
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://localhost:54959",
-      "sslPort": 0
-    }
-  },
 	"profiles": {
 		"RevigoWebDelepment": {
 			"commandName": "Project",
@@ -14,7 +6,8 @@
 			"launchBrowser": true,
 			"applicationUrl": "http://localhost:5000",
 			"environmentVariables": {
-				"ASPNETCORE_ENVIRONMENT": "Development"
+				"ASPNETCORE_ENVIRONMENT": "Development",
+				"DOTNET_ENVIRONMENT": "Development"
 			}
 		},
 		"RevigoWebStaging": {
@@ -23,7 +16,8 @@
 			"launchBrowser": false,
 			"applicationUrl": "http://localhost:5000",
 			"environmentVariables": {
-				"ASPNETCORE_ENVIRONMENT": "Staging"
+				"ASPNETCORE_ENVIRONMENT": "Staging",
+				"DOTNET_ENVIRONMENT": "Staging"
 			}
 		},
 		"RevigoWebProduction": {
@@ -32,7 +26,8 @@
 			"launchBrowser": false,
 			"applicationUrl": "http://localhost:5000",
 			"environmentVariables": {
-				"ASPNETCORE_ENVIRONMENT": "Production"
+				"ASPNETCORE_ENVIRONMENT": "Production",
+				"DOTNET_ENVIRONMENT": "Production"
 			}
 		}
 	}

@@ -1,4 +1,4 @@
-﻿#if STATISTICS
+﻿#if WEB_STATISTICS
 using System;
 using System.Data;
 using MySqlConnector;

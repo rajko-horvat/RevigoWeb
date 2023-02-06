@@ -3,7 +3,7 @@ using IRB.Revigo.Databases;
 using IRB.Revigo.Worker;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-#if STATISTICS
+#if WEB_STATISTICS
 using MySqlConnector;
 #endif
 using System.Data;
@@ -15,7 +15,7 @@ namespace IRB.RevigoWeb.Pages
 {
     public class GetStatisticsModel : PageModel
 	{
-#if STATISTICS
+#if WEB_STATISTICS
 		public ContentResult OnGet()
         {
 			string sKey = WebUtilities.TypeConverter.ToString(Request.Query["key"]);

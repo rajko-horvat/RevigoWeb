@@ -16,15 +16,21 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>$(DefineConstants);STATISTICS</DefineConstants>
+    <DefineConstants>$(DefineConstants);WEB_STATISTICS</DefineConstants>
+    <DebugType>portable</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants>$(DefineConstants);STATISTICS</DefineConstants>
+    <DefineConstants>$(DefineConstants);WEB_STATISTICS;WINDOWS_SERVICE</DefineConstants>
+    <DebugType>portable</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(DefineConstants), '^(.*;)*STATISTICS(;.*)*$'))" Include="..\..\..\..\..\source\repos\MySqlConnector-2.1\MySqlConnector\MySqlConnector.csproj" />
+    <PackageReference Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(DefineConstants), '^(.*;)*WINDOWS_SERVICE(;.*)*$'))" Include="System.ServiceProcess.ServiceController" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(DefineConstants), '^(.*;)*WEB_STATISTICS(;.*)*$'))" Include="..\..\..\..\..\source\repos\MySqlConnector-2.1\MySqlConnector\MySqlConnector.csproj" />
     <ProjectReference Include="..\RevigoCore\RevigoCore.csproj" />
   </ItemGroup>
 
