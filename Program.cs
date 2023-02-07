@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Rewrite;
 using IRB.RevigoWeb;
+using System.Reflection;
 #if WINDOWS_SERVICE
 using System.ServiceProcess;
 #endif
@@ -12,7 +13,8 @@ internal class Program
 
 	private static void Main()
 	{
-		Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName));
+		// ensure that CWD is the assembly path to be able to access contents and configuration files
+		Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
 
 		ServiceBase[] ServicesToRun;
 		ServicesToRun = new ServiceBase[]
@@ -27,7 +29,8 @@ internal class Program
 
 	private static void Main(string[] args)
 	{
-		Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName));
+		// ensure that CWD is the assembly path to be able to access contents and configuration files
+		Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
 
 		var builder = WebApplication.CreateBuilder(args);
 
