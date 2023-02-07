@@ -58,7 +58,7 @@ namespace RevigoWeb.Pages
 		private void StartJob()
 		{
 			// validate parameters
-			string sUserData = this.txtGOInput.Trim();
+			string sUserData = WebUtilities.TypeConverter.ToString(this.txtGOInput).Trim();
 			double dCutoff = 0.7;
 			ValueTypeEnum eValueType = ValueTypeEnum.PValue;
 			int iSpeciesTaxon = 0;
