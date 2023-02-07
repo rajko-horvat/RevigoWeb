@@ -58,7 +58,7 @@ namespace RevigoWeb.Pages
 		private void StartJob()
 		{
 			// validate parameters
-			string sUserData = WebUtilities.TypeConverter.ToString(this.txtGOInput).Trim();
+			string sUserData = this.txtGOInput;
 			double dCutoff = 0.7;
 			ValueTypeEnum eValueType = ValueTypeEnum.PValue;
 			int iSpeciesTaxon = 0;
@@ -84,7 +84,7 @@ namespace RevigoWeb.Pages
 				return;
 			}
 
-			if (string.IsNullOrEmpty(sUserData))
+			if (string.IsNullOrEmpty(sUserData) || string.IsNullOrEmpty(sUserData.Trim()))
 			{
 				ShowError("The data you submitted is empty, plase fill out your data or use one of our examples.");
 				return;
