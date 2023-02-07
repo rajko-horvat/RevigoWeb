@@ -2,7 +2,7 @@
 <p>This is the main REVIGO web service that implements the web interface and visualizations.</p>
 
 ## How to compile and run
-<p>To compile and run the web service you need the Visual Studio Code (Visual Studio is also fine), RevigoCore library, a set of precompiled databases available 
+<p>To compile and run the web service you need the Visual Studio Code (Visual Studio is better), RevigoCore library, a set of precompiled databases available 
 	<a href="http://revigo.irb.hr/Databases/GeneOntology.xml.gz" target="_blank">here</a> (Gene Ontology) and 
 	<a href="http://revigo.irb.hr/Databases/SpeciesAnnotations.xml.gz" target="_blank">here</a> (Species annotations), 
 	or build your databases with <a href="https://github.com/rajko-horvat/RevigoGenerateDatabases">RevigoGenerateDatabases command line utility</a>.</p>
