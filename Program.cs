@@ -8,7 +8,7 @@ using System.ServiceProcess;
 internal class Program
 {
 #if WORKER_SERVICE
-
+	// To do: Implement Worker Service
 #elif WINDOWS_SERVICE
 
 	private static void Main()
