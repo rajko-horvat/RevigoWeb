@@ -245,7 +245,7 @@ namespace IRB.RevigoWeb.Pages
 						{
 							writer.AppendFormat("UserValue_{0}\t", c - 1);
 						}
-						writer.Append("LogSize\tFrequency\tUniqueness\tDispensability\tRepresentative");
+						writer.AppendLine("LogSize\tFrequency\tUniqueness\tDispensability\tRepresentative");
 
 						// print the data
 						for (int i = 0; i < terms.Count; i++)
