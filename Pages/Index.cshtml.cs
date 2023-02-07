@@ -287,6 +287,7 @@ namespace RevigoWeb.Pages
 			if (!string.IsNullOrEmpty(sUserData))
 			{
 				this.txtGOInput = sUserData;
+				this.bAutoStart = false;
 
 				// {0.4 - 0.9}
 				// if the value is not provided 0.7 will be assumed
