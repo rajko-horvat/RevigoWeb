@@ -219,9 +219,9 @@
 				Every Url that ended with '.aspx' extension is now invoked without that extension. 
 				For example: '/StartJob.aspx' is now simply '/StartJob' without ending '.aspx'.
 			</p>
-					<p><b>Each query needs to be posted as a html form (&quot;application/x-www-form-urlencoded&quot;).</b> The process of submitting jobs is divided into three stages:</p>
+			<p>The process of submitting jobs is divided into three stages:</p>
             <h4>1) Submit the job to the server</h4>
-            Submit the job at http://revigo.irb.hr/StartJob with the following parameters:<br />
+			Submit (Post method) the job at http://revigo.irb.hr/StartJob as a <b>html form (&quot;application/x-www-form-urlencoded&quot;)</b> with the following parameters:<br />
             <ul>
                 <li>"goList" - Your data (this value is required)</li>
                 <li>"cutoff" - [ 0.4 - 0.9 ] (if the value is not provided 0.7 will be assumed)</li>
@@ -239,7 +239,7 @@
             </ul>
             <br />
             <h4>2) Wait for the job to complete</h4>
-            Query the job status at http://revigo.irb.hr/QueryJob?jobid=...&type=jstatus with the following parameters:<br />
+            Query (Get method) the job status at http://revigo.irb.hr/QueryJob?jobid=...&type=jstatus with the following parameters:<br />
             <ul>
                 <li>"jobid" - Job ID that you collected from the previous step.</li>
                 <li>"type" - jstatus .</li>
@@ -253,7 +253,7 @@
             </ul>
             <br />
             <h4>3) Gather the results</h4>
-            Gather the job results at http://revigo.irb.hr/QueryJob?jobid=...&... with the following parameters:<br />
+            Gather (Get method) the job results at http://revigo.irb.hr/QueryJob?jobid=...&... with the following parameters:<br />
             <ul>
                 <li>"jobid" - Job ID that you collected in the first step.</li>
                 <li>"namespace" - [1, 2, 3] The namespace for which you are collecting results. 1 represents BIOLOGICAL_PROCESS, 2 represents CELLULAR_COMPONENT, 3 represents MOLECULAR_FUNCTION.</li>
