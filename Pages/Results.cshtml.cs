@@ -57,7 +57,7 @@ namespace IRB.RevigoWeb.Pages
 			{
 				RevigoJob job = Global.Jobs.GetValueByKey(this.iJobID);
 
-				job.ExtendExpiration(Global.SessionTimeout);
+				job.ExtendExpiration();
 				oWorker = job.Worker;
 			}
 

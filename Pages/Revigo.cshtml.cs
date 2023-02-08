@@ -217,6 +217,8 @@ namespace IRB.RevigoWeb.Pages
 					WebUtilities.Email.SendEmailNotification(oWorker);
 				}
 			}
+
+			Global.RemoveJob(iJobID);
 		}
 
 		private DataTable ToResultTable(string name, GOTermList terms)

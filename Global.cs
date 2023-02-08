@@ -30,11 +30,12 @@ namespace IRB.RevigoWeb
 		private static string sEmailFrom = null;
 		private static string sEmailTo = null;
 		private static string sEmailCC = null;
-		private static TimeSpan tsSessionTimeout = new TimeSpan(0, 30, 0);
-		private static TimeSpan tsJobTimeout = new TimeSpan(0, 15, 0);
 		private static string sRecaptchaPublicKey = null;
 		private static string sRecaptchaPrivateKey = null;
 		private static string sStatisticsKey = null;
+		private static TimeSpan tsJobTimeout = new TimeSpan(0, 15, 0);
+		private static TimeSpan tsSessionTimeout = new TimeSpan(0, 30, 0);
+		private static TimeSpan tsJobSessionTimeout = new TimeSpan(0, 20, 0);
 
 		// JS control paths
 		private static string sPathToJQuery = null;
@@ -145,13 +146,6 @@ namespace IRB.RevigoWeb
 
 			try
 			{
-				tsJobTimeout = TimeSpan.Parse(configuration.GetSection("AppSettings")["JobTimeout"]);
-				tsSessionTimeout = TimeSpan.Parse(configuration.GetSection("AppSettings")["SessionTimeout"]);
-			}
-			catch { }
-
-			try
-			{
 				sRecaptchaPublicKey = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppSettings")["RecaptchaPublicKey"]);
 				sRecaptchaPrivateKey = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppSettings")["RecaptchaPrivateKey"]);
 
@@ -162,6 +156,14 @@ namespace IRB.RevigoWeb
 			{
 				sStatisticsKey = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppSettings")["StatisticsKey"]);
 
+			}
+			catch { }
+
+			try
+			{
+				tsJobTimeout = TimeSpan.Parse(configuration.GetSection("AppSettings")["JobTimeout"]);
+				tsSessionTimeout = TimeSpan.Parse(configuration.GetSection("AppSettings")["SessionTimeout"]);
+				tsJobSessionTimeout = TimeSpan.Parse(configuration.GetSection("AppSettings")["JobSessionTimeout"]);
 			}
 			catch { }
 
@@ -262,9 +264,11 @@ namespace IRB.RevigoWeb
 
         public static BDictionary<int, RevigoJob> Jobs { get { return oJobs; } }
 
-        public static TimeSpan SessionTimeout { get { return tsSessionTimeout; } }
+		public static TimeSpan JobTimeout { get { return tsJobTimeout; } }
 
-        public static TimeSpan JobTimeout { get { return tsJobTimeout; } }
+		public static TimeSpan SessionTimeout { get { return tsSessionTimeout; } }
+
+		public static TimeSpan JobSessionTimeout { get { return tsJobSessionTimeout; } }
 
 		public static string EmailServer { get{return sEmailServer; } }
 
@@ -318,7 +322,7 @@ namespace IRB.RevigoWeb
                     // remove old jobs
                     for (int i = 0; i < oJobs.Count; i++)
                     {
-                        if ((DateTime.Now - oJobs[i].Value.Expiration).TotalMinutes > 0)
+                        if (oJobs[i].Value.IsExpired)
                         {
                             oJobs.RemoveAt(i);
                             i--;
@@ -355,7 +359,7 @@ namespace IRB.RevigoWeb
                     // remove old jobs
                     for (int i = 0; i < oJobs.Count; i++)
                     {
-                        if ((DateTime.Now - oJobs[i].Value.Expiration).TotalMinutes > 0)
+                        if (oJobs[i].Value.IsExpired)
                         {
                             oJobs.RemoveAt(i);
                             i--;
@@ -380,7 +384,23 @@ namespace IRB.RevigoWeb
             return iJobID;
         }
 
-        private static void oWorker_OnFinish(object sender, EventArgs e)
+		public static void RemoveJob(int jobID)
+		{
+			lock (oJobLock)
+			{
+				if (oJobs.ContainsKey(jobID))
+				{
+					oJobs.RemoveByKey(jobID);
+				}
+			}
+		}
+
+		public static void RemoveJob(RevigoJob job)
+		{
+			RemoveJob(job.ID);
+		}
+
+		private static void oWorker_OnFinish(object sender, EventArgs e)
         {
             // update our statistics
             if (sender is RevigoWorker)
@@ -645,6 +665,7 @@ namespace IRB.RevigoWeb
             }
 #endif
 		}
+
 
         public static void WriteToSystemLog(string source, string message)
         {

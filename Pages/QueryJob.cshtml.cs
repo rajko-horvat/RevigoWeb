@@ -61,7 +61,7 @@ namespace IRB.RevigoWeb.Pages
 				{
 					RevigoJob job = Global.Jobs.GetValueByKey(iJobID);
 					oWorker = job.Worker;
-					job.ExtendExpiration(bJSON ? Global.SessionTimeout : Global.JobTimeout);
+					job.ExtendExpiration();
 				}
 
 				// this is a deal breaker, we have to positively indentify a job

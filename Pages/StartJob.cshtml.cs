@@ -127,7 +127,7 @@ namespace IRB.RevigoWeb.Pages
 			int iJobID = -1;
 			try
 			{
-				iJobID = Global.StartNewJob(RequestSourceEnum.JubSubmitting, sUserData, dCutoff, eValueType, oAnnotations, eMeasure, bRemoveObsolete);
+				iJobID = Global.StartNewJob(RequestSourceEnum.JobSubmitting, sUserData, dCutoff, eValueType, oAnnotations, eMeasure, bRemoveObsolete);
 			}
 			catch (Exception ex)
 			{

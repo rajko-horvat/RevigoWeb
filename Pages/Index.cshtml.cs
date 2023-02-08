@@ -279,7 +279,7 @@ namespace RevigoWeb.Pages
 					sMeasure = oWorker.Measure.ToString();
 					sRemoveObsolete = oWorker.RemoveObsolete.ToString();
 
-					Global.Jobs.RemoveByKey(iJobID);
+					Global.RemoveJob(iJobID);
 					this.bAutoStart = false;
 				}
 			}
