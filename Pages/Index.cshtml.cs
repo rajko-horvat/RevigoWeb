@@ -29,7 +29,7 @@ namespace RevigoWeb.Pages
 		[BindProperty]
 		public string lstSpecies { get; set; }
 		[BindProperty]
-		public string lstMeasures { get; set; }
+		public string lstSimilarity { get; set; }
 
 		private bool bAutoStart = false;
 
@@ -62,7 +62,7 @@ namespace RevigoWeb.Pages
 			double dCutoff = 0.7;
 			ValueTypeEnum eValueType = ValueTypeEnum.PValue;
 			int iSpeciesTaxon = 0;
-			SemanticSimilarityScoreEnum eMeasure = SemanticSimilarityScoreEnum.SIMREL;
+			SemanticSimilarityEnum eMeasure = SemanticSimilarityEnum.SIMREL;
 			bool bRemoveObsolete = true;
 			GDPRTypeEnum eGDPRType = GDPR.GetGDPRState(this.HttpContext);
 
@@ -153,14 +153,14 @@ namespace RevigoWeb.Pages
 			}
 			SpeciesAnnotations oAnnotations = Global.SpeciesAnnotations.GetByID(iSpeciesTaxon);
 
-			string sMeasure = this.lstMeasures;
+			string sSimilarity = this.lstSimilarity;
 			bool bFound = false;
-			Array aEnumValues = Enum.GetValues(typeof(SemanticSimilarityScoreEnum));
+			Array aEnumValues = Enum.GetValues(typeof(SemanticSimilarityEnum));
 			foreach (var value in aEnumValues)
 			{
-				if (value.ToString().Equals(sMeasure, StringComparison.InvariantCultureIgnoreCase))
+				if (value.ToString().Equals(sSimilarity, StringComparison.InvariantCultureIgnoreCase))
 				{
-					eMeasure = (SemanticSimilarityScoreEnum)value;
+					eMeasure = (SemanticSimilarityEnum)value;
 					bFound = true;
 					break;
 				}
@@ -202,7 +202,7 @@ namespace RevigoWeb.Pages
 			string sCutOff = null;
 			string sValueType = null;
 			string sSpeciesTaxon = null;
-			string sMeasure = null;
+			string sSimilarity = null;
 			string sRemoveObsolete = null;
 			string sAutoStart = null;
 
@@ -257,7 +257,7 @@ namespace RevigoWeb.Pages
 				{
 					sSpeciesTaxon = WebUtilities.TypeConverter.ToString(Request.Form["goSizes"]);
 				}
-				sMeasure = WebUtilities.TypeConverter.ToString(Request.Form["measure"]);
+				sSimilarity = WebUtilities.TypeConverter.ToString(Request.Form["measure"]);
 				sRemoveObsolete = WebUtilities.TypeConverter.ToString(Request.Form["removeObsolete"]);
 				sAutoStart = WebUtilities.TypeConverter.ToString(Request.Form["autoStart"]);
 				ViewData["GDPRNoReload"] = true;
@@ -276,7 +276,7 @@ namespace RevigoWeb.Pages
 					sCutOff = oWorker.CutOff.ToString(CultureInfo.InvariantCulture);
 					sValueType = oWorker.ValueType.ToString();
 					sSpeciesTaxon = oWorker.Annotations.TaxonID.ToString();
-					sMeasure = oWorker.Measure.ToString();
+					sSimilarity = oWorker.SemanticSimilarity.ToString();
 					sRemoveObsolete = oWorker.RemoveObsolete.ToString();
 
 					Global.RemoveJob(iJobID);
@@ -343,17 +343,18 @@ namespace RevigoWeb.Pages
 
 				// {SIMREL, LIN, RESNIK, JIANG}
 				// if the value is not provided SIMREL will be assumed
-				this.lstMeasures = null;
-				if (!string.IsNullOrEmpty(sMeasure))
+				this.lstSimilarity = null;
+				if (!string.IsNullOrEmpty(sSimilarity))
 				{
-					sMeasure = sMeasure.Trim();
+					sSimilarity = sSimilarity.Trim();
 
-					foreach (SemanticSimilarityScore value in SemanticSimilarityScore.Values)
+					Array aSimilarityTypes = Enum.GetValues(typeof(SemanticSimilarityEnum));
+					foreach (SemanticSimilarityEnum value in aSimilarityTypes)
 					{
-						string sValue = value.EnumValue.ToString();
-						if (sValue.Equals(sMeasure, StringComparison.InvariantCultureIgnoreCase))
+						string sValue = value.ToString();
+						if (sValue.Equals(sSimilarity, StringComparison.InvariantCultureIgnoreCase))
 						{
-							this.lstMeasures = sValue;
+							this.lstSimilarity = sValue;
 							break;
 						}
 					}

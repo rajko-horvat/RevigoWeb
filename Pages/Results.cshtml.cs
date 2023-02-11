@@ -80,7 +80,7 @@ namespace IRB.RevigoWeb.Pages
 							Convert.ToDouble(this.fldCutoff, CultureInfo.InvariantCulture),
 							(ValueTypeEnum)Enum.Parse(typeof(ValueTypeEnum), this.fldValueType, true),
 							Global.SpeciesAnnotations.GetByID(Convert.ToInt32(this.fldSpeciesTaxon)),
-							(SemanticSimilarityScoreEnum)Enum.Parse(typeof(SemanticSimilarityScoreEnum), this.fldMeasure, true),
+							(SemanticSimilarityEnum)Enum.Parse(typeof(SemanticSimilarityEnum), this.fldMeasure, true),
 							bool.Parse(this.fldRemoveObsolete));
 					}
 					catch { }

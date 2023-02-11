@@ -27,7 +27,7 @@ namespace IRB.RevigoWeb.Pages
 			double dCutoff = 0.7;
 			ValueTypeEnum eValueType = ValueTypeEnum.PValue;
 			int iSpeciesTaxon = 0;
-			SemanticSimilarityScoreEnum eMeasure = SemanticSimilarityScoreEnum.SIMREL;
+			SemanticSimilarityEnum eMeasure = SemanticSimilarityEnum.SIMREL;
 			bool bRemoveObsolete = true;
 
 			if (Request.ContentType != "application/x-www-form-urlencoded")
@@ -96,13 +96,13 @@ namespace IRB.RevigoWeb.Pages
 			if (!string.IsNullOrEmpty(sMeasure))
 			{
 				sMeasure = sMeasure.Trim();
-				string[] aMeasures = Enum.GetNames(typeof(SemanticSimilarityScoreEnum));
+				string[] aMeasures = Enum.GetNames(typeof(SemanticSimilarityEnum));
 				bool bFound = false;
 				foreach (string measure in aMeasures)
 				{
 					if (measure.Equals(sMeasure, StringComparison.CurrentCultureIgnoreCase))
 					{
-						eMeasure = (SemanticSimilarityScoreEnum)Enum.Parse(typeof(SemanticSimilarityScoreEnum), sMeasure, true);
+						eMeasure = (SemanticSimilarityEnum)Enum.Parse(typeof(SemanticSimilarityEnum), sMeasure, true);
 						bFound = true;
 						break;
 					}

@@ -58,7 +58,7 @@ namespace IRB.RevigoWeb
 					sMessage.AppendLine("The user data set has been attached.");
 					sMessage.AppendLine();
 					sMessage.AppendFormat("Parameters: CutOff = {0}, ValueType = {1}, SpeciesTaxon = {2}, Measure = {3}, RemoveObsolete = {4}",
-						worker.CutOff, worker.ValueType, worker.Annotations.TaxonID, worker.Measure, worker.RemoveObsolete);
+						worker.CutOff, worker.ValueType, worker.Annotations.TaxonID, worker.SemanticSimilarity, worker.RemoveObsolete);
 					sMessage.AppendLine();
 					if (worker.HasDeveloperWarnings)
 					{
@@ -96,7 +96,7 @@ namespace IRB.RevigoWeb
 				{
 					Global.WriteToSystemLog(typeof(Global).FullName, string.Format("Warning(s) and/or error(s) occured during processing of user data on http://revigo.irb.hr; " +
 						"CutOff = {0}, ValueType = {1}, SpeciesTaxon = {2}, Measure = {3}; RemoveObsolete = {4}; Warnings: {5}; Errors: {6}; Dataset: {7}",
-						worker.CutOff, worker.ValueType, worker.Annotations.TaxonID, worker.Measure, worker.RemoveObsolete,
+						worker.CutOff, worker.ValueType, worker.Annotations.TaxonID, worker.SemanticSimilarity, worker.RemoveObsolete,
 						TypeConverter.JoinStringArray(worker.DeveloperWarnings), TypeConverter.JoinStringArray(worker.DeveloperErrors), worker.Data));
 				}
 			}
@@ -117,7 +117,7 @@ namespace IRB.RevigoWeb
 					sMessage.AppendLine();
 					sMessage.AppendLine();
 					sMessage.AppendFormat("Parameters: CutOff = {0}, ValueType = {1}, SpeciesTaxon = {2}, Measure = {3}, RemoveObsolete = {4}",
-						worker.CutOff, worker.ValueType, worker.Annotations.TaxonID, worker.Measure, worker.RemoveObsolete);
+						worker.CutOff, worker.ValueType, worker.Annotations.TaxonID, worker.SemanticSimilarity, worker.RemoveObsolete);
 					sMessage.AppendLine();
 					sMessage.AppendLine();
 
@@ -151,7 +151,7 @@ namespace IRB.RevigoWeb
 				{
 					Global.WriteToSystemLog(typeof(Email).FullName, string.Format("Error occured during exporting of the job results on http://revigo.irb.hr; " +
 						"CutOff = {0}, ValueType = {1}, SpeciesTaxon = {2}, Measure = {3}; Warnings: {4}; Errors: {5}; Dataset: {6}",
-						worker.CutOff, worker.ValueType, worker.Annotations.TaxonID, worker.Measure,
+						worker.CutOff, worker.ValueType, worker.Annotations.TaxonID, worker.SemanticSimilarity,
 						TypeConverter.JoinStringArray(worker.DeveloperWarnings), TypeConverter.JoinStringArray(worker.DeveloperErrors), worker.Data));
 				}
 			}

@@ -176,15 +176,16 @@
 
         <p>
             What semantic similarity measure would you like to use:
-            <select id="lstMeasures" name="lstMeasures">
+			<select id="lstSimilarity" name="lstSimilarity">
                 @{
                     // fill measure list
                     int iTemp = 0;
-                    sTemp = Model.lstMeasures;
-                    foreach (SemanticSimilarityScore value in SemanticSimilarityScore.Values)
+                    sTemp = Model.lstSimilarity;
+					Array aSimilarityTypes = Enum.GetValues(typeof(SemanticSimilarityEnum));
+					foreach (SemanticSimilarityEnum value in aSimilarityTypes)
                     {
-                        string sValue = value.EnumValue.ToString();
-						<option value="@sValue" 
+                        string sValue = value.ToString();
+						<option value="@value.ToString()"
 							@if(string.IsNullOrEmpty(sTemp))
 							{
 								if(iTemp == 0)
@@ -195,11 +196,25 @@
 							else if(sTemp.Equals(sValue))
 							{
 								<text>selected=""</text>
-							}>@value.ToString()</option>
+							}
+							>@switch(value)
+							{
+								case SemanticSimilarityEnum.RESNIK: // normalized to [0,1]
+									<text>Resnik (normalized)</text>
+									break;
+								case SemanticSimilarityEnum.LIN:
+									<text>Lin</text>
+									break;
+								case SemanticSimilarityEnum.SIMREL:
+									<text>SimRel (default)</text>
+									break;
+								case SemanticSimilarityEnum.JIANG:
+									<text>Jiang and Conrath</text>
+									break;
+							}
+							</option>
                         iTemp++;
                     }
-                    /*if (string.IsNullOrEmpty(sTemp))
-                        this.lstMeasures.SelectedIndex = 0;*/
                 }
             </select>&nbsp;&nbsp;
             <a href="http://funsimmat.bioinf.mpi-inf.mpg.de/help3.php" target="_blank">

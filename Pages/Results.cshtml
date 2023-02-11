@@ -45,7 +45,7 @@
 	<input id="fldCutoff" name="fldCutoff" type="hidden" value="@((Model.Worker != null) ? Model.Worker.CutOff.ToString(CultureInfo.InvariantCulture) : "")">
 	<input id="fldValueType" name="fldValueType" type="hidden" value="@((Model.Worker != null) ? Model.Worker.ValueType.ToString() : "")">
 	<input id="fldSpeciesTaxon" name="fldSpeciesTaxon" type="hidden" value="@((Model.Worker != null) ? Model.Worker.Annotations.TaxonID.ToString() : "")">
-	<input id="fldMeasure" name="fldMeasure" type="hidden" value="@((Model.Worker != null) ? Model.Worker.Measure.ToString() : "")">
+	<input id="fldMeasure" name="fldMeasure" type="hidden" value="@((Model.Worker != null) ? Model.Worker.SemanticSimilarity.ToString() : "")">
 	<input id="fldRemoveObsolete" name="fldRemoveObsolete" type="hidden" value="@((Model.Worker != null) ? Model.Worker.RemoveObsolete.ToString() : "")">
 	<div style="margin-left: auto; margin-right: auto;" >
 		<div id="pnlLoading" class="LoadingPanel">

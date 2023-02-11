@@ -121,7 +121,7 @@ namespace IRB.RevigoWeb.Pages
 						}
 
 						// add SemanticSimilarityScoreEnum values
-						FieldInfo[] aSemanticSimilarityScoreEnum = typeof(SemanticSimilarityScoreEnum).GetFields();
+						FieldInfo[] aSemanticSimilarityScoreEnum = typeof(SemanticSimilarityEnum).GetFields();
 						for (int i = 1; i < aSemanticSimilarityScoreEnum.Length; i++)
 						{
 							sbSQL.AppendFormat(", (select SUM(stats{1}.Count) FROM {0} AS stats{1} WHERE stats{1}.Measure={2} and " +

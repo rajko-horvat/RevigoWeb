@@ -308,7 +308,7 @@ namespace IRB.RevigoWeb
 		public static string PathToAddThis { get { return sPathToAddThis; } }
 
 		public static int CreateNewJob(RequestSourceEnum requestSource, string data, double cutoff, 
-            ValueTypeEnum valueType, SpeciesAnnotations annotations, SemanticSimilarityScoreEnum measure, bool removeObsolete)
+            ValueTypeEnum valueType, SpeciesAnnotations annotations, SemanticSimilarityEnum measure, bool removeObsolete)
         {
             int iJobID = -1;
 
@@ -345,7 +345,7 @@ namespace IRB.RevigoWeb
             return iJobID;
         }
 
-        public static int StartNewJob(RequestSourceEnum requestSource, string data, double cutoff, ValueTypeEnum valueType, SpeciesAnnotations annotations, SemanticSimilarityScoreEnum measure, bool removeObsolete)
+        public static int StartNewJob(RequestSourceEnum requestSource, string data, double cutoff, ValueTypeEnum valueType, SpeciesAnnotations annotations, SemanticSimilarityEnum measure, bool removeObsolete)
         {
             int iJobID = -1;
 
@@ -433,7 +433,7 @@ namespace IRB.RevigoWeb
                                 oCommand.Parameters.Add("?vCutoff", MySqlDbType.Int32).Value = (int)(worker.CutOff * 10.0);
                                 oCommand.Parameters.Add("?vValueType", MySqlDbType.Int32).Value = (int)worker.ValueType;
                                 oCommand.Parameters.Add("?vSpeciesTaxon", MySqlDbType.Int32).Value = (int)worker.Annotations.TaxonID;
-                                oCommand.Parameters.Add("?vMeasure", MySqlDbType.Int32).Value = (int)worker.Measure;
+                                oCommand.Parameters.Add("?vMeasure", MySqlDbType.Int32).Value = (int)worker.SemanticSimilarity;
                                 oCommand.Parameters.Add("?vRemoveObsolete", MySqlDbType.Int32).Value = (int)(worker.RemoveObsolete ? 1 : 0);
                                 oCommand.Parameters.Add("?vBiologicalProcess", MySqlDbType.Int64).Value =
                                     (long)((worker.BPVisualizer != null) ? worker.BPVisualizer.Terms.Length : 0);
@@ -461,7 +461,7 @@ namespace IRB.RevigoWeb
                                 oCommand.Parameters.Add("?vCutoff", MySqlDbType.Int32).Value = (int)(worker.CutOff * 10.0);
                                 oCommand.Parameters.Add("?vValueType", MySqlDbType.Int32).Value = (int)worker.ValueType;
                                 oCommand.Parameters.Add("?vSpeciesTaxon", MySqlDbType.Int32).Value = (int)worker.Annotations.TaxonID;
-                                oCommand.Parameters.Add("?vMeasure", MySqlDbType.Int32).Value = (int)worker.Measure;
+                                oCommand.Parameters.Add("?vMeasure", MySqlDbType.Int32).Value = (int)worker.SemanticSimilarity;
                                 oCommand.Parameters.Add("?vRemoveObsolete", MySqlDbType.Int32).Value = (int)(worker.RemoveObsolete ? 1 : 0);
                                 oCommand.Parameters.Add("?vNSCount", MySqlDbType.Double).Value =
                                     (worker.HasBPVisualizer ? 1.0 : 0.0) + (worker.HasMFVisualizer ? 1.0 : 0.0) +
@@ -500,7 +500,7 @@ namespace IRB.RevigoWeb
                                     oCommand.Parameters.Add("?vCutoff", MySqlDbType.Int32).Value = (int)(worker.CutOff * 10.0);
                                     oCommand.Parameters.Add("?vValueType", MySqlDbType.Int32).Value = (int)worker.ValueType;
                                     oCommand.Parameters.Add("?vSpeciesTaxon", MySqlDbType.Int32).Value = (int)worker.Annotations.TaxonID;
-                                    oCommand.Parameters.Add("?vMeasure", MySqlDbType.Int32).Value = (int)worker.Measure;
+                                    oCommand.Parameters.Add("?vMeasure", MySqlDbType.Int32).Value = (int)worker.SemanticSimilarity;
                                     oCommand.Parameters.Add("?vRemoveObsolete", MySqlDbType.Int32).Value = (int)(worker.RemoveObsolete ? 1 : 0);
                                     oCommand.Parameters.Add("?vBiologicalProcess", MySqlDbType.Int64).Value = (long)worker.BPVisualizer.Terms.Length;
                                     oCommand.Parameters.Add("?vCellularComponent", MySqlDbType.Int64).Value = (long)worker.CCVisualizer.Terms.Length;
@@ -645,7 +645,7 @@ namespace IRB.RevigoWeb
                                 oCommand.Parameters.Add("?vCutoff", MySqlDbType.Int32).Value = (int)(worker.CutOff * 10.0);
                                 oCommand.Parameters.Add("?vValueType", MySqlDbType.Int32).Value = (int)worker.ValueType;
                                 oCommand.Parameters.Add("?vSpeciesTaxon", MySqlDbType.Int32).Value = (int)worker.Annotations.TaxonID;
-                                oCommand.Parameters.Add("?vMeasure", MySqlDbType.Int32).Value = (int)worker.Measure;
+                                oCommand.Parameters.Add("?vMeasure", MySqlDbType.Int32).Value = (int)worker.SemanticSimilarity;
                                 oCommand.Parameters.Add("?vRemoveObsolete", MySqlDbType.Int32).Value = (int)(worker.RemoveObsolete ? 1 : 0);
                                 oCommand.Parameters.Add("?vNSCount", MySqlDbType.Double).Value =
                                     (worker.HasBPVisualizer ? 1.0 : 0.0) + (worker.HasMFVisualizer ? 1.0 : 0.0) +
