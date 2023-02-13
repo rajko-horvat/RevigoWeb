@@ -2,19 +2,29 @@
 <p>This is the main REVIGO web service that implements the web interface and visualizations.</p>
 
 ## How to compile and run
-<p>To compile and run the web service you need the Visual Studio Code (Visual Studio is better), compiled RevigoCore library, a set of precompiled databases: 
+<p>To compile and run the web service you need the compiled RevigoCore library, a set of precompiled databases: 
 	<a href="http://revigo.irb.hr/Databases/GeneOntology.xml.gz" target="_blank">Gene Ontology</a> and 
 	<a href="http://revigo.irb.hr/Databases/SpeciesAnnotations.xml.gz" target="_blank">Species annotations</a>, 
 	or build your own databases with <a href="https://github.com/rajko-horvat/RevigoGenerateDatabases">RevigoGenerateDatabases</a> command line utility.</p>
-	<p>The following JavaScript libraries are also needed: 
+<p>The following JavaScript libraries are also needed: 
 	<a href="https://jquery.com/download/">JQuery</a>, 
 	<a href="https://jqueryui.com/download/">JQuery-UI</a> (with Accordion, Button, Tabs, Dialog, Datepicker, Selectmenu and Tooltip widgets), 
 	<a href="https://d3js.org/">D3</a>, <a href="https://www.x3dom.org/nodes/">X3Dom</a>, <a href="https://github.com/LCweb-ita/LC-switch">LCSwitch</a> and 
 	<a href="https://github.com/cytoscape/cytoscape.js">Cytoscape</a>.</p>
-	<p>For the Statistics functionality you also need the <a href="https://github.com/mysql-net/MySqlConnector/tree/v2.1">MySqlConnector 2.1 library</a> 
+<p>For the Statistics functionality you also need the <a href="https://github.com/mysql-net/MySqlConnector/tree/v2.1">MySqlConnector 2.1 library</a> 
 	(Under project -> Buld -> Compilation Symbols the 'WEB_STATISTICS' keyword needs to be defined).</p>
-	<p>The web server can be run as a command line utility, worker service or windows service by specifying 'WINDOWS_SERVICE' or 'WORKER_SERVICE' symbols.</p>
-	<p>The 'appsettings.json' (Rename from 'appsettings.example.json') also needs to be configured properly, specifically 'AppSettings' and 'AppPaths' section.</p>
+<p>The web server can be run as a command line utility, worker service or windows service by specifying 'WINDOWS_SERVICE' or 'WORKER_SERVICE' symbols.</p>
+<p>The 'appsettings.json' (Rename from 'appsettings.example.json') also needs to be configured properly, specifically 'AppSettings' and 'AppPaths' section.</p>
+
+<p>To compile from command line: 
+<ul>
+	<li>Optional: Install <a href="https://visualstudio.microsoft.com/">Visual Studio Code</a> or <a href="https://visualstudio.microsoft.com/">Visual Studio for Windows</a> (You can also compile from Visual Studio for Windows)</li>
+	<li>Install .NET core 6.0 from Microsoft (<a href="https://dotnet.microsoft.com/download">Install .NET for Windows</a>, <a href="https://learn.microsoft.com/en-us/dotnet/core/install/linux">Install .NET for Linux</a>)</li>
+	<li>git clone https://github.com/rajko-horvat/RevigoCore</li>
+	<li>git clone https://github.com/rajko-horvat/RevigoWeb</li>
+	<li>dotnet build --configuration Release --os win-x64 RevigoWeb.csproj (For Linux use --os linux. See <a href="https://learn.microsoft.com/en-us/dotnet/core/rid-catalog">list of OS RIDs</a> for --os option)</li>
+	<li>Run generated binary file (under RevigoWeb/bin/net6.0/) and enjoy.</li>
+</ul></p>
 
 ## About REVIGO (REduce + VIsualize Gene Ontology) project
 <p>Outcomes of high-throughput biological experiments are typically interpreted by statistical testing
