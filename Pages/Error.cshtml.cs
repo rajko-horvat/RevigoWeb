@@ -34,7 +34,7 @@ namespace IRB.RevigoWeb.Pages
 					!error.Message.Contains("invalid webresource request") &&
 					!error.Message.Contains("potentially dangerous"))
 				{
-					WebUtilities.Email.SendEmailNotification(error);
+					Global.LogAndReportError(error.Source, error);
 				}
 			}
 		}

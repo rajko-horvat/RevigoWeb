@@ -530,7 +530,7 @@ namespace IRB.RevigoWeb
 				// for debugging
 				if (worker.HasDeveloperWarnings || worker.HasDeveloperErrors)
                 {
-                    WebUtilities.Email.SendEmailNotification(worker);
+                    LogAndReportError("RevigoWorker", worker);
                 }
             }
         }
@@ -666,8 +666,142 @@ namespace IRB.RevigoWeb
 #endif
 		}
 
+		public static void LogAndReportError(string source, Exception ex)
+		{
+			Global.WriteToSystemLog(source, string.Format("Error occured in the Revigo web service. Error message: '{0}'. Stack trace: '{1}'.",
+				ex.Message, ex.StackTrace));
 
-        public static void WriteToSystemLog(string source, string message)
+			if (!string.IsNullOrEmpty(Global.EmailServer) && !string.IsNullOrEmpty(Global.EmailFrom) && !string.IsNullOrEmpty(Global.EmailTo))
+			{
+				StringBuilder sMessage = new StringBuilder();
+				sMessage.AppendFormat("Error ({0}) occured in the Revigo web service, source object '{1}'.", ex.GetType().FullName, source);
+				sMessage.AppendLine();
+				sMessage.AppendLine();
+
+				sMessage.AppendFormat("Error message: {0}", ex.Message);
+				sMessage.AppendLine();
+				sMessage.AppendLine();
+
+				sMessage.AppendFormat("Stack trace: {0}", ex.StackTrace);
+				sMessage.AppendLine();
+
+				SmtpClient client = new SmtpClient(Global.EmailServer);
+				client.EnableSsl = false;
+				MailMessage message = new MailMessage(Global.EmailFrom, Global.EmailTo, "Notice from Revigo", sMessage.ToString());
+				if (!string.IsNullOrEmpty(Global.EmailCC))
+					message.CC.Add(Global.EmailCC);
+
+				try
+				{
+					client.Send(message);
+				}
+				catch (Exception ex1)
+				{
+					Global.WriteToSystemLog(typeof(Global).FullName, ex1.Message);
+				}
+			}
+		}
+
+		public static void LogAndReportError(string source, RevigoWorker worker)
+		{
+			Global.WriteToSystemLog(source, string.Format("Warning(s) and/or error(s) occured in the Revigo web service while processing the user data; " +
+				"CutOff = {0}, ValueType = {1}, SpeciesTaxon = {2}, Measure = {3}; RemoveObsolete = {4}; Warnings: {5}; Errors: {6}; Dataset: {7}",
+				worker.CutOff, worker.ValueType, worker.Annotations.TaxonID, worker.SemanticSimilarity, worker.RemoveObsolete,
+				WebUtilities.TypeConverter.JoinStringArray(worker.DeveloperWarnings), WebUtilities.TypeConverter.JoinStringArray(worker.DeveloperErrors), worker.Data));
+
+			if (!string.IsNullOrEmpty(Global.EmailServer) && !string.IsNullOrEmpty(Global.EmailFrom) && !string.IsNullOrEmpty(Global.EmailTo))
+			{
+				StringBuilder sMessage = new StringBuilder();
+				sMessage.AppendFormat("Warning(s) and/or error(s) occured in the Revigo web service while processing the user data, source object: '{0}.", source);
+				sMessage.AppendLine();
+				sMessage.AppendLine("The user data set has been attached.");
+				sMessage.AppendLine();
+				sMessage.AppendFormat("Parameters: CutOff = {0}, ValueType = {1}, SpeciesTaxon = {2}, Measure = {3}, RemoveObsolete = {4}",
+					worker.CutOff, worker.ValueType, worker.Annotations.TaxonID, worker.SemanticSimilarity, worker.RemoveObsolete);
+				sMessage.AppendLine();
+				if (worker.HasDeveloperWarnings)
+				{
+					sMessage.AppendLine();
+					sMessage.AppendFormat("Warnings: {0}", WebUtilities.TypeConverter.JoinStringArray(worker.DeveloperWarnings));
+					sMessage.AppendLine();
+				}
+				if (worker.HasDeveloperErrors)
+				{
+					sMessage.AppendLine();
+					sMessage.AppendFormat("Errors: {0}", WebUtilities.TypeConverter.JoinStringArray(worker.DeveloperErrors));
+					sMessage.AppendLine();
+				}
+
+				SmtpClient client = new SmtpClient(Global.EmailServer);
+				client.EnableSsl = false;
+				MailMessage message = new MailMessage(Global.EmailFrom, Global.EmailTo, "Notice from Revigo", sMessage.ToString());
+				if (!string.IsNullOrEmpty(Global.EmailCC))
+					message.CC.Add(Global.EmailCC);
+				MemoryStream oStream = new MemoryStream(Encoding.UTF8.GetBytes(worker.Data));
+				message.Attachments.Add(new Attachment(oStream, "dataset.txt", "text/plain;charset=UTF-8"));
+
+				try
+				{
+					client.Send(message);
+				}
+				catch (Exception ex)
+				{
+					Global.WriteToSystemLog(typeof(Global).FullName, ex.Message);
+				}
+
+				oStream.Close();
+			}
+		}
+
+		public static void LogAndReportError(string source, RevigoWorker worker, Exception ex)
+		{
+			Global.WriteToSystemLog(source, string.Format("Error occured in the Revigo web service while exporting the job results; " +
+				"CutOff = {0}, ValueType = {1}, SpeciesTaxon = {2}, Measure = {3}; Warnings: {4}; Errors: {5}; Dataset: {6}",
+				worker.CutOff, worker.ValueType, worker.Annotations.TaxonID, worker.SemanticSimilarity,
+				WebUtilities.TypeConverter.JoinStringArray(worker.DeveloperWarnings), WebUtilities.TypeConverter.JoinStringArray(worker.DeveloperErrors), worker.Data));
+
+			if (!string.IsNullOrEmpty(Global.EmailServer) && !string.IsNullOrEmpty(Global.EmailFrom) && !string.IsNullOrEmpty(Global.EmailTo))
+			{
+				StringBuilder sMessage = new StringBuilder();
+				sMessage.AppendFormat("Error occured in the Revigo web service while exporting the job results ({0}), source object '{1}'.", ex.GetType().FullName, source);
+				sMessage.AppendLine();
+				sMessage.AppendLine("The user data set has been attached.");
+				sMessage.AppendLine();
+				sMessage.AppendLine();
+				sMessage.AppendFormat("Parameters: CutOff = {0}, ValueType = {1}, SpeciesTaxon = {2}, Measure = {3}, RemoveObsolete = {4}",
+					worker.CutOff, worker.ValueType, worker.Annotations.TaxonID, worker.SemanticSimilarity, worker.RemoveObsolete);
+				sMessage.AppendLine();
+				sMessage.AppendLine();
+
+				sMessage.AppendFormat("Error message: {0}", ex.Message);
+				sMessage.AppendLine();
+				sMessage.AppendLine();
+
+				sMessage.AppendFormat("Stack trace: {0}", ex.StackTrace);
+				sMessage.AppendLine();
+
+				SmtpClient client = new SmtpClient(Global.EmailServer);
+				client.EnableSsl = false;
+				MailMessage message = new MailMessage(Global.EmailFrom, Global.EmailTo, "Notice from Revigo", sMessage.ToString());
+				if (!string.IsNullOrEmpty(Global.EmailCC))
+					message.CC.Add(Global.EmailCC);
+				MemoryStream oStream = new MemoryStream(Encoding.UTF8.GetBytes(worker.Data));
+				message.Attachments.Add(new Attachment(oStream, "dataset.txt", "text/plain;charset=UTF-8"));
+
+				try
+				{
+					client.Send(message);
+				}
+				catch (Exception ex1)
+				{
+					Global.WriteToSystemLog(typeof(Global).FullName, ex1.Message);
+				}
+
+				oStream.Close();
+			}
+		}
+
+		public static void WriteToSystemLog(string source, string message)
         {
             if (oLog != null)
             {

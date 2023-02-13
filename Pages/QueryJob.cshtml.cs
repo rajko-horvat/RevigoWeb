@@ -1033,7 +1033,7 @@ namespace IRB.RevigoWeb.Pages
 							writer.Append(oVisualizer.Terms[i].FormattedID);
 							for (int j = 0; j < oVisualizer.Terms.Length; j++)
 							{
-								writer.AppendFormat("\t{0}", oVisualizer.Matrix.Matrix[i, j].ToString(CultureInfo.InvariantCulture));
+								writer.AppendFormat("\t{0}", oVisualizer.Matrix.GetValue(i, j).ToString(CultureInfo.InvariantCulture));
 							}
 							writer.AppendLine();
 						}
@@ -1168,7 +1168,7 @@ namespace IRB.RevigoWeb.Pages
 			catch (ThreadAbortException) { throw; /* propagate */ }
 			catch (Exception ex)
 			{
-				WebUtilities.Email.SendEmailNotification(oWorker, ex, sType);
+				Global.LogAndReportError(string.Format("{0} ({1})", typeof(QueryJobModel).Name, sType), oWorker, ex);
 				return ReturnError("Undefined error occured while querying the job.");
 			}
 		}

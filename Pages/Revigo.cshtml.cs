@@ -214,7 +214,7 @@ namespace IRB.RevigoWeb.Pages
 
 				if (oWorker.HasDeveloperWarnings || oWorker.HasDeveloperErrors)
 				{
-					WebUtilities.Email.SendEmailNotification(oWorker);
+					Global.LogAndReportError("RevigoWorker", oWorker);
 				}
 			}
 
