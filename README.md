@@ -22,7 +22,9 @@
 	<li>Install .NET core 6.0 from Microsoft (<a href="https://dotnet.microsoft.com/download">Install .NET for Windows</a>, <a href="https://learn.microsoft.com/en-us/dotnet/core/install/linux">Install .NET for Linux</a>)</li>
 	<li>git clone https://github.com/rajko-horvat/RevigoCore</li>
 	<li>git clone https://github.com/rajko-horvat/RevigoWeb</li>
+	<li>Configure 'DefineConstants' section in RevigoWeb.csproj file</li>
 	<li>dotnet build --configuration Release --os win-x64 RevigoWeb.csproj (For Linux use --os linux. See <a href="https://learn.microsoft.com/en-us/dotnet/core/rid-catalog">list of OS RIDs</a> for --os option)</li>
+	<li>Copy entire wwwroot directory to the binary directory (for example: cp -r wwwroot ./bin/net6.0/linux-x64/)</li>
 	<li>Run generated binary file (under RevigoWeb/bin/net6.0/) and enjoy.</li>
 </ul></p>
 
