@@ -13,30 +13,36 @@ using System.Text;
 
 namespace IRB.RevigoWeb.Pages
 {
-    public class GetStatisticsModel : PageModel
+	public class GetStatisticsModel : PageModel
 	{
 #if WEB_STATISTICS
 		public ContentResult OnGet()
-        {
-			string sKey = WebUtilities.TypeConverter.ToString(Request.Query["key"]);
+		{
+			string? sKey = WebUtilities.TypeConverter.ToString(Request.Query["key"]);
 
 			if (string.IsNullOrEmpty(sKey) || sKey != Global.StatisticsKey)
 			{
 				return Content("{}", "application/json", Encoding.UTF8);
 			}
 
-			DBConnection oConnection = new DBConnection(Global.ConnectionString);
-
 			string sContentType = "application/json";
 			StringBuilder writer = new StringBuilder();
 
-			if (oConnection != null && oConnection.IsConnected)
+			if (!string.IsNullOrEmpty(Global.ConnectionString))
 			{
+				if (Global.SpeciesAnnotations == null)
+				{
+					writer.AppendFormat("{{\"error\":\"Species annotations not available\",\"maxDate\":{0},\"requestCount\":0,\"views\":[]}}",
+						(new DateTime(Global.MaxStatTicks)).ToString("d.M.yyyy"));
+
+					return Content(writer.ToString(), sContentType, Encoding.UTF8);
+				}
+
 				// parameters
 				DateTime dtFrom;
 				DateTime dtTo;
-				string sFrom = WebUtilities.TypeConverter.ToString(Request.Query["from"]);
-				string sTo = WebUtilities.TypeConverter.ToString(Request.Query["to"]);
+				string? sFrom = WebUtilities.TypeConverter.ToString(Request.Query["from"]);
+				string? sTo = WebUtilities.TypeConverter.ToString(Request.Query["to"]);
 
 				if (DateTime.TryParseExact(sFrom, "d.M.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtFrom) &&
 					DateTime.TryParseExact(sTo, "d.M.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtTo))
@@ -54,30 +60,10 @@ namespace IRB.RevigoWeb.Pages
 					{
 						int iMaxPoints = 100; // how many points we want in our graph
 						DataTable dtResult = new DataTable();
-
 						// compile data list
 						StringBuilder sbSQL = new StringBuilder();
 						int iTableIndex = 0;
 						string sTableName = "stats";
-
-						MySqlCommand oCommand = new MySqlCommand(
-							string.Format("select count(*) from {0} where ({0}.DateTimeTicks>=?from) and ({0}.DateTimeTicks<?to);", sTableName),
-							oConnection.Connection);
-						oCommand.Parameters.Add("?from", MySqlDbType.Int64).Value = dtFrom.Ticks;
-						oCommand.Parameters.Add("?to", MySqlDbType.Int64).Value = dtTo.Ticks;
-						object count = oCommand.ExecuteScalar();
-
-						if (count != null && count != DBNull.Value)
-						{
-							try
-							{
-								if (Convert.ToInt64(count) > 1200)
-								{
-									sTableName = "stats_h";
-								}
-							}
-							catch { }
-						}
 
 						sbSQL.AppendFormat("select {0}.DateTimeTicks, SUM({0}.Count) AS Requests", sTableName);
 
@@ -185,14 +171,45 @@ namespace IRB.RevigoWeb.Pages
 
 						sbSQL.AppendFormat(" from {0} where ({0}.DateTimeTicks>=?from) and ({0}.DateTimeTicks<?to) group by {0}.DateTimeTicks;", sTableName);
 
-						// fetch the data
-						MySqlDataAdapter oAdapter = new MySqlDataAdapter(sbSQL.ToString(), oConnection.Connection);
-						oAdapter.SelectCommand.Parameters.Add("?from", MySqlDbType.Int64).Value = dtFrom.Ticks;
-						oAdapter.SelectCommand.Parameters.Add("?to", MySqlDbType.Int64).Value = dtTo.Ticks;
-						//oAdapter.SelectCommand.CommandTimeout = 240;
-						oAdapter.Fill(dtResult);
-						oAdapter.Dispose();
+						using (MySqlConnection oConnection = new MySqlConnection(Global.ConnectionString))
+						{
+							oConnection.Open();
+							object? count = null;
 
+							using (MySqlCommand oCommand = new MySqlCommand(
+								string.Format("select count(*) from {0} where ({0}.DateTimeTicks>=?from) and ({0}.DateTimeTicks<?to);", sTableName),
+								oConnection))
+							{
+								oCommand.Parameters.Add("?from", MySqlDbType.Int64).Value = dtFrom.Ticks;
+								oCommand.Parameters.Add("?to", MySqlDbType.Int64).Value = dtTo.Ticks;
+								count = oCommand.ExecuteScalar();
+							}
+
+							if (count != null && count != DBNull.Value)
+							{
+								try
+								{
+									if (Convert.ToInt64(count) > 1200)
+									{
+										sTableName = "stats_h";
+									}
+								}
+								catch { }
+							}
+
+							// fetch the data
+							using (MySqlDataAdapter oAdapter = new MySqlDataAdapter(sbSQL.ToString(), oConnection))
+							{
+								if (oAdapter.SelectCommand != null)
+								{
+									oAdapter.SelectCommand.Parameters.Add("?from", MySqlDbType.Int64).Value = dtFrom.Ticks;
+									oAdapter.SelectCommand.Parameters.Add("?to", MySqlDbType.Int64).Value = dtTo.Ticks;
+									//oAdapter.SelectCommand.CommandTimeout = 240;
+									oAdapter.Fill(dtResult);
+									oAdapter.Dispose();
+								}
+							}
+						}
 						if (dtResult.Rows.Count > 0)
 						{
 							List<string> aViewNames = new List<string>();
@@ -513,7 +530,7 @@ namespace IRB.RevigoWeb.Pages
 						writer.AppendFormat("{{\"error\":\"Error accessing data\",\"maxDate\":\"{0}\",\"requestCount\":0,\"views\":[]}}",
 							(new DateTime(Global.MaxStatTicks)).ToString("d.M.yyyy"));
 						writer.AppendLine();
-						Global.WriteToSystemLog(typeof(Global).FullName, ex.Message);
+						Global.WriteToSystemLog($"{this.GetType().Name}.OnGet", $"Message: '{ex.Message}', Stack trace: '{ex.StackTrace}'");
 					}
 				}
 				else
@@ -522,11 +539,9 @@ namespace IRB.RevigoWeb.Pages
 						(new DateTime(Global.MaxStatTicks)).ToString("d.M.yyyy"));
 					writer.AppendLine();
 				}
-				oConnection.Close();
-				
+
 				return Content(writer.ToString(), sContentType, Encoding.UTF8);
 			}
-
 			writer.AppendFormat("{{\"error\":\"No database available\",\"maxDate\":{0},\"requestCount\":0,\"views\":[]}}",
 				(new DateTime(Global.MaxStatTicks)).ToString("d.M.yyyy"));
 

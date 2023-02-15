@@ -16,20 +16,20 @@ namespace RevigoWeb.Pages
 	[IgnoreAntiforgeryToken]
 	public class IndexModel : PageModel
     {
-        public string ErrorMessage = null;
+        public string? ErrorMessage = null;
 
 		[BindProperty]
-		public string txtGOInput { get; set; }
+		public string? txtGOInput { get; set; }
 		[BindProperty]
-		public string chkCutOff { get; set; }
+		public string? chkCutOff { get; set; }
 		[BindProperty]
-		public string lstValueType { get; set; }
+		public string? lstValueType { get; set; }
 		[BindProperty]
-		public string chkRemoveObsolete { get; set; }
+		public string? chkRemoveObsolete { get; set; }
 		[BindProperty]
-		public string lstSpecies { get; set; }
+		public string? lstSpecies { get; set; }
 		[BindProperty]
-		public string lstSimilarity { get; set; }
+		public string? lstSimilarity { get; set; }
 
 		private bool bAutoStart = false;
 
@@ -58,7 +58,7 @@ namespace RevigoWeb.Pages
 		private void StartJob()
 		{
 			// validate parameters
-			string sUserData = this.txtGOInput;
+			string? sUserData = this.txtGOInput;
 			double dCutoff = 0.7;
 			ValueTypeEnum eValueType = ValueTypeEnum.PValue;
 			int iSpeciesTaxon = 0;
@@ -151,14 +151,20 @@ namespace RevigoWeb.Pages
 				ShowError("Please select appropriate species taxon.");
 				return;
 			}
-			SpeciesAnnotations oAnnotations = Global.SpeciesAnnotations.GetByID(iSpeciesTaxon);
+			SpeciesAnnotations? oAnnotations = Global.SpeciesAnnotations.GetByID(iSpeciesTaxon);
+			if (oAnnotations == null)
+			{
+				ShowError("Selected species has not been found.");
+				return;
+			}
 
-			string sSimilarity = this.lstSimilarity;
+			string? sSimilarity = this.lstSimilarity;
 			bool bFound = false;
 			Array aEnumValues = Enum.GetValues(typeof(SemanticSimilarityEnum));
 			foreach (var value in aEnumValues)
 			{
-				if (value.ToString().Equals(sSimilarity, StringComparison.InvariantCultureIgnoreCase))
+				string? sValue = value.ToString();
+				if (!string.IsNullOrEmpty(sValue) && sValue.Equals(sSimilarity, StringComparison.InvariantCultureIgnoreCase))
 				{
 					eMeasure = (SemanticSimilarityEnum)value;
 					bFound = true;
@@ -181,7 +187,7 @@ namespace RevigoWeb.Pages
 			}
 			catch (Exception ex)
 			{
-				Global.WriteToSystemLog(this.GetType().Name, ex.StackTrace);
+				Global.WriteToSystemLog($"{this.GetType().Name}.LogAndReportError", $"Message: '{ex.Message}', Stack trace: '{ex.StackTrace}'");
 				ShowError("Undefined error occured");
 				return;
 			}
@@ -198,13 +204,16 @@ namespace RevigoWeb.Pages
 		// we wan't to support old style job submitting, and returns from result page
 		private void FillParameters()
 		{
-			string sUserData = null;
-			string sCutOff = null;
-			string sValueType = null;
-			string sSpeciesTaxon = null;
-			string sSimilarity = null;
-			string sRemoveObsolete = null;
-			string sAutoStart = null;
+			string? sUserData = null;
+			string? sCutOff = null;
+			string? sValueType = null;
+			string? sSpeciesTaxon = null;
+			string? sSimilarity = null;
+			string? sRemoveObsolete = null;
+			string? sAutoStart = null;
+
+			if (Global.SpeciesAnnotations == null)
+				return;
 
 			if (Request.ContentType == "application/x-www-form-urlencoded")
 			{
@@ -221,13 +230,13 @@ namespace RevigoWeb.Pages
 				sValueType = WebUtilities.TypeConverter.ToString(Request.Form["valueType"]);
 				if (string.IsNullOrEmpty(sValueType))
 				{
-					string sIsPValue = WebUtilities.TypeConverter.ToString(Request.Form["isPValue"]); // {no, yes} - deprecated, use "valueType"
+					string? sIsPValue = WebUtilities.TypeConverter.ToString(Request.Form["isPValue"]); // {no, yes} - deprecated, use "valueType"
 					if (!string.IsNullOrEmpty(sIsPValue))
 					{
 						sIsPValue = sIsPValue.Trim();
 						if (!sIsPValue.Equals("yes", StringComparison.InvariantCultureIgnoreCase))
 						{
-							string sWhatIsBetter = WebUtilities.TypeConverter.ToString(Request.Form["whatIsBetter"]); // {higher, lower, absolute, abs_log} - deprecated, use "valueType"
+							string? sWhatIsBetter = WebUtilities.TypeConverter.ToString(Request.Form["whatIsBetter"]); // {higher, lower, absolute, abs_log} - deprecated, use "valueType"
 							if (!string.IsNullOrEmpty(sWhatIsBetter))
 							{
 								switch (sWhatIsBetter.Trim().ToLower())
@@ -265,7 +274,7 @@ namespace RevigoWeb.Pages
 			else
 			{
 				int iJobID = -1;
-				string sJobID = WebUtilities.TypeConverter.ToString(Request.Query["JobID"]);
+				string? sJobID = WebUtilities.TypeConverter.ToString(Request.Query["JobID"]);
 
 				if (!string.IsNullOrEmpty(sJobID) && int.TryParse(sJobID, out iJobID) && Global.Jobs != null && Global.Jobs.ContainsKey(iJobID))
 				{
@@ -275,7 +284,7 @@ namespace RevigoWeb.Pages
 					sUserData = oWorker.Data;
 					sCutOff = oWorker.CutOff.ToString(CultureInfo.InvariantCulture);
 					sValueType = oWorker.ValueType.ToString();
-					sSpeciesTaxon = oWorker.Annotations.TaxonID.ToString();
+					sSpeciesTaxon = (oWorker.Annotations == null) ? "0" : oWorker.Annotations.TaxonID.ToString();
 					sSimilarity = oWorker.SemanticSimilarity.ToString();
 					sRemoveObsolete = oWorker.RemoveObsolete.ToString();
 

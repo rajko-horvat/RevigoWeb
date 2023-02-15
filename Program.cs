@@ -25,12 +25,14 @@ internal class Program
 	}
 #else
 
-	private static WebApplication oWebApplication;
+	private static WebApplication? oWebApplication = null;
 
 	private static void Main(string[] args)
 	{
 		// ensure that CWD is the assembly path to be able to access contents and configuration files
-		Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+		string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+		if (!string.IsNullOrEmpty(path))
+			Directory.SetCurrentDirectory(path);
 
 		var builder = WebApplication.CreateBuilder(args);
 
@@ -70,7 +72,7 @@ internal class Program
 
 	private static void OnStarted()
 	{
-		Global.StartApplication(oWebApplication.Configuration);
+		Global.StartApplication(oWebApplication?.Configuration);
 	}
 
 	private static void OnStopped()

@@ -10,7 +10,7 @@ namespace IRB.RevigoWeb
     {
 		public static class TypeConverter
         {
-            public static Boolean ToBoolean(object value)
+            public static Boolean ToBoolean(object? value)
             {
                 bool bValue = false;
 
@@ -27,7 +27,7 @@ namespace IRB.RevigoWeb
                 return bValue;
             }
 
-            public static uint ToUInt32(object value)
+            public static uint ToUInt32(object? value)
             {
                 uint uiValue = 0;
 
@@ -44,7 +44,7 @@ namespace IRB.RevigoWeb
                 return uiValue;
             }
 
-            public static int ToInt32(object value)
+            public static int ToInt32(object? value)
             {
                 int iValue = 0;
 
@@ -61,7 +61,7 @@ namespace IRB.RevigoWeb
                 return iValue;
             }
 
-            public static long ToInt64(object value)
+            public static long ToInt64(object? value)
             {
                 long lValue = 0;
 
@@ -78,7 +78,7 @@ namespace IRB.RevigoWeb
                 return lValue;
             }
 
-            public static double ToDouble(object value)
+            public static double ToDouble(object? value)
             {
                 double dValue = 0.0;
 
@@ -95,7 +95,7 @@ namespace IRB.RevigoWeb
                 return dValue;
             }
 
-            public static string? ToString(object value)
+            public static string? ToString(object? value)
             {
                 string? sValue = null;
 
@@ -122,8 +122,11 @@ namespace IRB.RevigoWeb
 				return value.ToString(CultureInfo.InvariantCulture);
 			}
 
-			public static string StringToJSON(string text)
+			public static string StringToJSON(string? text)
 			{
+				if (string.IsNullOrEmpty(text))
+					return "null";
+
 				StringBuilder result = new StringBuilder();
 
 				for (int i = 0; i < text.Length; i++)

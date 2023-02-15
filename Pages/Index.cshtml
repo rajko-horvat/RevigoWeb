@@ -144,7 +144,7 @@
             <select id="lstSpecies" name="lstSpecies">
                 @{
                     // fill species list
-                    string sTemp = Model.lstSpecies;
+                    string? sTemp = Model.lstSpecies;
 
                     if (Global.SpeciesAnnotations != null)
 			        {
@@ -233,7 +233,7 @@
                     The Gene Ontology database
                     @if (Global.Ontology != null)
 			        {
-				        string link = Global.Ontology.Link;
+				        string? link = Global.Ontology.Link;
 				        if (!string.IsNullOrEmpty(link))
 				        {
                             string[] aLink = link.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
@@ -254,7 +254,7 @@
                     The UniProt-to-GO mapping database from the EBI GOA project
                     @if (Global.SpeciesAnnotations != null)
                     {
-                        string link = Global.SpeciesAnnotations.Link;
+                        string? link = Global.SpeciesAnnotations.Link;
                         if (!string.IsNullOrEmpty(link))
                         {
                             string[] aLink = link.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);

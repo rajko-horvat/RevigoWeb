@@ -12,20 +12,20 @@ namespace IRB.RevigoWeb.Pages
 {
 	[IgnoreAntiforgeryToken]
 	public class RevigoModel : PageModel
-    {
-		public string ErrorMessage = null;
+	{
+		public string? ErrorMessage = null;
 
-		public RevigoWorker oWorker = null;
-		public DataTable BPTable = null;
-		public DataTable CCTable = null;
-		public DataTable MFTable = null;
+		public RevigoWorker? oWorker = null;
+		public DataTable? BPTable = null;
+		public DataTable? CCTable = null;
+		public DataTable? MFTable = null;
 
 		public void OnGet()
-        {
+		{
 			ProcessJob();
 		}
 
-		public void OnPost() 
+		public void OnPost()
 		{
 			ProcessJob();
 		}
@@ -41,6 +41,12 @@ namespace IRB.RevigoWeb.Pages
 			if (Request.ContentType != "application/x-www-form-urlencoded")
 			{
 				ShowError("Tre request must be sent as a form.");
+				return;
+			}
+
+			if (Global.Ontology == null)
+			{
+				ShowError("Gene Ontology object is not initialized.");
 				return;
 			}
 
@@ -102,7 +108,12 @@ namespace IRB.RevigoWeb.Pages
 					return;
 				}
 			}
-			SpeciesAnnotations oAnnotations = Global.SpeciesAnnotations.GetByID(iSpeciesTaxon);
+			SpeciesAnnotations? oAnnotations = Global.SpeciesAnnotations.GetByID(iSpeciesTaxon);
+			if (oAnnotations == null)
+			{
+				ShowError("The speciesTaxon field has invalid value");
+				return;
+			}
 
 			// {SIMREL, LIN, RESNIK, JIANG}
 			// if the value is not provided SIMREL will be assumed
@@ -147,7 +158,7 @@ namespace IRB.RevigoWeb.Pages
 			}
 			catch (Exception ex)
 			{
-				Global.WriteToSystemLog(this.GetType().Name, ex.StackTrace);
+				Global.WriteToSystemLog($"{this.GetType().Name}.ProcessJob", $"Message: '{ex.Message}', Stack trace: '{ex.StackTrace}'");
 				ShowError("Undefined error occured");
 				return;
 			}
@@ -170,7 +181,7 @@ namespace IRB.RevigoWeb.Pages
 			{
 				if (!oWorker.HasUserErrors && !oWorker.HasDeveloperErrors)
 				{
-					if (oWorker.HasBPVisualizer)
+					if (oWorker.BPVisualizer != null && oWorker.HasBPVisualizer)
 					{
 						// Assign the Biological process controls
 						TermListVisualizer oVisualizer = oWorker.BPVisualizer;
@@ -182,7 +193,7 @@ namespace IRB.RevigoWeb.Pages
 
 						Global.UpdateJobUsageStats(oWorker, "table", "1");
 					}
-					if (oWorker.HasCCVisualizer)
+					if (oWorker.CCVisualizer != null && oWorker.HasCCVisualizer)
 					{
 						// Assign the Biological process controls
 						TermListVisualizer oVisualizer = oWorker.CCVisualizer;
@@ -194,7 +205,7 @@ namespace IRB.RevigoWeb.Pages
 
 						Global.UpdateJobUsageStats(oWorker, "table", "2");
 					}
-					if (oWorker.HasMFVisualizer)
+					if (oWorker.MFVisualizer != null && oWorker.HasMFVisualizer)
 					{
 						// Assign the Biological process controls
 						TermListVisualizer oVisualizer = oWorker.MFVisualizer;
@@ -239,39 +250,42 @@ namespace IRB.RevigoWeb.Pages
 			dtResultTable.Columns.Add("Eliminated", typeof(bool));
 			dtResultTable.Columns.Add("Representative", typeof(string));
 
-			// fill table with data
-			for (int i = 0; i < terms.Count; i++)
+			if (oWorker != null)
 			{
-				GOTerm curGOTerm = terms[i];
-				GOTermProperties oProperties = oWorker.AllProperties.GetValueByKey(curGOTerm.ID);
-				DataRow row = dtResultTable.NewRow();
-				int iColumn = 0;
+				// fill table with data
+				for (int i = 0; i < terms.Count; i++)
+				{
+					GOTerm curGOTerm = terms[i];
+					GOTermProperties oProperties = oWorker.AllProperties.GetValueByKey(curGOTerm.ID);
+					DataRow row = dtResultTable.NewRow();
+					int iColumn = 0;
 
-				// hidden columns
-				row[iColumn] = curGOTerm.ID;
-				iColumn++;
-				row[iColumn] = curGOTerm.Description;
-				iColumn++;
+					// hidden columns
+					row[iColumn] = curGOTerm.ID;
+					iColumn++;
+					row[iColumn] = curGOTerm.Description;
+					iColumn++;
 
-				// visible columns
-				row[iColumn] = curGOTerm.FormattedID;
-				iColumn++;
-				row[iColumn] = curGOTerm.Name;
-				iColumn++;
-				row[iColumn] = oProperties.AnnotationFrequency * 100.0;
-				iColumn++;
-				row[iColumn] = oProperties.Value;
-				iColumn++;
-				row[iColumn] = oProperties.Uniqueness;
-				iColumn++;
-				row[iColumn] = oProperties.Dispensability;
-				iColumn++;
-				row[iColumn] = oProperties.Dispensability > oWorker.CutOff;
-				iColumn++;
-				row[iColumn] = (oProperties.Representative > 0) ? oProperties.Representative.ToString() : "null";
-				iColumn++;
+					// visible columns
+					row[iColumn] = curGOTerm.FormattedID;
+					iColumn++;
+					row[iColumn] = curGOTerm.Name;
+					iColumn++;
+					row[iColumn] = oProperties.AnnotationFrequency * 100.0;
+					iColumn++;
+					row[iColumn] = oProperties.Value;
+					iColumn++;
+					row[iColumn] = oProperties.Uniqueness;
+					iColumn++;
+					row[iColumn] = oProperties.Dispensability;
+					iColumn++;
+					row[iColumn] = oProperties.Dispensability > oWorker.CutOff;
+					iColumn++;
+					row[iColumn] = (oProperties.Representative > 0) ? oProperties.Representative.ToString() : "null";
+					iColumn++;
 
-				dtResultTable.Rows.Add(row);
+					dtResultTable.Rows.Add(row);
+				}
 			}
 
 			return dtResultTable;

@@ -9,7 +9,7 @@ namespace IRB.RevigoWeb.Pages
 	[IgnoreAntiforgeryToken]
 	public class ErrorModel : PageModel
     {
-		public string ErrorMessage { get; set; }
+		public string? ErrorMessage { get; set; }
 
         public void OnGet()
         {
@@ -34,7 +34,7 @@ namespace IRB.RevigoWeb.Pages
 					!error.Message.Contains("invalid webresource request") &&
 					!error.Message.Contains("potentially dangerous"))
 				{
-					Global.LogAndReportError(error.Source, error);
+					Global.LogAndReportError((error.Source == null) ? "Undefined" : error.Source, error);
 				}
 			}
 		}

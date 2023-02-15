@@ -13,20 +13,20 @@ namespace IRB.RevigoWeb.Pages
     public class ContactModel : PageModel
     {
 		private static HttpClient oHttpClient = new HttpClient();
-		public string ErrorMessage = null;
+		public string? ErrorMessage = null;
 		public bool SeccessfullySent = false;
 
 		[BindProperty]
-		public string txtName { get; set; }
+		public string? txtName { get; set; }
 
 		[BindProperty]
-		public string txtEmail { get; set; }
+		public string? txtEmail { get; set; }
 
 		[BindProperty]
-		public string txtMessage { get; set; }
+		public string? txtMessage { get; set; }
 
 		[BindProperty]
-		public string chkGDPR { get; set; }
+		public string? chkGDPR { get; set; }
 
 		public void OnGet()
         {
@@ -76,19 +76,15 @@ namespace IRB.RevigoWeb.Pages
 				return;
 			}
 
-			string sEmailServer = Global.EmailServer;
-			string sEmailTo = Global.EmailTo;
-			string sEmailCc = Global.EmailCC;
-
-			if (!string.IsNullOrEmpty(sEmailServer) && !string.IsNullOrEmpty(sEmailTo))
+			if (!string.IsNullOrEmpty(Global.EmailServer) && !string.IsNullOrEmpty(Global.EmailTo))
 			{
-				SmtpClient client = new SmtpClient(sEmailServer);
+				SmtpClient client = new SmtpClient(Global.EmailServer);
 				client.EnableSsl = false;
-				MailMessage message = new MailMessage(this.txtEmail, sEmailTo, "User message from Revigo",
+				MailMessage message = new MailMessage(this.txtEmail, Global.EmailTo, "User message from Revigo",
 					string.Format("Name: {0}\r\n\r\nMessage:\r\n{1}",
 					this.txtName, this.txtMessage));
-				if (!string.IsNullOrEmpty(sEmailCc))
-					message.CC.Add(sEmailCc);
+				if (!string.IsNullOrEmpty(Global.EmailCC))
+					message.CC.Add(Global.EmailCC);
 
 				try
 				{
@@ -96,7 +92,7 @@ namespace IRB.RevigoWeb.Pages
 				}
 				catch (Exception ex)
 				{
-					Global.WriteToSystemLog(this.GetType().FullName, ex.Message);
+					Global.WriteToSystemLog($"{typeof(Global).GetType().Name}.OnPost", $"Message: '{ex.Message}', Stack trace: '{ex.StackTrace}'");
 
 					ShowMessage("The e-mail server has reported error, please check your e-mail address and try again.");
 					return;
@@ -120,8 +116,11 @@ namespace IRB.RevigoWeb.Pages
 			VerificationFailed
 		}
 
-		private CaptchaErrorEnum ValidateCaptcha(string privateKey)
+		private CaptchaErrorEnum ValidateCaptcha(string? privateKey)
 		{
+			if (string.IsNullOrEmpty(privateKey))
+				return CaptchaErrorEnum.Unavailable;
+
 			try
 			{
 				oHttpClient.Timeout = new TimeSpan(0, 0, 30);
@@ -146,16 +145,20 @@ namespace IRB.RevigoWeb.Pages
 					// parse JSON response
 					while (!reader.EndOfStream)
 					{
-						string line = reader.ReadLine().Replace("\"", "").Trim();
-						if (line.StartsWith("success:", StringComparison.CurrentCultureIgnoreCase))
+						string? line = reader.ReadLine();
+						if (!string.IsNullOrEmpty(line))
 						{
-							string value = line.Substring(8).Replace(",", "").Trim().ToLower();
-							switch (value)
+							line = line.Replace("\"", "").Trim();
+							if (line.StartsWith("success:", StringComparison.CurrentCultureIgnoreCase))
 							{
-								case "true":
-									return CaptchaErrorEnum.OK;
-								default:
-									return CaptchaErrorEnum.VerificationFailed;
+								string value = line.Substring(8).Replace(",", "").Trim().ToLower();
+								switch (value)
+								{
+									case "true":
+										return CaptchaErrorEnum.OK;
+									default:
+										return CaptchaErrorEnum.VerificationFailed;
+								}
 							}
 						}
 					}

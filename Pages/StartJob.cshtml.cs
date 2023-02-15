@@ -88,7 +88,9 @@ namespace IRB.RevigoWeb.Pages
 					return ReturnError("The speciesTaxon field has invalid value");
 				}
 			}
-			SpeciesAnnotations oAnnotations = Global.SpeciesAnnotations.GetByID(iSpeciesTaxon);
+			SpeciesAnnotations? oAnnotations = Global.SpeciesAnnotations.GetByID(iSpeciesTaxon);
+			if (oAnnotations == null)
+				return ReturnError("The speciesTaxon field has invalid value");
 
 			// {SIMREL, LIN, RESNIK, JIANG}
 			// if the value is not provided SIMREL will be assumed
@@ -131,7 +133,7 @@ namespace IRB.RevigoWeb.Pages
 			}
 			catch (Exception ex)
 			{
-				Global.WriteToSystemLog(this.GetType().Name, ex.StackTrace);
+				Global.WriteToSystemLog($"{this.GetType().Name}.ProcessJob", $"Message: '{ex.Message}', Stack trace: '{ex.StackTrace}'");
 				return ReturnError("Undefined error occured");
 			}
 

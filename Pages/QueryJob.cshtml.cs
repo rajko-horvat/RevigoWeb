@@ -13,10 +13,10 @@ namespace IRB.RevigoWeb.Pages
 	public class QueryJobModel : PageModel
     {
 		private int iJobID = -1;
-		private RevigoWorker oWorker = null;
+		private RevigoWorker? oWorker = null;
 		private GONamespaceEnum eNamespace = GONamespaceEnum.None;
 		private string sNamespace = "_";
-		private TermListVisualizer oVisualizer = null;
+		private TermListVisualizer? oVisualizer = null;
 
 		private bool bAttachment = false;
 		private bool bJSON = true;  // true by default
@@ -33,7 +33,13 @@ namespace IRB.RevigoWeb.Pages
 
 		private ContentResult ProcessQuery()
 		{
-			string sType = null;
+			string? sType = null;
+
+			if (Global.Ontology == null)
+				return ReturnError("Gene Ontology object is not initialized.");
+
+			if (Global.SpeciesAnnotations == null)
+				return ReturnError("Species annotations object is not initialized.");
 
 			try
 			{
@@ -54,7 +60,7 @@ namespace IRB.RevigoWeb.Pages
 					}
 				}
 
-				string sJobID = WebUtilities.TypeConverter.ToString(Request.Query["JobID"]);
+				string? sJobID = WebUtilities.TypeConverter.ToString(Request.Query["JobID"]);
 
 				if (!string.IsNullOrEmpty(sJobID) && int.TryParse(sJobID, out iJobID) &&
 					Global.Jobs != null && Global.Jobs.ContainsKey(iJobID))
@@ -75,7 +81,7 @@ namespace IRB.RevigoWeb.Pages
 				GOTermList terms;
 				bool bFirst;
 				string sLabelOfValue;
-				ContentResult oCheckParameterResult;
+				ContentResult? oCheckParameterResult;
 
 				Global.UpdateJobUsageStats(oWorker, sType, WebUtilities.TypeConverter.ToString(Request.Query["namespace"]));
 
@@ -105,9 +111,9 @@ namespace IRB.RevigoWeb.Pages
 							oWorker.HasUserWarnings ? WebUtilities.TypeConverter.StringArrayToJSON(oWorker.UserWarnings) : "[]",
 							oWorker.HasUserErrors ? WebUtilities.TypeConverter.StringArrayToJSON(oWorker.UserErrors) : "[]",
 							(long)(oWorker.ExecutingTime.TotalSeconds),
-							oWorker.HasBPVisualizer ? 1 : 0, oWorker.HasBPVisualizer ? oWorker.BPVisualizer.Terms.Length : 0,
-							oWorker.HasCCVisualizer ? 1 : 0, oWorker.HasCCVisualizer ? oWorker.CCVisualizer.Terms.Length : 0,
-							oWorker.HasMFVisualizer ? 1 : 0, oWorker.HasMFVisualizer ? oWorker.MFVisualizer.Terms.Length : 0,
+							oWorker.HasBPVisualizer ? 1 : 0, (oWorker.BPVisualizer != null && oWorker.HasBPVisualizer) ? oWorker.BPVisualizer.Terms.Length : 0,
+							oWorker.HasCCVisualizer ? 1 : 0, (oWorker.CCVisualizer != null && oWorker.HasCCVisualizer) ? oWorker.CCVisualizer.Terms.Length : 0,
+							oWorker.HasMFVisualizer ? 1 : 0, (oWorker.MFVisualizer != null && oWorker.HasMFVisualizer) ? oWorker.MFVisualizer.Terms.Length : 0,
 							oWorker.HasClouds ? 1 : 0);
 						#endregion
 						return Content(writer.ToString(), "application/json", Encoding.UTF8);
@@ -120,7 +126,7 @@ namespace IRB.RevigoWeb.Pages
 							return oCheckParameterResult;
 
 						int iTermID = -1;
-						string sTemID = WebUtilities.TypeConverter.ToString(Request.Query["TermID"]);
+						string? sTemID = WebUtilities.TypeConverter.ToString(Request.Query["TermID"]);
 
 						if (!string.IsNullOrEmpty(sTemID) && int.TryParse(sTemID, out iTermID) &&
 							this.oWorker.ContainsTermID(iTermID))
@@ -142,6 +148,9 @@ namespace IRB.RevigoWeb.Pages
 						oCheckParameterResult = CheckParameters();
 						if (oCheckParameterResult != null)
 							return oCheckParameterResult;
+
+						if (oVisualizer == null)
+							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
 
 						terms = new GOTermList(oVisualizer.Terms);
 						terms.FindClustersAndSortByThem(Global.Ontology, this.oWorker.AllProperties, this.oWorker.CutOff);
@@ -237,6 +246,9 @@ namespace IRB.RevigoWeb.Pages
 							Response.Headers.Add("Content-Disposition", string.Format("attachment; filename=Revigo{0}Table.tsv", this.sNamespace));
 						}
 
+						if (oVisualizer == null)
+							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
+
 						terms = new GOTermList(oVisualizer.Terms);
 						terms.FindClustersAndSortByThem(Global.Ontology, oWorker.AllProperties, oWorker.CutOff);
 
@@ -289,6 +301,9 @@ namespace IRB.RevigoWeb.Pages
 						oCheckParameterResult = CheckParameters();
 						if (oCheckParameterResult != null)
 							return oCheckParameterResult;
+
+						if (oVisualizer == null)
+							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
 
 						terms = new GOTermList(oVisualizer.Terms);
 						terms.FindClustersAndSortByThem(Global.Ontology, this.oWorker.AllProperties, this.oWorker.CutOff);
@@ -346,6 +361,9 @@ namespace IRB.RevigoWeb.Pages
 							sContentType = "application/octet-stream";
 							Response.Headers.Add("Content-Disposition", string.Format("attachment; filename=Revigo{0}Scatterplot.tsv", this.sNamespace));
 						}
+
+						if (oVisualizer == null)
+							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
 
 						terms = new GOTermList(oVisualizer.Terms);
 						terms.FindClustersAndSortByThem(Global.Ontology, oWorker.AllProperties, oWorker.CutOff);
@@ -405,6 +423,9 @@ namespace IRB.RevigoWeb.Pages
 							sContentType = "application/octet-stream";
 							Response.Headers.Add("Content-Disposition", string.Format("attachment; filename=Revigo{0}Scatterplot.R", this.sNamespace));
 						}
+
+						if (oVisualizer == null)
+							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
 
 						terms = new GOTermList(oVisualizer.Terms);
 						terms.FindClustersAndSortByThem(Global.Ontology, oWorker.AllProperties, oWorker.CutOff);
@@ -552,6 +573,9 @@ namespace IRB.RevigoWeb.Pages
 						if (oCheckParameterResult != null)
 							return oCheckParameterResult;
 
+						if (oVisualizer == null)
+							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
+
 						terms = new GOTermList(oVisualizer.Terms);
 						terms.FindClustersAndSortByThem(Global.Ontology, this.oWorker.AllProperties, this.oWorker.CutOff);
 
@@ -609,6 +633,9 @@ namespace IRB.RevigoWeb.Pages
 							Response.Headers.Add("Content-Disposition", string.Format("attachment; filename=Revigo{0}Scatterplot3D.tsv", this.sNamespace));
 						}
 
+						if (oVisualizer == null)
+							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
+
 						terms = new GOTermList(oVisualizer.Terms);
 						terms.FindClustersAndSortByThem(Global.Ontology, oWorker.AllProperties, oWorker.CutOff);
 
@@ -659,6 +686,9 @@ namespace IRB.RevigoWeb.Pages
 						oCheckParameterResult = CheckParameters();
 						if (oCheckParameterResult != null)
 							return oCheckParameterResult;
+
+						if (oVisualizer == null)
+							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
 
 						terms = new GOTermList(oVisualizer.Terms);
 						terms.FindClustersAndSortByThem(Global.Ontology, this.oWorker.AllProperties, 0.10);
@@ -723,6 +753,9 @@ namespace IRB.RevigoWeb.Pages
 							sContentType = "application/octet-stream";
 							Response.Headers.Add("Content-Disposition", string.Format("attachment; filename=Revigo{0}TreeMap.tsv", this.sNamespace));
 						}
+
+						if (oVisualizer == null)
+							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
 
 						terms = new GOTermList(oVisualizer.Terms);
 						terms.FindClustersAndSortByThem(Global.Ontology, oWorker.AllProperties, 0.1);
@@ -791,6 +824,9 @@ namespace IRB.RevigoWeb.Pages
 							Response.Headers.Add("Content-Disposition", string.Format("attachment; filename=Revigo{0}TreeMap.R", this.sNamespace));
 
 						}
+
+						if (oVisualizer == null)
+							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
 
 						terms = new GOTermList(oVisualizer.Terms);
 						terms.FindClustersAndSortByThem(Global.Ontology, oWorker.AllProperties, 0.1);
@@ -926,6 +962,9 @@ namespace IRB.RevigoWeb.Pages
 						if (oCheckParameterResult != null)
 							return oCheckParameterResult;
 
+						if (oVisualizer == null || oVisualizer.SimpleOntologram == null)
+							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
+
 						OntoloGraph graph = oVisualizer.SimpleOntologram;
 						double minSize = double.MaxValue;
 						double maxSize = double.MinValue;
@@ -962,9 +1001,10 @@ namespace IRB.RevigoWeb.Pages
 							if (i > 0)
 								writer.Append(",");
 
+							string? sDescription = graph.nodes[i].properties.GetValueByKey("description").ToString();
 							writer.AppendFormat("{{\"data\":{{\"id\":\"GO:{0:d7}\",\"label\":\"{1}\",\"value\":{2},\"color\":\"{3}\",\"log_size\":{4}}}}}",
 								graph.nodes[i].ID,
-								WebUtilities.TypeConverter.StringToJSON(graph.nodes[i].properties.GetValueByKey("description").ToString().Replace("'", "")),
+								WebUtilities.TypeConverter.StringToJSON((sDescription == null) ? "" : sDescription.Replace("'", "")),
 								WebUtilities.TypeConverter.DoubleToJSON(Math.Round((double)graph.nodes[i].properties.GetValueByKey("value"), 3)),
 								WebUtilities.TypeConverter.StringToJSON(graph.nodes[i].properties.GetValueByKey("color").ToString()),
 								10 + (int)Math.Floor(((double)graph.nodes[i].properties.GetValueByKey("LogSize") - minSize) * sizeMult));
@@ -996,6 +1036,10 @@ namespace IRB.RevigoWeb.Pages
 							sContentType = "application/octet-stream";
 							Response.Headers.Add("Content-Disposition", string.Format("attachment; filename=Revigo{0}Cytoscape.xgmml", this.sNamespace));
 						}
+
+						if (oVisualizer == null || oVisualizer.SimpleOntologram == null)
+							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
+
 						using (MemoryStream memoryStream = new MemoryStream())
 						{
 							StreamWriter streamWriter1 = new StreamWriter(memoryStream);
@@ -1022,6 +1066,9 @@ namespace IRB.RevigoWeb.Pages
 							sContentType = "application/octet-stream";
 							Response.Headers.Add("Content-Disposition", string.Format("attachment; filename=Revigo{0}SimilarityMatrix.tsv", this.sNamespace));
 						}
+
+						if (oVisualizer == null || oVisualizer.Matrix == null)
+							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
 
 						for (int i = 0; i < oVisualizer.Terms.Length; i++)
 						{
@@ -1168,14 +1215,22 @@ namespace IRB.RevigoWeb.Pages
 			catch (ThreadAbortException) { throw; /* propagate */ }
 			catch (Exception ex)
 			{
-				Global.LogAndReportError(string.Format("{0} ({1})", typeof(QueryJobModel).Name, sType), oWorker, ex);
+				if (oWorker == null)
+				{
+					Global.LogAndReportError(string.Format("{0} ({1})", typeof(QueryJobModel).Name, sType), ex);
+				}
+				else
+				{
+					Global.LogAndReportError(string.Format("{0} ({1})", typeof(QueryJobModel).Name, sType), oWorker, ex);
+				}
+
 				return ReturnError("Undefined error occured while querying the job.");
 			}
 		}
 
 		private void GetNamespace()
 		{
-			string sNamespace = WebUtilities.TypeConverter.ToString(Request.Query["namespace"]);
+			string ?sNamespace = WebUtilities.TypeConverter.ToString(Request.Query["namespace"]);
 			int iNamespace = -1;
 
 			int.TryParse(sNamespace, out iNamespace);
@@ -1211,8 +1266,11 @@ namespace IRB.RevigoWeb.Pages
 			}
 		}
 
-		private ContentResult CheckParameters()
+		private ContentResult? CheckParameters()
 		{
+			if (oWorker == null)
+				return ReturnError("The Job doesn't exist");
+
 			if (oWorker.IsRunning || !oWorker.IsFinished)
 			{
 				return ReturnError("The Job did not yet complete");

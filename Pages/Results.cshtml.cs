@@ -1,4 +1,5 @@
 using IRB.Revigo.Core;
+using IRB.Revigo.Databases;
 using IRB.Revigo.Worker;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -7,14 +8,14 @@ using System.Globalization;
 namespace IRB.RevigoWeb.Pages
 {
 	public class ResultsModel : PageModel
-    {
+	{
 		[BindProperty]
-		public string lnkBack { get; set; }
+		public string? lnkBack { get; set; }
 
 		private int iJobID = -1;
-		RevigoWorker oWorker = null;
+		RevigoWorker? oWorker = null;
 
-		public string JobID 
+		public string JobID
 		{
 			get
 			{
@@ -22,7 +23,7 @@ namespace IRB.RevigoWeb.Pages
 			}
 		}
 
-		public RevigoWorker Worker
+		public RevigoWorker? Worker
 		{
 			get
 			{
@@ -31,17 +32,17 @@ namespace IRB.RevigoWeb.Pages
 		}
 
 		[BindProperty]
-		public string fldGOList { get; set; }
+		public string? fldGOList { get; set; }
 		[BindProperty]
-		public string fldCutoff { get; set; }
+		public string? fldCutoff { get; set; }
 		[BindProperty]
-		public string fldValueType { get; set; }
+		public string? fldValueType { get; set; }
 		[BindProperty]
-		public string fldSpeciesTaxon { get; set; }
+		public string? fldSpeciesTaxon { get; set; }
 		[BindProperty]
-		public string fldMeasure { get; set; }
+		public string? fldMeasure { get; set; }
 		[BindProperty]
-		public string fldRemoveObsolete { get; set; }
+		public string? fldRemoveObsolete { get; set; }
 
 
 		public void OnGet()
@@ -71,17 +72,23 @@ namespace IRB.RevigoWeb.Pages
 		{
 			if (!string.IsNullOrEmpty(lnkBack))
 			{
-				if (!string.IsNullOrEmpty(this.fldGOList))
+				if (Global.SpeciesAnnotations != null &&
+					!string.IsNullOrEmpty(this.fldGOList) && this.fldValueType != null && this.fldSpeciesTaxon != null && 
+					this.fldMeasure != null && this.fldRemoveObsolete != null)
 				{
 					int iNewJobID = -1;
 					try
 					{
-						iNewJobID = Global.CreateNewJob(RequestSourceEnum.WebPage, this.fldGOList,
-							Convert.ToDouble(this.fldCutoff, CultureInfo.InvariantCulture),
-							(ValueTypeEnum)Enum.Parse(typeof(ValueTypeEnum), this.fldValueType, true),
-							Global.SpeciesAnnotations.GetByID(Convert.ToInt32(this.fldSpeciesTaxon)),
-							(SemanticSimilarityEnum)Enum.Parse(typeof(SemanticSimilarityEnum), this.fldMeasure, true),
-							bool.Parse(this.fldRemoveObsolete));
+						SpeciesAnnotations? oAnnotations = Global.SpeciesAnnotations.GetByID(Convert.ToInt32(this.fldSpeciesTaxon));
+						if (oAnnotations != null)
+						{
+							iNewJobID = Global.CreateNewJob(RequestSourceEnum.WebPage, this.fldGOList,
+								Convert.ToDouble(this.fldCutoff, CultureInfo.InvariantCulture),
+								(ValueTypeEnum)Enum.Parse(typeof(ValueTypeEnum), this.fldValueType, true),
+								oAnnotations,
+								(SemanticSimilarityEnum)Enum.Parse(typeof(SemanticSimilarityEnum), this.fldMeasure, true),
+								bool.Parse(this.fldRemoveObsolete));
+						}
 					}
 					catch { }
 

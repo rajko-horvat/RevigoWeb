@@ -9,7 +9,7 @@ namespace IRB.RevigoWeb.Pages
 	public class ErrorCodeModel : PageModel
     {
 		public int OriginalStatusCode { get; set; }
-		public string OriginalPathAndQuery { get; set; }
+		public string? OriginalPathAndQuery { get; set; }
 
 		public void OnGet(int statusCode)
         {
@@ -17,6 +17,8 @@ namespace IRB.RevigoWeb.Pages
 
 			var statusCodeReExecuteFeature =
 				HttpContext.Features.Get<IStatusCodeReExecuteFeature>();
+
+			OriginalPathAndQuery = null;
 
 			if (statusCodeReExecuteFeature is not null)
 			{

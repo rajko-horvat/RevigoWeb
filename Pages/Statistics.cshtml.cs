@@ -5,7 +5,7 @@ namespace IRB.RevigoWeb.Pages
 {
     public class StatisticsModel : PageModel
     {
-		public string Key { get; set; }
+		public string? Key { get; set; }
 
 		public void OnGet()
 		{
