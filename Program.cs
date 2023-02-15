@@ -14,7 +14,9 @@ internal class Program
 	private static void Main()
 	{
 		// ensure that CWD is the assembly path to be able to access contents and configuration files
-		Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+		string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+		if (!string.IsNullOrEmpty(path))
+			Directory.SetCurrentDirectory(path);
 
 		ServiceBase[] ServicesToRun;
 		ServicesToRun = new ServiceBase[]
