@@ -13,17 +13,17 @@ internal class Program
 
 	private static void Main()
 	{
-		// ensure that CWD is the assembly path to be able to access contents and configuration files
-		string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-		if (!string.IsNullOrEmpty(path))
-			Directory.SetCurrentDirectory(path);
-
-		ServiceBase[] ServicesToRun;
-		ServicesToRun = new ServiceBase[]
+		if (OperatingSystem.IsWindows())
 		{
-			new RevigoWebService()
-		};
-		ServiceBase.Run(ServicesToRun);
+			// ensure that CWD is the assembly path to be able to access contents and configuration files
+			string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+			if (!string.IsNullOrEmpty(path))
+				Directory.SetCurrentDirectory(path);
+
+			ServiceBase[] ServicesToRun;
+			ServicesToRun = new ServiceBase[] { new RevigoWebService() };
+			ServiceBase.Run(ServicesToRun);
+		}
 	}
 #else
 

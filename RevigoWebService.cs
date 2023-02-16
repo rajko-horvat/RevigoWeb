@@ -11,11 +11,18 @@ namespace IRB.RevigoWeb
 
 		public RevigoWebService()
 		{
-			this.ServiceName = "Revigo Web Service";
-			this.CanHandlePowerEvent = false;
-			this.CanShutdown = false;
-			this.CanStop = true;
-			this.CanPauseAndContinue = false;
+			if (OperatingSystem.IsWindows())
+			{
+				this.ServiceName = "Revigo Web Service";
+				this.CanHandlePowerEvent = false;
+				this.CanShutdown = false;
+				this.CanStop = true;
+				this.CanPauseAndContinue = false;
+			}
+
+			// not really needed, but for nullable sake
+			oBuilder = WebApplication.CreateBuilder();
+			oWebApplication = WebApplication.Create();
 		}
 
 		protected override void OnStart(string[] args)
