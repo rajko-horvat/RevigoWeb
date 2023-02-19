@@ -1,6 +1,6 @@
 ## Repository description
 <p>This is the main REVIGO web service that implements the web interface and visualizations.</p>
-<p>Since a lot of changes had to be made for .NET Core. Official release with binaries is planned for mid February 2023</p>
+<p>Since a lot of changes had to be made for .NET Core API. Official release with binaries is planned for mid March 2023</p>
 
 ## How to compile and run
 <p>To compile and run the web service you need the compiled RevigoCore library, a set of precompiled databases: 
