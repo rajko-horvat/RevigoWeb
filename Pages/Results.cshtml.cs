@@ -1,6 +1,6 @@
 using IRB.Revigo.Core;
-using IRB.Revigo.Databases;
-using IRB.Revigo.Worker;
+using IRB.Revigo.Core.Databases;
+using IRB.Revigo.Core.Worker;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Globalization;
@@ -86,7 +86,7 @@ namespace IRB.RevigoWeb.Pages
 								Convert.ToDouble(this.fldCutoff, CultureInfo.InvariantCulture),
 								(ValueTypeEnum)Enum.Parse(typeof(ValueTypeEnum), this.fldValueType, true),
 								oAnnotations,
-								(SemanticSimilarityEnum)Enum.Parse(typeof(SemanticSimilarityEnum), this.fldMeasure, true),
+								(SemanticSimilarityTypeEnum)Enum.Parse(typeof(SemanticSimilarityTypeEnum), this.fldMeasure, true),
 								bool.Parse(this.fldRemoveObsolete));
 						}
 					}

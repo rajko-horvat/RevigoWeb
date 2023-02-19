@@ -1,7 +1,5 @@
-﻿using IRB.Revigo.Worker;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Net;
-using System.Net.Mail;
 using System.Text;
 
 namespace IRB.RevigoWeb

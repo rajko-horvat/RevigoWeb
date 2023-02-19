@@ -1,13 +1,10 @@
 ﻿using System.Data;
-using System.Globalization;
-using System.Linq.Expressions;
-using System.Net;
 using System.Net.Mail;
 using System.Text;
 using IRB.Collections.Generic;
 using IRB.Revigo.Core;
-using IRB.Revigo.Databases;
-using IRB.Revigo.Worker;
+using IRB.Revigo.Core.Databases;
+using IRB.Revigo.Core.Worker;
 #if WEB_STATISTICS
 using MySqlConnector;
 #endif
@@ -23,7 +20,7 @@ namespace IRB.RevigoWeb
 		private static string? sPathToLog = null;
 		private static StreamWriter? oLog = null;
 		private static GeneOntology? oOntology = null;
-		private static SpeciesAnnotationsList? oSpeciesAnnotations = null;
+		private static SpeciesAnnotationList? oSpeciesAnnotations = null;
 		private static BDictionary<int, RevigoJob> oJobs = new BDictionary<int, RevigoJob>();
 		private static object oJobLock = new object();
 		private static string? sEmailServer = null;
@@ -179,74 +176,74 @@ namespace IRB.RevigoWeb
 			// try to load and intialize ontology object
 			try
 			{
-                string? sPath = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToGO"]);
-                if (!string.IsNullOrEmpty(sPath))
-                {
-                    oOntology = GeneOntology.Deserialize(sPath);
-                }
-                else
-                {
-                    WriteToSystemLog($"{typeof(Global).GetType().Name}.StartApplication", "Error: The path to Gene Ontology is empty");
-                }
-            }
-            catch (Exception ex)
-            {
-                oOntology = null;
-                WriteToSystemLog($"{typeof(Global).GetType().Name}.StartApplication", "Error loading Gene Ontology: " + ex.Message);
-            }
+				string? sPath = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToGO"]);
+				if (!string.IsNullOrEmpty(sPath))
+				{
+					oOntology = GeneOntology.Deserialize(sPath);
+				}
+				else
+				{
+					WriteToSystemLog($"{typeof(Global).GetType().Name}.StartApplication", "Error: The path to Gene Ontology is empty");
+				}
+			}
+			catch (Exception ex)
+			{
+				oOntology = null;
+				WriteToSystemLog($"{typeof(Global).GetType().Name}.StartApplication", "Error loading Gene Ontology: " + ex.Message);
+			}
 
-            // try to load and initialize Species annotations object
-            try
-            {
-                string? sPath = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToSpeciesAnnotations"]);
-                if (!string.IsNullOrEmpty(sPath))
-                {
-                    oSpeciesAnnotations = SpeciesAnnotationsList.Deserialize(sPath);
-                }
-                else
-                {
-                    WriteToSystemLog($"{typeof(Global).GetType().Name}.StartApplication", "Error: The path to Species Annotations is empty");
-                }
-            }
-            catch (Exception ex)
-            {
-                WriteToSystemLog($"{typeof(Global).GetType().Name}.StartApplication", "Error loading Species Annotations: " + ex.Message);
-            }
-        }
+			// try to load and initialize Species annotations object
+			try
+			{
+				string? sPath = WebUtilities.TypeConverter.ToString(configuration.GetSection("AppPaths")["PathToSpeciesAnnotations"]);
+				if (!string.IsNullOrEmpty(sPath))
+				{
+					oSpeciesAnnotations = SpeciesAnnotationList.Deserialize(sPath);
+				}
+				else
+				{
+					WriteToSystemLog($"{typeof(Global).GetType().Name}.StartApplication", "Error: The path to Species Annotations is empty");
+				}
+			}
+			catch (Exception ex)
+			{
+				WriteToSystemLog($"{typeof(Global).GetType().Name}.StartApplication", "Error loading Species Annotations: " + ex.Message);
+			}
+		}
 
-        public static void StopApplication()
-        {
-            bDisposing = true;
+		public static void StopApplication()
+		{
+			bDisposing = true;
 
-            if (oJobs != null)
-            {
-                for (int i = 0; i < oJobs.Count; i++)
-                {
-                    if (oJobs[i].Value.Worker.IsRunning)
-                        oJobs[i].Value.Worker.Abort();
-                }
-                oJobs.Clear();
-            }
+			if (oJobs != null)
+			{
+				for (int i = 0; i < oJobs.Count; i++)
+				{
+					if (oJobs[i].Value.Worker.IsRunning)
+						oJobs[i].Value.Worker.Abort();
+				}
+				oJobs.Clear();
+			}
 
-            if (oLog != null)
-            {
-                oLog.Close();
-                oLog.Dispose();
-                oLog = null;
-            }
-        }
+			if (oLog != null)
+			{
+				oLog.Close();
+				oLog.Dispose();
+				oLog = null;
+			}
+		}
 
 		public static string? ConnectionString { get { return sConnectionString; } }
 
-        public static long MinStatTicks { get { return lMinStatTicks; } }
+		public static long MinStatTicks { get { return lMinStatTicks; } }
 
-        public static long MaxStatTicks { get { return lMaxStatTicks; } }
+		public static long MaxStatTicks { get { return lMaxStatTicks; } }
 
-        public static GeneOntology? Ontology { get { return oOntology; } }
+		public static GeneOntology? Ontology { get { return oOntology; } }
 
-        public static SpeciesAnnotationsList? SpeciesAnnotations { get { return oSpeciesAnnotations; } }
+		public static SpeciesAnnotationList? SpeciesAnnotations { get { return oSpeciesAnnotations; } }
 
-        public static BDictionary<int, RevigoJob> Jobs { get { return oJobs; } }
+		public static BDictionary<int, RevigoJob> Jobs { get { return oJobs; } }
 
 		public static TimeSpan JobTimeout { get { return tsJobTimeout; } }
 
@@ -254,7 +251,7 @@ namespace IRB.RevigoWeb
 
 		public static TimeSpan JobSessionTimeout { get { return tsJobSessionTimeout; } }
 
-		public static string? EmailServer { get{return sEmailServer; } }
+		public static string? EmailServer { get { return sEmailServer; } }
 
 		public static string? EmailFrom { get { return sEmailFrom; } }
 
@@ -291,82 +288,82 @@ namespace IRB.RevigoWeb
 		// Path to AddThis control
 		public static string? PathToAddThis { get { return sPathToAddThis; } }
 
-		public static int CreateNewJob(RequestSourceEnum requestSource, string data, double cutoff, 
-            ValueTypeEnum valueType, SpeciesAnnotations annotations, SemanticSimilarityEnum measure, bool removeObsolete)
-        {
-            int iJobID = -1;
+		public static int CreateNewJob(RequestSourceEnum requestSource, string data, double cutoff,
+			ValueTypeEnum valueType, SpeciesAnnotations annotations, SemanticSimilarityTypeEnum measure, bool removeObsolete)
+		{
+			int iJobID = -1;
 
-            if (!bDisposing)
-            {
-                iJobID = Math.Abs(Environment.TickCount);
-                RevigoWorker oWorker;
+			if (!bDisposing && Global.Ontology != null)
+			{
+				iJobID = Math.Abs(Environment.TickCount);
+				RevigoWorker oWorker;
 
-                lock (oJobLock)
-                {
-                    // remove old jobs
-                    for (int i = 0; i < oJobs.Count; i++)
-                    {
-                        if (oJobs[i].Value.IsExpired)
-                        {
-                            oJobs.RemoveAt(i);
-                            i--;
-                        }
-                    }
+				lock (oJobLock)
+				{
+					// remove old jobs
+					for (int i = 0; i < oJobs.Count; i++)
+					{
+						if (oJobs[i].Value.IsExpired)
+						{
+							oJobs.RemoveAt(i);
+							i--;
+						}
+					}
 
-                    // get unique Job ID
-                    while (oJobs.ContainsKey(iJobID) || iJobID < 1)
-                    {
-                        iJobID++;
-                    }
+					// get unique Job ID
+					while (oJobs.ContainsKey(iJobID) || iJobID < 1)
+					{
+						iJobID++;
+					}
 
-                    oWorker = new RevigoWorker(iJobID, Global.Ontology, annotations, Global.JobTimeout, 
-                        requestSource, data, cutoff, valueType, measure, removeObsolete);
+					oWorker = new RevigoWorker(iJobID, Global.Ontology, annotations, Global.JobTimeout,
+						requestSource, data, cutoff, valueType, measure, removeObsolete);
 
-                    oJobs.Add(iJobID, new RevigoJob(iJobID, DateTime.Now.AddMinutes(Global.SessionTimeout.TotalMinutes + 1.0), oWorker));
-                }
-            }
+					oJobs.Add(iJobID, new RevigoJob(iJobID, DateTime.Now.AddMinutes(Global.SessionTimeout.TotalMinutes + 1.0), oWorker));
+				}
+			}
 
-            return iJobID;
-        }
+			return iJobID;
+		}
 
-        public static int StartNewJob(RequestSourceEnum requestSource, string data, double cutoff, ValueTypeEnum valueType, SpeciesAnnotations annotations, SemanticSimilarityEnum measure, bool removeObsolete)
-        {
-            int iJobID = -1;
+		public static int StartNewJob(RequestSourceEnum requestSource, string data, double cutoff, ValueTypeEnum valueType, SpeciesAnnotations annotations, SemanticSimilarityTypeEnum measure, bool removeObsolete)
+		{
+			int iJobID = -1;
 
-            if (!bDisposing)
-            {
-                iJobID = Math.Abs(Environment.TickCount);
-                RevigoWorker oWorker;
+			if (!bDisposing && Global.Ontology != null)
+			{
+				iJobID = Math.Abs(Environment.TickCount);
+				RevigoWorker oWorker;
 
-                lock (oJobLock)
-                {
-                    // remove old jobs
-                    for (int i = 0; i < oJobs.Count; i++)
-                    {
-                        if (oJobs[i].Value.IsExpired)
-                        {
-                            oJobs.RemoveAt(i);
-                            i--;
-                        }
-                    }
+				lock (oJobLock)
+				{
+					// remove old jobs
+					for (int i = 0; i < oJobs.Count; i++)
+					{
+						if (oJobs[i].Value.IsExpired)
+						{
+							oJobs.RemoveAt(i);
+							i--;
+						}
+					}
 
-                    // get unique Job ID
-                    while (oJobs.ContainsKey(iJobID) || iJobID < 1)
-                    {
-                        iJobID++;
-                    }
+					// get unique Job ID
+					while (oJobs.ContainsKey(iJobID) || iJobID < 1)
+					{
+						iJobID++;
+					}
 
-                    oWorker = new RevigoWorker(iJobID, Global.Ontology, annotations, Global.JobTimeout, 
-                        requestSource, data, cutoff, valueType, measure, removeObsolete);
-                    oJobs.Add(iJobID, new RevigoJob(iJobID, DateTime.Now.AddMinutes(Global.SessionTimeout.TotalMinutes + 1.0), oWorker));
-                }
+					oWorker = new RevigoWorker(iJobID, Global.Ontology, annotations, Global.JobTimeout,
+						requestSource, data, cutoff, valueType, measure, removeObsolete);
+					oJobs.Add(iJobID, new RevigoJob(iJobID, DateTime.Now.AddMinutes(Global.SessionTimeout.TotalMinutes + 1.0), oWorker));
+				}
 
-                oWorker.OnFinish += oWorker_OnFinish;
-                oWorker.Start();
-            }
+				oWorker.OnFinish += oWorker_OnFinish;
+				oWorker.Start();
+			}
 
-            return iJobID;
-        }
+			return iJobID;
+		}
 
 		public static void RemoveJob(int jobID)
 		{
@@ -385,11 +382,11 @@ namespace IRB.RevigoWeb
 		}
 
 		private static void oWorker_OnFinish(object? sender, EventArgs e)
-        {
-            // update our statistics
-            if (sender is RevigoWorker)
-            {
-                RevigoWorker worker = (RevigoWorker)sender;
+		{
+			// update our statistics
+			if (sender is RevigoWorker)
+			{
+				RevigoWorker worker = (RevigoWorker)sender;
 
 #if WEB_STATISTICS
 				if (!string.IsNullOrEmpty(sConnectionString))
@@ -421,11 +418,11 @@ namespace IRB.RevigoWeb
 									oCommand.Parameters.Add("?vMeasure", MySqlDbType.Int32).Value = (int)worker.SemanticSimilarity;
 									oCommand.Parameters.Add("?vRemoveObsolete", MySqlDbType.Int32).Value = (int)(worker.RemoveObsolete ? 1 : 0);
 									oCommand.Parameters.Add("?vBiologicalProcess", MySqlDbType.Int64).Value =
-										(long)((worker.BPVisualizer != null) ? worker.BPVisualizer.Terms.Length : 0);
+										(long)(worker.HasBPVisualizer ? worker.BPVisualizer.Terms.Count : 0);
 									oCommand.Parameters.Add("?vCellularComponent", MySqlDbType.Int64).Value =
-										(long)((worker.CCVisualizer != null) ? worker.CCVisualizer.Terms.Length : 0);
+										(long)(worker.HasCCVisualizer ? worker.CCVisualizer.Terms.Count : 0);
 									oCommand.Parameters.Add("?vMolecularFunction", MySqlDbType.Int64).Value =
-										(long)((worker.MFVisualizer != null) ? worker.MFVisualizer.Terms.Length : 0);
+										(long)(worker.HasMFVisualizer ? worker.MFVisualizer.Terms.Count : 0);
 									oCommand.Parameters.Add("?vExecTicks", MySqlDbType.Int64).Value = worker.ExecutingTime.Ticks;
 									oCommand.Parameters.Add("?vCount", MySqlDbType.Int64).Value = (long)1;
 									oCommand.Parameters.Add("?vNSCount", MySqlDbType.Double).Value =
@@ -468,9 +465,12 @@ namespace IRB.RevigoWeb
 										"ExecTicks=ExecTicks+?vExecTicks, Count=Count+1 " +
 										"where ID=?id;", oConnection))
 									{
-										oCommand.Parameters.Add("?vBiologicalProcess", MySqlDbType.Int64).Value = (long)((worker.BPVisualizer == null) ? 0 : worker.BPVisualizer.Terms.Length);
-										oCommand.Parameters.Add("?vCellularComponent", MySqlDbType.Int64).Value = (long)((worker.CCVisualizer == null) ? 0 : worker.CCVisualizer.Terms.Length);
-										oCommand.Parameters.Add("?vMolecularFunction", MySqlDbType.Int64).Value = (long)((worker.MFVisualizer == null) ? 0 : worker.MFVisualizer.Terms.Length);
+										oCommand.Parameters.Add("?vBiologicalProcess", MySqlDbType.Int64).Value =
+											(long)(worker.HasBPVisualizer ? worker.BPVisualizer.Terms.Count : 0);
+										oCommand.Parameters.Add("?vCellularComponent", MySqlDbType.Int64).Value =
+											(long)(worker.HasCCVisualizer ? worker.CCVisualizer.Terms.Count : 0);
+										oCommand.Parameters.Add("?vMolecularFunction", MySqlDbType.Int64).Value =
+											(long)(worker.HasMFVisualizer ? worker.MFVisualizer.Terms.Count : 0);
 										oCommand.Parameters.Add("?vExecTicks", MySqlDbType.Int64).Value = worker.ExecutingTime.Ticks;
 										oCommand.Parameters.Add("?id", MySqlDbType.Int64).Value = Convert.ToInt64(id);
 
@@ -491,12 +491,16 @@ namespace IRB.RevigoWeb
 										oCommand.Parameters.Add("?vRequestSource", MySqlDbType.Int32).Value = (int)worker.RequestSource;
 										oCommand.Parameters.Add("?vCutoff", MySqlDbType.Int32).Value = (int)(worker.CutOff * 10.0);
 										oCommand.Parameters.Add("?vValueType", MySqlDbType.Int32).Value = (int)worker.ValueType;
-										oCommand.Parameters.Add("?vSpeciesTaxon", MySqlDbType.Int32).Value = (int)((worker.Annotations == null) ? 0 : worker.Annotations.TaxonID);
+										oCommand.Parameters.Add("?vSpeciesTaxon", MySqlDbType.Int32).Value = 
+											WebUtilities.TypeConverter.ToInt32(worker.Annotations?.TaxonID);
 										oCommand.Parameters.Add("?vMeasure", MySqlDbType.Int32).Value = (int)worker.SemanticSimilarity;
 										oCommand.Parameters.Add("?vRemoveObsolete", MySqlDbType.Int32).Value = (int)(worker.RemoveObsolete ? 1 : 0);
-										oCommand.Parameters.Add("?vBiologicalProcess", MySqlDbType.Int64).Value = (long)((worker.BPVisualizer == null) ? 0 : worker.BPVisualizer.Terms.Length);
-										oCommand.Parameters.Add("?vCellularComponent", MySqlDbType.Int64).Value = (long)((worker.CCVisualizer == null) ? 0 : worker.CCVisualizer.Terms.Length);
-										oCommand.Parameters.Add("?vMolecularFunction", MySqlDbType.Int64).Value = (long)((worker.MFVisualizer == null) ? 0 : worker.MFVisualizer.Terms.Length);
+										oCommand.Parameters.Add("?vBiologicalProcess", MySqlDbType.Int64).Value =
+											(long)(worker.HasBPVisualizer ? worker.BPVisualizer.Terms.Count : 0);
+										oCommand.Parameters.Add("?vCellularComponent", MySqlDbType.Int64).Value =
+											(long)(worker.HasCCVisualizer ? worker.CCVisualizer.Terms.Count : 0);
+										oCommand.Parameters.Add("?vMolecularFunction", MySqlDbType.Int64).Value =
+											(long)(worker.HasMFVisualizer ? worker.MFVisualizer.Terms.Count : 0);
 										oCommand.Parameters.Add("?vExecTicks", MySqlDbType.Int64).Value = worker.ExecutingTime.Ticks;
 										oCommand.Parameters.Add("?vCount", MySqlDbType.Int64).Value = (long)1;
 										oCommand.Parameters.Add("?vNSCount", MySqlDbType.Double).Value =
@@ -520,11 +524,11 @@ namespace IRB.RevigoWeb
 
 				// for debugging
 				if (worker.HasDeveloperWarnings || worker.HasDeveloperErrors)
-                {
-                    LogAndReportError("RevigoWorker", worker);
-                }
-            }
-        }
+				{
+					LogAndReportError("RevigoWorker", worker);
+				}
+			}
+		}
 
 		public static void UpdateJobUsageStats(RevigoWorker worker, string? type, string? ns)
 		{
@@ -799,17 +803,17 @@ namespace IRB.RevigoWeb
 		}
 
 		public static void WriteToSystemLog(string source, string message)
-        {
-            if (oLog != null)
-            {
-                try
-                {
-                    oLog.WriteLine("[{0};{1}] {2}", DateTime.Now, source, message);
-                    oLog.Flush();
-                }
-                catch
-                { }
-            }
-        }
-    }
+		{
+			if (oLog != null)
+			{
+				try
+				{
+					oLog.WriteLine("[{0};{1}] {2}", DateTime.Now, source, message);
+					oLog.Flush();
+				}
+				catch
+				{ }
+			}
+		}
+	}
 }

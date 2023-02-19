@@ -1,15 +1,10 @@
 using IRB.Revigo.Core;
-using IRB.Revigo.Databases;
-using IRB.Revigo.Worker;
+using IRB.Revigo.Core.Databases;
+using IRB.Revigo.Core.Worker;
 using IRB.RevigoWeb;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
-using System.Diagnostics.Metrics;
 using System.Globalization;
-using System.Reflection;
-using System.Text;
 
 namespace RevigoWeb.Pages
 {
@@ -62,7 +57,7 @@ namespace RevigoWeb.Pages
 			double dCutoff = 0.7;
 			ValueTypeEnum eValueType = ValueTypeEnum.PValue;
 			int iSpeciesTaxon = 0;
-			SemanticSimilarityEnum eMeasure = SemanticSimilarityEnum.SIMREL;
+			SemanticSimilarityTypeEnum eMeasure = SemanticSimilarityTypeEnum.SIMREL;
 			bool bRemoveObsolete = true;
 			GDPRTypeEnum eGDPRType = GDPR.GetGDPRState(this.HttpContext);
 
@@ -160,13 +155,13 @@ namespace RevigoWeb.Pages
 
 			string? sSimilarity = this.lstSimilarity;
 			bool bFound = false;
-			Array aEnumValues = Enum.GetValues(typeof(SemanticSimilarityEnum));
+			Array aEnumValues = Enum.GetValues(typeof(SemanticSimilarityTypeEnum));
 			foreach (var value in aEnumValues)
 			{
 				string? sValue = value.ToString();
 				if (!string.IsNullOrEmpty(sValue) && sValue.Equals(sSimilarity, StringComparison.InvariantCultureIgnoreCase))
 				{
-					eMeasure = (SemanticSimilarityEnum)value;
+					eMeasure = (SemanticSimilarityTypeEnum)value;
 					bFound = true;
 					break;
 				}
@@ -357,8 +352,8 @@ namespace RevigoWeb.Pages
 				{
 					sSimilarity = sSimilarity.Trim();
 
-					Array aSimilarityTypes = Enum.GetValues(typeof(SemanticSimilarityEnum));
-					foreach (SemanticSimilarityEnum value in aSimilarityTypes)
+					Array aSimilarityTypes = Enum.GetValues(typeof(SemanticSimilarityTypeEnum));
+					foreach (SemanticSimilarityTypeEnum value in aSimilarityTypes)
 					{
 						string sValue = value.ToString();
 						if (sValue.Equals(sSimilarity, StringComparison.InvariantCultureIgnoreCase))

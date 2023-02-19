@@ -1,6 +1,6 @@
 using IRB.Revigo.Core;
-using IRB.Revigo.Databases;
-using IRB.Revigo.Worker;
+using IRB.Revigo.Core.Databases;
+using IRB.Revigo.Core.Worker;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Globalization;
@@ -11,12 +11,12 @@ namespace IRB.RevigoWeb.Pages
 {
 	[IgnoreAntiforgeryToken]
 	public class QueryJobModel : PageModel
-    {
+	{
 		private int iJobID = -1;
 		private RevigoWorker? oWorker = null;
-		private GONamespaceEnum eNamespace = GONamespaceEnum.None;
+		private GeneOntologyNamespaceEnum eNamespace = GeneOntologyNamespaceEnum.None;
 		private string sNamespace = "_";
-		private TermListVisualizer? oVisualizer = null;
+		private NamespaceVisualizer? oVisualizer = null;
 
 		private bool bAttachment = false;
 		private bool bJSON = true;  // true by default
@@ -78,7 +78,7 @@ namespace IRB.RevigoWeb.Pages
 
 				StringBuilder writer = new StringBuilder();
 				string sContentType;
-				GOTermList terms;
+				RevigoTermCollection terms;
 				bool bFirst;
 				string sLabelOfValue;
 				ContentResult? oCheckParameterResult;
@@ -111,9 +111,9 @@ namespace IRB.RevigoWeb.Pages
 							oWorker.HasUserWarnings ? WebUtilities.TypeConverter.StringArrayToJSON(oWorker.UserWarnings) : "[]",
 							oWorker.HasUserErrors ? WebUtilities.TypeConverter.StringArrayToJSON(oWorker.UserErrors) : "[]",
 							(long)(oWorker.ExecutingTime.TotalSeconds),
-							oWorker.HasBPVisualizer ? 1 : 0, (oWorker.BPVisualizer != null && oWorker.HasBPVisualizer) ? oWorker.BPVisualizer.Terms.Length : 0,
-							oWorker.HasCCVisualizer ? 1 : 0, (oWorker.CCVisualizer != null && oWorker.HasCCVisualizer) ? oWorker.CCVisualizer.Terms.Length : 0,
-							oWorker.HasMFVisualizer ? 1 : 0, (oWorker.MFVisualizer != null && oWorker.HasMFVisualizer) ? oWorker.MFVisualizer.Terms.Length : 0,
+							oWorker.HasBPVisualizer ? 1 : 0, oWorker.HasBPVisualizer ? oWorker.BPVisualizer.Terms.Count : 0,
+							oWorker.HasCCVisualizer ? 1 : 0, oWorker.HasCCVisualizer ? oWorker.CCVisualizer.Terms.Count : 0,
+							oWorker.HasMFVisualizer ? 1 : 0, oWorker.HasMFVisualizer ? oWorker.MFVisualizer.Terms.Count : 0,
 							oWorker.HasClouds ? 1 : 0);
 						#endregion
 						return Content(writer.ToString(), "application/json", Encoding.UTF8);
@@ -152,8 +152,7 @@ namespace IRB.RevigoWeb.Pages
 						if (oVisualizer == null)
 							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
 
-						terms = new GOTermList(oVisualizer.Terms);
-						terms.FindClustersAndSortByThem(Global.Ontology, this.oWorker.AllProperties, this.oWorker.CutOff);
+						terms = oVisualizer.Terms.FindClustersAndSortByThem(Global.Ontology, this.oWorker.CutOff);
 
 						writer.Append("{\"Columns\":[");
 
@@ -205,24 +204,23 @@ namespace IRB.RevigoWeb.Pages
 
 						for (int i = 0; i < terms.Count; i++)
 						{
-							GOTerm oTerm = terms[i];
-							GOTermProperties oProperties = oWorker.AllProperties.GetValueByKey(oTerm.ID);
+							RevigoTerm term = terms[i];
 
 							if (i > 0)
 								writer.Append(",");
 
 							writer.Append("{");
-							writer.AppendFormat("\"ID\":{0},", oTerm.ID);
-							writer.AppendFormat("\"Term ID\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(oTerm.FormattedID));
-							writer.AppendFormat("\"Name\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(oTerm.Name));
-							writer.AppendFormat("\"Description\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(oTerm.Description));
-							writer.AppendFormat("\"Pin Term\":{0},", oProperties.Pinned ? 0 : (oProperties.Representative <= 0 ? -1 : oTerm.ID));
-							writer.AppendFormat("\"Value\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.Value));
-							writer.AppendFormat("\"LogSize\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.LogAnnotationSize));
-							writer.AppendFormat("\"Frequency\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.AnnotationFrequency * 100.0));
-							writer.AppendFormat("\"Uniqueness\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.Uniqueness));
-							writer.AppendFormat("\"Dispensability\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.Dispensability));
-							writer.AppendFormat("\"Representative\":{0}", oProperties.Representative);
+							writer.AppendFormat("\"ID\":{0},", term.GOTerm.ID);
+							writer.AppendFormat("\"Term ID\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(term.GOTerm.FormattedID));
+							writer.AppendFormat("\"Name\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(term.GOTerm.Name));
+							writer.AppendFormat("\"Description\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(term.GOTerm.Description));
+							writer.AppendFormat("\"Pin Term\":{0},", term.Pinned ? 0 : (term.RepresentativeID <= 0 ? -1 : term.GOTerm.ID));
+							writer.AppendFormat("\"Value\":{0},", WebUtilities.TypeConverter.DoubleToJSON(term.Value));
+							writer.AppendFormat("\"LogSize\":{0},", WebUtilities.TypeConverter.DoubleToJSON(term.LogAnnotationSize));
+							writer.AppendFormat("\"Frequency\":{0},", WebUtilities.TypeConverter.DoubleToJSON(term.AnnotationFrequency * 100.0));
+							writer.AppendFormat("\"Uniqueness\":{0},", WebUtilities.TypeConverter.DoubleToJSON(term.Uniqueness));
+							writer.AppendFormat("\"Dispensability\":{0},", WebUtilities.TypeConverter.DoubleToJSON(term.Dispensability));
+							writer.AppendFormat("\"Representative\":{0}", term.RepresentativeID);
 							writer.Append("}");
 						}
 						writer.Append("]}");
@@ -249,8 +247,7 @@ namespace IRB.RevigoWeb.Pages
 						if (oVisualizer == null)
 							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
 
-						terms = new GOTermList(oVisualizer.Terms);
-						terms.FindClustersAndSortByThem(Global.Ontology, oWorker.AllProperties, oWorker.CutOff);
+						terms = oVisualizer.Terms.FindClustersAndSortByThem(Global.Ontology, oWorker.CutOff);
 
 						writer.Append("TermID\tName\tValue\t");
 						for (int c = 1; c < oWorker.MinNumColsPerGoTerm; c++)
@@ -262,28 +259,27 @@ namespace IRB.RevigoWeb.Pages
 						// print the data
 						for (int i = 0; i < terms.Count; i++)
 						{
-							GOTerm oTerm = terms[i];
-							GOTermProperties oProperties = oWorker.AllProperties.GetValueByKey(oTerm.ID);
+							RevigoTerm term = terms[i];
 
-							writer.AppendFormat("\"{0}\"\t", oTerm.FormattedID);
-							writer.AppendFormat("\"{0}\"\t", oTerm.Name);
-							writer.AppendFormat("{0}\t", oProperties.Value.ToString(CultureInfo.InvariantCulture));
+							writer.AppendFormat("\"{0}\"\t", term.GOTerm.FormattedID);
+							writer.AppendFormat("\"{0}\"\t", term.GOTerm.Name);
+							writer.AppendFormat("{0}\t", term.Value.ToString(CultureInfo.InvariantCulture));
 
 							for (int c = 1; c < oWorker.MinNumColsPerGoTerm; c++)
 							{
-								writer.AppendFormat("{0}\t", oProperties.UserValues[c - 1].ToString(CultureInfo.InvariantCulture));
+								writer.AppendFormat("{0}\t", term.UserValues[c - 1].ToString(CultureInfo.InvariantCulture));
 							}
 
 							writer.AppendFormat("{0}\t",
-								oProperties.LogAnnotationSize.ToString(CultureInfo.InvariantCulture));
+								term.LogAnnotationSize.ToString(CultureInfo.InvariantCulture));
 							writer.AppendFormat("{0}\t",
-								(oProperties.AnnotationFrequency * 100.0).ToString(CultureInfo.InvariantCulture));
-							writer.AppendFormat("{0}\t", oProperties.Uniqueness.ToString(CultureInfo.InvariantCulture));
-							writer.AppendFormat("{0}\t", oProperties.Dispensability.ToString(CultureInfo.InvariantCulture));
+								(term.AnnotationFrequency * 100.0).ToString(CultureInfo.InvariantCulture));
+							writer.AppendFormat("{0}\t", term.Uniqueness.ToString(CultureInfo.InvariantCulture));
+							writer.AppendFormat("{0}\t", term.Dispensability.ToString(CultureInfo.InvariantCulture));
 
-							if (oProperties.Representative > 0)
+							if (term.RepresentativeID > 0)
 							{
-								writer.AppendFormat("{0}", oProperties.Representative);
+								writer.AppendFormat("{0}", term.RepresentativeID);
 							}
 							else
 							{
@@ -305,39 +301,37 @@ namespace IRB.RevigoWeb.Pages
 						if (oVisualizer == null)
 							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
 
-						terms = new GOTermList(oVisualizer.Terms);
-						terms.FindClustersAndSortByThem(Global.Ontology, this.oWorker.AllProperties, this.oWorker.CutOff);
+						terms = oVisualizer.Terms.FindClustersAndSortByThem(Global.Ontology, this.oWorker.CutOff);
 
 						writer.Append("[");
 
 						for (int i = 0; i < terms.Count; i++)
 						{
-							GOTerm oTerm = terms[i];
-							GOTermProperties oProperties = oWorker.AllProperties.GetValueByKey(oTerm.ID);
+							RevigoTerm term = terms[i];
 
 							if (i > 0)
 								writer.Append(",");
 
 							writer.Append("{");
-							writer.AppendFormat("\"ID\":{0},", oTerm.ID);
-							writer.AppendFormat("\"Term ID\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(oTerm.FormattedID));
-							writer.AppendFormat("\"Name\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(oTerm.Name));
-							writer.AppendFormat("\"Description\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(oTerm.Description));
-							writer.AppendFormat("\"Pin Term\":{0},", oProperties.Pinned ? 0 : (oProperties.Representative <= 0 ? -1 : oTerm.ID));
-							writer.AppendFormat("\"Value\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.Value));
-							writer.AppendFormat("\"LogSize\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.LogAnnotationSize));
-							writer.AppendFormat("\"Frequency\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.AnnotationFrequency * 100.0));
-							writer.AppendFormat("\"Uniqueness\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.Uniqueness));
-							writer.AppendFormat("\"Dispensability\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.Dispensability));
+							writer.AppendFormat("\"ID\":{0},", term.GOTerm.ID);
+							writer.AppendFormat("\"Term ID\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(term.GOTerm.FormattedID));
+							writer.AppendFormat("\"Name\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(term.GOTerm.Name));
+							writer.AppendFormat("\"Description\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(term.GOTerm.Description));
+							writer.AppendFormat("\"Pin Term\":{0},", term.Pinned ? 0 : (term.RepresentativeID <= 0 ? -1 : term.GOTerm.ID));
+							writer.AppendFormat("\"Value\":{0},", WebUtilities.TypeConverter.DoubleToJSON(term.Value));
+							writer.AppendFormat("\"LogSize\":{0},", WebUtilities.TypeConverter.DoubleToJSON(term.LogAnnotationSize));
+							writer.AppendFormat("\"Frequency\":{0},", WebUtilities.TypeConverter.DoubleToJSON(term.AnnotationFrequency * 100.0));
+							writer.AppendFormat("\"Uniqueness\":{0},", WebUtilities.TypeConverter.DoubleToJSON(term.Uniqueness));
+							writer.AppendFormat("\"Dispensability\":{0},", WebUtilities.TypeConverter.DoubleToJSON(term.Dispensability));
 
 							// 2D
-							writer.AppendFormat("\"PC_0\":{0},", (oProperties.PC.Count > 0) ?
-								WebUtilities.TypeConverter.DoubleToJSON(oProperties.PC[0]) : "0");
-							writer.AppendFormat("\"PC_1\":{0},", (oProperties.PC.Count > 1) ?
-								WebUtilities.TypeConverter.DoubleToJSON(oProperties.PC[1]) : "0");
-							writer.AppendFormat("\"Selected\":{0},", (oProperties.Dispensability <= 0.05) ? 1 : 0);
+							writer.AppendFormat("\"PC_0\":{0},", (term.PC.Count > 0) ?
+								WebUtilities.TypeConverter.DoubleToJSON(term.PC[0]) : "0");
+							writer.AppendFormat("\"PC_1\":{0},", (term.PC.Count > 1) ?
+								WebUtilities.TypeConverter.DoubleToJSON(term.PC[1]) : "0");
+							writer.AppendFormat("\"Selected\":{0},", (term.Dispensability <= 0.05) ? 1 : 0);
 
-							writer.AppendFormat("\"Representative\":{0}", oProperties.Representative);
+							writer.AppendFormat("\"Representative\":{0}", term.RepresentativeID);
 							writer.Append("}");
 						}
 						writer.Append("]");
@@ -365,37 +359,32 @@ namespace IRB.RevigoWeb.Pages
 						if (oVisualizer == null)
 							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
 
-						terms = new GOTermList(oVisualizer.Terms);
-						terms.FindClustersAndSortByThem(Global.Ontology, oWorker.AllProperties, oWorker.CutOff);
+						terms = oVisualizer.Terms.FindClustersAndSortByThem(Global.Ontology, oWorker.CutOff);
 
 						writer.AppendLine("TermID\tName\tValue\tLogSize\tFrequency\tUniqueness\tDispensability\tPC_0\tPC_1\tRepresentative");
 
 						// print the data
 						for (int i = 0; i < terms.Count; i++)
 						{
-							GOTerm oTerm = terms[i];
-							GOTermProperties oProperties = oWorker.AllProperties.GetValueByKey(oTerm.ID);
+							RevigoTerm term = terms[i];
 
-							writer.AppendFormat("\"{0}\"\t", oTerm.FormattedID);
-							writer.AppendFormat("\"{0}\"\t", oTerm.Name);
-							writer.AppendFormat("{0}\t", oProperties.Value.ToString(CultureInfo.InvariantCulture));
-
-							writer.AppendFormat("{0}\t",
-								oProperties.LogAnnotationSize.ToString(CultureInfo.InvariantCulture));
-							writer.AppendFormat("{0}\t",
-								(oProperties.AnnotationFrequency * 100.0).ToString(CultureInfo.InvariantCulture));
-							writer.AppendFormat("{0}\t", oProperties.Uniqueness.ToString(CultureInfo.InvariantCulture));
-							writer.AppendFormat("{0}\t", oProperties.Dispensability.ToString(CultureInfo.InvariantCulture));
+							writer.AppendFormat("\"{0}\"\t", term.GOTerm.FormattedID);
+							writer.AppendFormat("\"{0}\"\t", term.GOTerm.Name);
+							writer.AppendFormat("{0}\t", term.Value.ToString(CultureInfo.InvariantCulture));
+							writer.AppendFormat("{0}\t", term.LogAnnotationSize.ToString(CultureInfo.InvariantCulture));
+							writer.AppendFormat("{0}\t", (term.AnnotationFrequency * 100.0).ToString(CultureInfo.InvariantCulture));
+							writer.AppendFormat("{0}\t", term.Uniqueness.ToString(CultureInfo.InvariantCulture));
+							writer.AppendFormat("{0}\t", term.Dispensability.ToString(CultureInfo.InvariantCulture));
 
 							// 2D
-							writer.AppendFormat("{0}\t", (oProperties.PC.Count > 0) ?
-								oProperties.PC[0].ToString(CultureInfo.InvariantCulture) : "null");
-							writer.AppendFormat("{0}\t", (oProperties.PC.Count > 1) ?
-								oProperties.PC[1].ToString(CultureInfo.InvariantCulture) : "null");
+							writer.AppendFormat("{0}\t", (term.PC.Count > 0) ?
+								term.PC[0].ToString(CultureInfo.InvariantCulture) : "null");
+							writer.AppendFormat("{0}\t", (term.PC.Count > 1) ?
+								term.PC[1].ToString(CultureInfo.InvariantCulture) : "null");
 
-							if (oProperties.Representative > 0)
+							if (term.RepresentativeID > 0)
 							{
-								writer.AppendFormat("{0}", oProperties.Representative);
+								writer.AppendFormat("{0}", term.RepresentativeID);
 							}
 							else
 							{
@@ -427,8 +416,7 @@ namespace IRB.RevigoWeb.Pages
 						if (oVisualizer == null)
 							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
 
-						terms = new GOTermList(oVisualizer.Terms);
-						terms.FindClustersAndSortByThem(Global.Ontology, oWorker.AllProperties, oWorker.CutOff);
+						terms = oVisualizer.Terms.FindClustersAndSortByThem(Global.Ontology, oWorker.CutOff);
 
 						writer.AppendLine("# A plotting R script produced by the Revigo server at http://revigo.irb.hr/");
 						writer.AppendLine("# If you found Revigo useful in your work, please cite the following reference:");
@@ -471,9 +459,9 @@ namespace IRB.RevigoWeb.Pages
 						bFirst = true;
 						for (int i = 0; i < terms.Count; i++)
 						{
-							GOTerm curGOTerm = terms[i];
-							GOTermProperties oProperties = oWorker.AllProperties.GetValueByKey(curGOTerm.ID);
-							bool isTermEliminated = oProperties.Dispensability > oWorker.CutOff;
+							RevigoTerm term = terms[i];
+
+							bool isTermEliminated = term.Dispensability > oWorker.CutOff;
 							if (!isTermEliminated)
 							{
 								if (bFirst)
@@ -485,31 +473,31 @@ namespace IRB.RevigoWeb.Pages
 									writer.AppendLine(",");
 								}
 								writer.Append("c(");
-								writer.AppendFormat("\"{0}\",", curGOTerm.FormattedID);
-								writer.AppendFormat("\"{0}\",", curGOTerm.Name);
+								writer.AppendFormat("\"{0}\",", term.GOTerm.FormattedID);
+								writer.AppendFormat("\"{0}\",", term.GOTerm.Name);
 								writer.AppendFormat("{0},",
-									(oProperties.AnnotationFrequency * 100.0).ToString(CultureInfo.InvariantCulture));
+									(term.AnnotationFrequency * 100.0).ToString(CultureInfo.InvariantCulture));
 
-								writer.AppendFormat("{0},", (oProperties.PC.Count > 0) ?
-									oProperties.PC[0].ToString(CultureInfo.InvariantCulture) : "null");
-								writer.AppendFormat("{0},", (oProperties.PC.Count > 1) ?
-									oProperties.PC[1].ToString(CultureInfo.InvariantCulture) : "null");
+								writer.AppendFormat("{0},", (term.PC.Count > 0) ?
+									term.PC[0].ToString(CultureInfo.InvariantCulture) : "null");
+								writer.AppendFormat("{0},", (term.PC.Count > 1) ?
+									term.PC[1].ToString(CultureInfo.InvariantCulture) : "null");
 
 								writer.AppendFormat("{0},",
-									oProperties.LogAnnotationSize.ToString(CultureInfo.InvariantCulture));
+									term.LogAnnotationSize.ToString(CultureInfo.InvariantCulture));
 
 								if (oWorker.TermsWithValuesCount > 0)
 								{
-									writer.AppendFormat("{0},", oProperties.Value.ToString(CultureInfo.InvariantCulture));
+									writer.AppendFormat("{0},", term.Value.ToString(CultureInfo.InvariantCulture));
 								}
 
 								for (int c = 1; c < oWorker.MinNumColsPerGoTerm; c++)
 								{
-									writer.AppendFormat("{0},", oProperties.UserValues[c - 1].ToString(CultureInfo.InvariantCulture));
+									writer.AppendFormat("{0},", term.UserValues[c - 1].ToString(CultureInfo.InvariantCulture));
 								}
 
-								writer.AppendFormat("{0},", oProperties.Uniqueness.ToString(CultureInfo.InvariantCulture));
-								writer.AppendFormat("{0}", oProperties.Dispensability.ToString(CultureInfo.InvariantCulture));
+								writer.AppendFormat("{0},", term.Uniqueness.ToString(CultureInfo.InvariantCulture));
+								writer.AppendFormat("{0}", term.Dispensability.ToString(CultureInfo.InvariantCulture));
 								writer.Append(")");
 							}
 						}
@@ -576,40 +564,38 @@ namespace IRB.RevigoWeb.Pages
 						if (oVisualizer == null)
 							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
 
-						terms = new GOTermList(oVisualizer.Terms);
-						terms.FindClustersAndSortByThem(Global.Ontology, this.oWorker.AllProperties, this.oWorker.CutOff);
+						terms = oVisualizer.Terms.FindClustersAndSortByThem(Global.Ontology, this.oWorker.CutOff);
 
 						writer.Append("[");
 
 						for (int i = 0; i < terms.Count; i++)
 						{
-							GOTerm oTerm = terms[i];
-							GOTermProperties oProperties = oWorker.AllProperties.GetValueByKey(oTerm.ID);
+							RevigoTerm term = terms[i];
 
 							if (i > 0)
 								writer.Append(",");
 
 							writer.Append("{");
-							writer.AppendFormat("\"ID\":{0},", oTerm.ID);
-							writer.AppendFormat("\"Term ID\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(oTerm.FormattedID));
-							writer.AppendFormat("\"Name\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(oTerm.Name));
-							writer.AppendFormat("\"Description\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(oTerm.Description));
-							writer.AppendFormat("\"Pin Term\":{0},", oProperties.Pinned ? 0 : (oProperties.Representative <= 0 ? -1 : oTerm.ID));
-							writer.AppendFormat("\"Value\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.Value));
-							writer.AppendFormat("\"LogSize\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.LogAnnotationSize));
-							writer.AppendFormat("\"Frequency\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.AnnotationFrequency * 100.0));
-							writer.AppendFormat("\"Uniqueness\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.Uniqueness));
-							writer.AppendFormat("\"Dispensability\":{0},", WebUtilities.TypeConverter.DoubleToJSON(oProperties.Dispensability));
+							writer.AppendFormat("\"ID\":{0},", term.GOTerm.ID);
+							writer.AppendFormat("\"Term ID\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(term.GOTerm.FormattedID));
+							writer.AppendFormat("\"Name\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(term.GOTerm.Name));
+							writer.AppendFormat("\"Description\":\"{0}\",", WebUtilities.TypeConverter.StringToJSON(term.GOTerm.Description));
+							writer.AppendFormat("\"Pin Term\":{0},", term.Pinned ? 0 : (term.RepresentativeID <= 0 ? -1 : term.GOTerm.ID));
+							writer.AppendFormat("\"Value\":{0},", WebUtilities.TypeConverter.DoubleToJSON(term.Value));
+							writer.AppendFormat("\"LogSize\":{0},", WebUtilities.TypeConverter.DoubleToJSON(term.LogAnnotationSize));
+							writer.AppendFormat("\"Frequency\":{0},", WebUtilities.TypeConverter.DoubleToJSON(term.AnnotationFrequency * 100.0));
+							writer.AppendFormat("\"Uniqueness\":{0},", WebUtilities.TypeConverter.DoubleToJSON(term.Uniqueness));
+							writer.AppendFormat("\"Dispensability\":{0},", WebUtilities.TypeConverter.DoubleToJSON(term.Dispensability));
 
 							// 3D
-							writer.AppendFormat("\"PC3_0\":{0},", (oProperties.PC3.Count > 0) ?
-								WebUtilities.TypeConverter.DoubleToJSON(oProperties.PC3[0]) : "0");
-							writer.AppendFormat("\"PC3_1\":{0},", (oProperties.PC3.Count > 1) ?
-								WebUtilities.TypeConverter.DoubleToJSON(oProperties.PC3[1]) : "0");
-							writer.AppendFormat("\"PC3_2\":{0},", (oProperties.PC3.Count > 2) ?
-								WebUtilities.TypeConverter.DoubleToJSON(oProperties.PC3[2]) : "0");
+							writer.AppendFormat("\"PC3_0\":{0},", (term.PC3.Count > 0) ?
+								WebUtilities.TypeConverter.DoubleToJSON(term.PC3[0]) : "0");
+							writer.AppendFormat("\"PC3_1\":{0},", (term.PC3.Count > 1) ?
+								WebUtilities.TypeConverter.DoubleToJSON(term.PC3[1]) : "0");
+							writer.AppendFormat("\"PC3_2\":{0},", (term.PC3.Count > 2) ?
+								WebUtilities.TypeConverter.DoubleToJSON(term.PC3[2]) : "0");
 
-							writer.AppendFormat("\"Representative\":{0}", oProperties.Representative);
+							writer.AppendFormat("\"Representative\":{0}", term.RepresentativeID);
 							writer.Append("}");
 						}
 						writer.Append("]");
@@ -636,39 +622,34 @@ namespace IRB.RevigoWeb.Pages
 						if (oVisualizer == null)
 							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
 
-						terms = new GOTermList(oVisualizer.Terms);
-						terms.FindClustersAndSortByThem(Global.Ontology, oWorker.AllProperties, oWorker.CutOff);
+						terms = oVisualizer.Terms.FindClustersAndSortByThem(Global.Ontology, oWorker.CutOff);
 
 						writer.AppendLine("TermID\tName\tValue\tLogSize\tFrequency\tUniqueness\tDispensability\tPC3_0\tPC3_1\tPC3_2\tRepresentative");
 
 						// print the data
 						for (int i = 0; i < terms.Count; i++)
 						{
-							GOTerm oTerm = terms[i];
-							GOTermProperties oProperties = oWorker.AllProperties.GetValueByKey(oTerm.ID);
+							RevigoTerm term = terms[i];
 
-							writer.AppendFormat("\"{0}\"\t", oTerm.FormattedID);
-							writer.AppendFormat("\"{0}\"\t", oTerm.Name);
-							writer.AppendFormat("{0}\t", oProperties.Value.ToString(CultureInfo.InvariantCulture));
-
-							writer.AppendFormat("{0}\t",
-								oProperties.LogAnnotationSize.ToString(CultureInfo.InvariantCulture));
-							writer.AppendFormat("{0}\t",
-								(oProperties.AnnotationFrequency * 100.0).ToString(CultureInfo.InvariantCulture));
-							writer.AppendFormat("{0}\t", oProperties.Uniqueness.ToString(CultureInfo.InvariantCulture));
-							writer.AppendFormat("{0}\t", oProperties.Dispensability.ToString(CultureInfo.InvariantCulture));
+							writer.AppendFormat("\"{0}\"\t", term.GOTerm.FormattedID);
+							writer.AppendFormat("\"{0}\"\t", term.GOTerm.Name);
+							writer.AppendFormat("{0}\t", term.Value.ToString(CultureInfo.InvariantCulture));
+							writer.AppendFormat("{0}\t", term.LogAnnotationSize.ToString(CultureInfo.InvariantCulture));
+							writer.AppendFormat("{0}\t", (term.AnnotationFrequency * 100.0).ToString(CultureInfo.InvariantCulture));
+							writer.AppendFormat("{0}\t", term.Uniqueness.ToString(CultureInfo.InvariantCulture));
+							writer.AppendFormat("{0}\t", term.Dispensability.ToString(CultureInfo.InvariantCulture));
 
 							// 3D
-							writer.AppendFormat("{0}\t", (oProperties.PC3.Count > 0) ?
-								oProperties.PC3[0].ToString(CultureInfo.InvariantCulture) : "null");
-							writer.AppendFormat("{0}\t", (oProperties.PC3.Count > 1) ?
-								oProperties.PC3[1].ToString(CultureInfo.InvariantCulture) : "null");
-							writer.AppendFormat("{0}\t", (oProperties.PC3.Count > 2) ?
-								oProperties.PC3[2].ToString(CultureInfo.InvariantCulture) : "null");
+							writer.AppendFormat("{0}\t", (term.PC3.Count > 0) ?
+								term.PC3[0].ToString(CultureInfo.InvariantCulture) : "null");
+							writer.AppendFormat("{0}\t", (term.PC3.Count > 1) ?
+								term.PC3[1].ToString(CultureInfo.InvariantCulture) : "null");
+							writer.AppendFormat("{0}\t", (term.PC3.Count > 2) ?
+								term.PC3[2].ToString(CultureInfo.InvariantCulture) : "null");
 
-							if (oProperties.Representative > 0)
+							if (term.RepresentativeID > 0)
 							{
-								writer.AppendFormat("{0}", oProperties.Representative);
+								writer.AppendFormat("{0}", term.RepresentativeID);
 							}
 							else
 							{
@@ -690,8 +671,7 @@ namespace IRB.RevigoWeb.Pages
 						if (oVisualizer == null)
 							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
 
-						terms = new GOTermList(oVisualizer.Terms);
-						terms.FindClustersAndSortByThem(Global.Ontology, this.oWorker.AllProperties, 0.10);
+						terms = oVisualizer.Terms.FindClustersAndSortByThem(Global.Ontology, 0.10);
 						int iObjectID = 0;
 						int iGroupID = 0;
 						int iCurrentRepresentativeID = -1;
@@ -701,33 +681,33 @@ namespace IRB.RevigoWeb.Pages
 
 						for (int i = 0; i < terms.Count; i++)
 						{
-							GOTerm curTerm = terms[i];
-							GOTermProperties oProperties = oWorker.AllProperties.GetValueByKey(curTerm.ID);
-							if (double.IsNaN(oProperties.Dispensability) || oProperties.Dispensability > oWorker.CutOff)
+							RevigoTerm term = terms[i];
+
+							if (double.IsNaN(term.Dispensability) || term.Dispensability > oWorker.CutOff)
 								continue;
 
-							if (oProperties.Representative <= 0 && iCurrentRepresentativeID != curTerm.ID)
+							if (term.RepresentativeID <= 0 && iCurrentRepresentativeID != term.GOTerm.ID)
 							{
 								if (iCurrentRepresentativeID > 0)
 								{
 									writer.Append("]},");
 								}
-								iCurrentRepresentativeID = curTerm.ID;
+								iCurrentRepresentativeID = term.GOTerm.ID;
 								writer.AppendFormat("{{\"id\":\"{0}\",\"name\":\"{1}\",\"children\":[",
-									curTerm.FormattedID.Replace(":", ""), WebUtilities.TypeConverter.StringToJSON(curTerm.Name));
+									term.GOTerm.FormattedID.Replace(":", ""), WebUtilities.TypeConverter.StringToJSON(term.GOTerm.Name));
 								bFirst = true;
 							}
 							if (!bFirst)
 								writer.Append(", ");
 							bFirst = false;
 							writer.AppendFormat("{{\"id\":\"{0}\",\"name\":\"{1}\",",
-								curTerm.FormattedID.Replace(":", ""), WebUtilities.TypeConverter.StringToJSON(curTerm.Name));
+								term.GOTerm.FormattedID.Replace(":", ""), WebUtilities.TypeConverter.StringToJSON(term.GOTerm.Name));
 							writer.AppendFormat("\"value\":{0},",
 								oWorker.TermsWithValuesCount == 0 ?
-								WebUtilities.TypeConverter.DoubleToJSON(oProperties.Uniqueness) :
-								WebUtilities.TypeConverter.DoubleToJSON(oProperties.TransformedValue)); // was * 100.0 intially
+								WebUtilities.TypeConverter.DoubleToJSON(term.Uniqueness) :
+								WebUtilities.TypeConverter.DoubleToJSON(term.TransformedValue)); // was * 100.0 intially
 							writer.AppendFormat("\"logSize\":{0}}}",
-								WebUtilities.TypeConverter.DoubleToJSON(oProperties.LogAnnotationSize));
+								WebUtilities.TypeConverter.DoubleToJSON(term.LogAnnotationSize));
 						}
 						if (iCurrentRepresentativeID >= 0)
 						{
@@ -757,8 +737,7 @@ namespace IRB.RevigoWeb.Pages
 						if (oVisualizer == null)
 							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
 
-						terms = new GOTermList(oVisualizer.Terms);
-						terms.FindClustersAndSortByThem(Global.Ontology, oWorker.AllProperties, 0.1);
+						terms = oVisualizer.Terms.FindClustersAndSortByThem(Global.Ontology, 0.1);
 
 						writer.AppendLine("# WARNING - This exported Revigo data is only useful for the specific purpose of constructing a TreeMap visualization.");
 						writer.AppendLine("# Do not use this table as a general list of non-redundant GO categories, as it sets an extremely permissive ");
@@ -775,28 +754,27 @@ namespace IRB.RevigoWeb.Pages
 						// print the data
 						for (int i = 0; i < terms.Count; i++)
 						{
-							GOTerm curGOTerm = terms[i];
-							GOTermProperties oProperties = oWorker.AllProperties.GetValueByKey(curGOTerm.ID);
-							bool isTermEliminated = oProperties.Dispensability > oWorker.CutOff;
+							RevigoTerm term = terms[i];
+
+							bool isTermEliminated = term.Dispensability > oWorker.CutOff;
 							if (isTermEliminated)
 								continue; // will not output terms below the dispensability threshold at all
 
-							writer.AppendFormat("\"{0}\"\t", curGOTerm.FormattedID);
-							writer.AppendFormat("\"{0}\"\t", curGOTerm.Name);
-							writer.AppendFormat("{0}\t", (oProperties.AnnotationFrequency * 100.0).ToString(CultureInfo.InvariantCulture));
-
-							writer.AppendFormat("{0}\t", oProperties.Value.ToString(CultureInfo.InvariantCulture));
+							writer.AppendFormat("\"{0}\"\t", term.GOTerm.FormattedID);
+							writer.AppendFormat("\"{0}\"\t", term.GOTerm.Name);
+							writer.AppendFormat("{0}\t", (term.AnnotationFrequency * 100.0).ToString(CultureInfo.InvariantCulture));
+							writer.AppendFormat("{0}\t", term.Value.ToString(CultureInfo.InvariantCulture));
 
 							for (int c = 1; c < oWorker.MinNumColsPerGoTerm; c++)
 							{
-								writer.AppendFormat("{0}\t", oProperties.UserValues[c - 1].ToString(CultureInfo.InvariantCulture));
+								writer.AppendFormat("{0}\t", term.UserValues[c - 1].ToString(CultureInfo.InvariantCulture));
 							}
 
-							writer.AppendFormat("{0}\t", oProperties.Uniqueness.ToString(CultureInfo.InvariantCulture));
-							writer.AppendFormat("{0}\t", oProperties.Dispensability.ToString(CultureInfo.InvariantCulture));
-							if (oProperties.Representative > 0)
+							writer.AppendFormat("{0}\t", term.Uniqueness.ToString(CultureInfo.InvariantCulture));
+							writer.AppendFormat("{0}\t", term.Dispensability.ToString(CultureInfo.InvariantCulture));
+							if (term.RepresentativeID > 0)
 							{
-								writer.AppendFormat("\"{0}\"", Global.Ontology.Terms.GetValueByKey(oProperties.Representative).Name);
+								writer.AppendFormat("\"{0}\"", Global.Ontology.Terms.GetValueByKey(term.RepresentativeID).Name);
 							}
 							else
 							{
@@ -828,8 +806,7 @@ namespace IRB.RevigoWeb.Pages
 						if (oVisualizer == null)
 							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
 
-						terms = new GOTermList(oVisualizer.Terms);
-						terms.FindClustersAndSortByThem(Global.Ontology, oWorker.AllProperties, 0.1);
+						terms = oVisualizer.Terms.FindClustersAndSortByThem(Global.Ontology, 0.1);
 
 						writer.AppendLine("# A treemap R script produced by the Revigo server at http://revigo.irb.hr/");
 						writer.AppendLine("# If you found Revigo useful in your work, please cite the following reference:");
@@ -874,9 +851,9 @@ namespace IRB.RevigoWeb.Pages
 						bFirst = true;
 						for (int i = 0; i < terms.Count; i++)
 						{
-							GOTerm curGOTerm = terms[i];
-							GOTermProperties oProperties = oWorker.AllProperties.GetValueByKey(curGOTerm.ID);
-							bool isTermEliminated = oProperties.Dispensability > oWorker.CutOff;
+							RevigoTerm term = terms[i];
+
+							bool isTermEliminated = term.Dispensability > oWorker.CutOff;
 							if (!isTermEliminated)
 							{
 								if (bFirst)
@@ -888,30 +865,29 @@ namespace IRB.RevigoWeb.Pages
 									writer.AppendLine(",");
 								}
 								writer.Append("c(");
-								writer.AppendFormat("\"{0}\",", curGOTerm.FormattedID);
-								writer.AppendFormat("\"{0}\",", curGOTerm.Name);
-								writer.AppendFormat("{0},",
-									(oProperties.AnnotationFrequency * 100.0).ToString(CultureInfo.InvariantCulture));
+								writer.AppendFormat("\"{0}\",", term.GOTerm.FormattedID);
+								writer.AppendFormat("\"{0}\",", term.GOTerm.Name);
+								writer.AppendFormat("{0},", (term.AnnotationFrequency * 100.0).ToString(CultureInfo.InvariantCulture));
 
 								if (oWorker.TermsWithValuesCount > 0)
 								{
-									writer.AppendFormat("{0},", Math.Abs(oProperties.Value).ToString(CultureInfo.InvariantCulture));
+									writer.AppendFormat("{0},", Math.Abs(term.Value).ToString(CultureInfo.InvariantCulture));
 								}
 
 								for (int c = 1; c < oWorker.MinNumColsPerGoTerm; c++)
 								{
-									writer.AppendFormat("{0},", oProperties.UserValues[c - 1].ToString(CultureInfo.InvariantCulture));
+									writer.AppendFormat("{0},", term.UserValues[c - 1].ToString(CultureInfo.InvariantCulture));
 								}
 
-								writer.AppendFormat("{0},", oProperties.Uniqueness.ToString(CultureInfo.InvariantCulture));
-								writer.AppendFormat("{0},", oProperties.Dispensability.ToString(CultureInfo.InvariantCulture));
-								if (oProperties.Representative > 0)
+								writer.AppendFormat("{0},", term.Uniqueness.ToString(CultureInfo.InvariantCulture));
+								writer.AppendFormat("{0},", term.Dispensability.ToString(CultureInfo.InvariantCulture));
+								if (term.RepresentativeID > 0)
 								{
-									writer.AppendFormat("\"{0}\"", Global.Ontology.Terms.GetValueByKey(oProperties.Representative).Name);
+									writer.AppendFormat("\"{0}\"", Global.Ontology.Terms.GetValueByKey(term.RepresentativeID).Name);
 								}
 								else
 								{
-									writer.AppendFormat("\"{0}\"", Global.Ontology.Terms.GetValueByKey(curGOTerm.ID).Name);
+									writer.AppendFormat("\"{0}\"", Global.Ontology.Terms.GetValueByKey(term.GOTerm.ID).Name);
 								}
 								writer.Append(")");
 							}
@@ -1070,17 +1046,17 @@ namespace IRB.RevigoWeb.Pages
 						if (oVisualizer == null || oVisualizer.Matrix == null)
 							return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
 
-						for (int i = 0; i < oVisualizer.Terms.Length; i++)
+						for (int i = 0; i < oVisualizer.Terms.Count; i++)
 						{
-							writer.AppendFormat("\t{0}", oVisualizer.Terms[i].FormattedID);
+							writer.AppendFormat("\t{0}", oVisualizer.Terms[i].GOTerm.FormattedID);
 						}
 						writer.AppendLine();
-						for (int i = 0; i < oVisualizer.Terms.Length; i++)
+						for (int i = 0; i < oVisualizer.Terms.Count; i++)
 						{
-							writer.Append(oVisualizer.Terms[i].FormattedID);
-							for (int j = 0; j < oVisualizer.Terms.Length; j++)
+							writer.Append(oVisualizer.Terms[i].GOTerm.FormattedID);
+							for (int j = 0; j < oVisualizer.Terms.Count; j++)
 							{
-								writer.AppendFormat("\t{0}", oVisualizer.Matrix.GetValue(i, j).ToString(CultureInfo.InvariantCulture));
+								writer.AppendFormat("\t{0}", oVisualizer.Matrix.GetSimilarity(i, j).ToString(CultureInfo.InvariantCulture));
 							}
 							writer.AppendLine();
 						}
@@ -1100,7 +1076,7 @@ namespace IRB.RevigoWeb.Pages
 						}
 
 						writer.Append("{");
-						if (oWorker.Enrichments != null)
+						if (oWorker.Enrichments.Count > 0)
 						{
 							writer.Append("\"Enrichments\":[");
 
@@ -1151,9 +1127,9 @@ namespace IRB.RevigoWeb.Pages
 							writer.Append("]");
 						}
 
-						if (oWorker.Correlations != null)
+						if (oWorker.Correlations.Count > 0)
 						{
-							if (oWorker.Enrichments != null)
+							if (oWorker.Enrichments.Count > 0)
 								writer.Append(",");
 
 							writer.Append("\"Correlations\":[");
@@ -1230,16 +1206,16 @@ namespace IRB.RevigoWeb.Pages
 
 		private void GetNamespace()
 		{
-			string ?sNamespace = WebUtilities.TypeConverter.ToString(Request.Query["namespace"]);
+			string? sNamespace = WebUtilities.TypeConverter.ToString(Request.Query["namespace"]);
 			int iNamespace = -1;
 
 			int.TryParse(sNamespace, out iNamespace);
 
-			foreach (int value in Enum.GetValues(typeof(GONamespaceEnum)))
+			foreach (int value in Enum.GetValues(typeof(GeneOntologyNamespaceEnum)))
 			{
 				if (value == iNamespace)
 				{
-					this.eNamespace = (GONamespaceEnum)value;
+					this.eNamespace = (GeneOntologyNamespaceEnum)value;
 					break;
 				}
 			}
@@ -1248,15 +1224,15 @@ namespace IRB.RevigoWeb.Pages
 			{
 				switch (eNamespace)
 				{
-					case GONamespaceEnum.BIOLOGICAL_PROCESS:
+					case GeneOntologyNamespaceEnum.BIOLOGICAL_PROCESS:
 						this.oVisualizer = oWorker.BPVisualizer;
 						this.sNamespace = "_BP_";
 						break;
-					case GONamespaceEnum.CELLULAR_COMPONENT:
+					case GeneOntologyNamespaceEnum.CELLULAR_COMPONENT:
 						this.oVisualizer = oWorker.CCVisualizer;
 						this.sNamespace = "_CC_";
 						break;
-					case GONamespaceEnum.MOLECULAR_FUNCTION:
+					case GeneOntologyNamespaceEnum.MOLECULAR_FUNCTION:
 						this.oVisualizer = oWorker.MFVisualizer;
 						this.sNamespace = "_MF_";
 						break;
@@ -1281,7 +1257,7 @@ namespace IRB.RevigoWeb.Pages
 				return ReturnError("The Job has an errors, no data available.");
 			}
 
-			if (eNamespace == GONamespaceEnum.None || oVisualizer == null || oVisualizer.Terms.Length == 0)
+			if (eNamespace == GeneOntologyNamespaceEnum.None || oVisualizer == null || oVisualizer.IsEmpty)
 			{
 				return ReturnError(string.Format("The namespace {0} has no results.", GeneOntology.NamespaceToFriendlyString(eNamespace)));
 			}

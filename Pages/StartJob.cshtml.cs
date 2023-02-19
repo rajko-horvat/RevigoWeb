@@ -1,11 +1,10 @@
 using IRB.Revigo.Core;
-using IRB.Revigo.Databases;
-using IRB.Revigo.Worker;
+using IRB.Revigo.Core.Databases;
+using IRB.Revigo.Core.Worker;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Globalization;
 using System.Text;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace IRB.RevigoWeb.Pages
 {
@@ -27,7 +26,7 @@ namespace IRB.RevigoWeb.Pages
 			double dCutoff = 0.7;
 			ValueTypeEnum eValueType = ValueTypeEnum.PValue;
 			int iSpeciesTaxon = 0;
-			SemanticSimilarityEnum eMeasure = SemanticSimilarityEnum.SIMREL;
+			SemanticSimilarityTypeEnum eMeasure = SemanticSimilarityTypeEnum.SIMREL;
 			bool bRemoveObsolete = true;
 
 			if (Request.ContentType != "application/x-www-form-urlencoded")
@@ -98,13 +97,13 @@ namespace IRB.RevigoWeb.Pages
 			if (!string.IsNullOrEmpty(sMeasure))
 			{
 				sMeasure = sMeasure.Trim();
-				string[] aMeasures = Enum.GetNames(typeof(SemanticSimilarityEnum));
+				string[] aMeasures = Enum.GetNames(typeof(SemanticSimilarityTypeEnum));
 				bool bFound = false;
 				foreach (string measure in aMeasures)
 				{
 					if (measure.Equals(sMeasure, StringComparison.CurrentCultureIgnoreCase))
 					{
-						eMeasure = (SemanticSimilarityEnum)Enum.Parse(typeof(SemanticSimilarityEnum), sMeasure, true);
+						eMeasure = (SemanticSimilarityTypeEnum)Enum.Parse(typeof(SemanticSimilarityTypeEnum), sMeasure, true);
 						bFound = true;
 						break;
 					}

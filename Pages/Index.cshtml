@@ -1,6 +1,6 @@
 ﻿@page
 @using IRB.Revigo.Core;
-@using IRB.Revigo.Databases;
+@using IRB.Revigo.Core.Databases;
 @using IRB.RevigoWeb;
 @using RevigoWeb;
 @using System.Globalization;
@@ -181,8 +181,8 @@
                     // fill measure list
                     int iTemp = 0;
                     sTemp = Model.lstSimilarity;
-					Array aSimilarityTypes = Enum.GetValues(typeof(SemanticSimilarityEnum));
-					foreach (SemanticSimilarityEnum value in aSimilarityTypes)
+					Array aSimilarityTypes = Enum.GetValues(typeof(SemanticSimilarityTypeEnum));
+					foreach (SemanticSimilarityTypeEnum value in aSimilarityTypes)
                     {
                         string sValue = value.ToString();
 						<option value="@value.ToString()"
@@ -199,16 +199,16 @@
 							}
 							>@switch(value)
 							{
-								case SemanticSimilarityEnum.RESNIK: // normalized to [0,1]
+								case SemanticSimilarityTypeEnum.RESNIK: // normalized to [0,1]
 									<text>Resnik (normalized)</text>
 									break;
-								case SemanticSimilarityEnum.LIN:
+								case SemanticSimilarityTypeEnum.LIN:
 									<text>Lin</text>
 									break;
-								case SemanticSimilarityEnum.SIMREL:
+								case SemanticSimilarityTypeEnum.SIMREL:
 									<text>SimRel (default)</text>
 									break;
-								case SemanticSimilarityEnum.JIANG:
+								case SemanticSimilarityTypeEnum.JIANG:
 									<text>Jiang and Conrath</text>
 									break;
 							}

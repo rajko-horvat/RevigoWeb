@@ -1,12 +1,10 @@
 using IRB.Revigo.Core;
-using IRB.Revigo.Databases;
-using IRB.Revigo.Worker;
+using IRB.Revigo.Core.Databases;
+using IRB.Revigo.Core.Worker;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Data;
 using System.Globalization;
-using System.Net.Mail;
-using System.Text;
 
 namespace IRB.RevigoWeb.Pages
 {
@@ -35,7 +33,7 @@ namespace IRB.RevigoWeb.Pages
 			double dCutoff = 0.7;
 			ValueTypeEnum eValueType = ValueTypeEnum.PValue;
 			int iSpeciesTaxon = 0;
-			SemanticSimilarityEnum eMeasure = SemanticSimilarityEnum.SIMREL;
+			SemanticSimilarityTypeEnum eMeasure = SemanticSimilarityTypeEnum.SIMREL;
 			bool bRemoveObsolete = true;
 
 			if (Request.ContentType != "application/x-www-form-urlencoded")
@@ -121,13 +119,13 @@ namespace IRB.RevigoWeb.Pages
 			if (!string.IsNullOrEmpty(sMeasure))
 			{
 				sMeasure = sMeasure.Trim();
-				string[] aMeasures = Enum.GetNames(typeof(SemanticSimilarityEnum));
+				string[] aMeasures = Enum.GetNames(typeof(SemanticSimilarityTypeEnum));
 				bool bFound = false;
 				foreach (string measure in aMeasures)
 				{
 					if (measure.Equals(sMeasure, StringComparison.CurrentCultureIgnoreCase))
 					{
-						eMeasure = (SemanticSimilarityEnum)Enum.Parse(typeof(SemanticSimilarityEnum), sMeasure, true);
+						eMeasure = (SemanticSimilarityTypeEnum)Enum.Parse(typeof(SemanticSimilarityTypeEnum), sMeasure, true);
 						bFound = true;
 						break;
 					}
@@ -181,38 +179,35 @@ namespace IRB.RevigoWeb.Pages
 			{
 				if (!oWorker.HasUserErrors && !oWorker.HasDeveloperErrors)
 				{
-					if (oWorker.BPVisualizer != null && oWorker.HasBPVisualizer)
+					if (oWorker.HasBPVisualizer)
 					{
 						// Assign the Biological process controls
-						TermListVisualizer oVisualizer = oWorker.BPVisualizer;
+						NamespaceVisualizer oVisualizer = oWorker.BPVisualizer;
 
 						// render Data table
-						GOTermList terms = new GOTermList(oVisualizer.Terms);
-						terms.FindClustersAndSortByThem(Global.Ontology, oWorker.AllProperties, oWorker.CutOff);
+						RevigoTermCollection terms = oVisualizer.Terms.FindClustersAndSortByThem(Global.Ontology, oWorker.CutOff);
 						BPTable = ToResultTable(oVisualizer.Namespace.ToString(), terms);
 
 						Global.UpdateJobUsageStats(oWorker, "table", "1");
 					}
-					if (oWorker.CCVisualizer != null && oWorker.HasCCVisualizer)
+					if (oWorker.HasCCVisualizer)
 					{
 						// Assign the Biological process controls
-						TermListVisualizer oVisualizer = oWorker.CCVisualizer;
+						NamespaceVisualizer oVisualizer = oWorker.CCVisualizer;
 
 						// render Data table
-						GOTermList terms = new GOTermList(oVisualizer.Terms);
-						terms.FindClustersAndSortByThem(Global.Ontology, oWorker.AllProperties, oWorker.CutOff);
+						RevigoTermCollection terms = oVisualizer.Terms.FindClustersAndSortByThem(Global.Ontology, oWorker.CutOff);
 						CCTable = ToResultTable(oVisualizer.Namespace.ToString(), terms);
 
 						Global.UpdateJobUsageStats(oWorker, "table", "2");
 					}
-					if (oWorker.MFVisualizer != null && oWorker.HasMFVisualizer)
+					if (oWorker.HasMFVisualizer)
 					{
 						// Assign the Biological process controls
-						TermListVisualizer oVisualizer = oWorker.MFVisualizer;
+						NamespaceVisualizer oVisualizer = oWorker.MFVisualizer;
 
 						// render Data table
-						GOTermList terms = new GOTermList(oVisualizer.Terms);
-						terms.FindClustersAndSortByThem(Global.Ontology, oWorker.AllProperties, oWorker.CutOff);
+						RevigoTermCollection terms = oVisualizer.Terms.FindClustersAndSortByThem(Global.Ontology, oWorker.CutOff);
 						MFTable = ToResultTable(oVisualizer.Namespace.ToString(), terms);
 
 						Global.UpdateJobUsageStats(oWorker, "table", "3");
@@ -232,7 +227,7 @@ namespace IRB.RevigoWeb.Pages
 			Global.RemoveJob(iJobID);
 		}
 
-		private DataTable ToResultTable(string name, GOTermList terms)
+		private DataTable ToResultTable(string name, RevigoTermCollection terms)
 		{
 			DataTable dtResultTable = new DataTable(name);
 
@@ -255,33 +250,33 @@ namespace IRB.RevigoWeb.Pages
 				// fill table with data
 				for (int i = 0; i < terms.Count; i++)
 				{
-					GOTerm curGOTerm = terms[i];
-					GOTermProperties oProperties = oWorker.AllProperties.GetValueByKey(curGOTerm.ID);
+					RevigoTerm term = terms[i];
+
 					DataRow row = dtResultTable.NewRow();
 					int iColumn = 0;
 
 					// hidden columns
-					row[iColumn] = curGOTerm.ID;
+					row[iColumn] = term.GOTerm.ID;
 					iColumn++;
-					row[iColumn] = curGOTerm.Description;
+					row[iColumn] = term.GOTerm.Description;
 					iColumn++;
 
 					// visible columns
-					row[iColumn] = curGOTerm.FormattedID;
+					row[iColumn] = term.GOTerm.FormattedID;
 					iColumn++;
-					row[iColumn] = curGOTerm.Name;
+					row[iColumn] = term.GOTerm.Name;
 					iColumn++;
-					row[iColumn] = oProperties.AnnotationFrequency * 100.0;
+					row[iColumn] = term.AnnotationFrequency * 100.0;
 					iColumn++;
-					row[iColumn] = oProperties.Value;
+					row[iColumn] = term.Value;
 					iColumn++;
-					row[iColumn] = oProperties.Uniqueness;
+					row[iColumn] = term.Uniqueness;
 					iColumn++;
-					row[iColumn] = oProperties.Dispensability;
+					row[iColumn] = term.Dispensability;
 					iColumn++;
-					row[iColumn] = oProperties.Dispensability > oWorker.CutOff;
+					row[iColumn] = term.Dispensability > oWorker.CutOff;
 					iColumn++;
-					row[iColumn] = (oProperties.Representative > 0) ? oProperties.Representative.ToString() : "null";
+					row[iColumn] = (term.RepresentativeID > 0) ? term.RepresentativeID.ToString() : "null";
 					iColumn++;
 
 					dtResultTable.Rows.Add(row);
