@@ -374,10 +374,10 @@
 						<p><a download="Revigo_BP_OnScreenTable.tsv" href="#" onclick='$(this).attr("href", revigoState.nsTabs[0].tabs[0].drawObj.GetEncodedContents()); return true;'>
 								<img alt="TSV" src="@Url.Content("~/Images/spreadsheet.png")" style="margin:5px 4px 5px 0px;width:22px;height:22px;vertical-align:middle;" />
 								Export table (as is shown on screen) to TSV<sup style="color:red">1,2</sup></a><br />
-							<a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aTable&namespace=@((int)GeneOntologyNamespaceEnum.BIOLOGICAL_PROCESS)'>
+							<a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aTable&namespace=@((int)GeneOntologyNamespaceEnum.BiologicalProcess)'>
 								<img alt="TSV" src="@Url.Content("~/Images/spreadsheet.png")" style="margin:5px 4px 5px 0px;margin-bottom:10px;width:22px;height:22px;vertical-align:middle;" />
 								Export raw table to TSV<sup style="color:red">1,2</sup></a><br />
-							<a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aSimMat&namespace=@((int)GeneOntologyNamespaceEnum.BIOLOGICAL_PROCESS)'>
+							<a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aSimMat&namespace=@((int)GeneOntologyNamespaceEnum.BiologicalProcess)'>
 								<img alt="TSV" src="@Url.Content("~/Images/spreadsheet.png")" style="margin:5px 4px 5px 0px;width:22px;height:22px;vertical-align:middle;" />
 								Export Term Similarity Matrix</a></p>
 						<p style="color: red;"><sup>1</sup> Please see our <a href='@Url.Content("~/FAQ#q07")'>Frequently Asked Questions</a> page for choices on creating a high quality drawing.<br />
@@ -398,9 +398,9 @@
 							The resulting projection may be highly non linear. The guiding principle is that semantically similar GO terms should remain close together in the plot. 
 							Repeated runs of Revigo may yield different arrangements, but the term distances will remain similar.</p>
 						<p>
-							<a style="margin-right:30px;" href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aRScatterplot&namespace=@((int)GeneOntologyNamespaceEnum.BIOLOGICAL_PROCESS)'>
+							<a style="margin-right:30px;" href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aRScatterplot&namespace=@((int)GeneOntologyNamespaceEnum.BiologicalProcess)'>
 								<img alt="R" src="@Url.Content("~/Images/development-r.png")" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to R script for plotting<sup style="color:red">1</sup></a><br />
-							<a style="margin-right:30px;" href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aScatterplot&namespace=@((int)GeneOntologyNamespaceEnum.BIOLOGICAL_PROCESS)'>
+							<a style="margin-right:30px;" href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aScatterplot&namespace=@((int)GeneOntologyNamespaceEnum.BiologicalProcess)'>
 								<img alt="TSV" src="@Url.Content("~/Images/spreadsheet.png")" width="22" height="22" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to TSV<sup style="color:red">1,2</sup></a></p>
 						<p style="color: red;"><sup>1</sup> Please see our <a href='@Url.Content("~/FAQ#q07")'>Frequently Asked Questions</a> page for choices on creating a high quality drawing.<br />
 							<sup>2</sup> Please see the explanation for NULL values in "Representative" column on our <a href='@Url.Content("~/FAQ#q06")'>Frequently Asked Questions</a> page.</p>
@@ -427,7 +427,7 @@
 							<li>Press 'r' key to reset view</li>
 							<li>View more navigation options on <a href="https://www.x3dom.org/documentation/interaction/" target="_blank">x3dom interaction</a> page</li>
 						</ul>
-						<p><a style="margin-right:30px;" href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aScatterplot3D&namespace=@((int)GeneOntologyNamespaceEnum.BIOLOGICAL_PROCESS)'>
+						<p><a style="margin-right:30px;" href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aScatterplot3D&namespace=@((int)GeneOntologyNamespaceEnum.BiologicalProcess)'>
 								<img alt="TSV" src="@Url.Content("~/Images/spreadsheet.png")" width="22" height="22" style="vertical-align:middle; margin:5px 4px 5px 0px;" />
 								Export to TSV<sup style="color:red">1,2</sup></a><br />
 							<a id="ExportBPX3D" download="Revigo_BP_3DScatterplot.x3d" href="#" onclick='return ExportX3D("ExportBPX3D", revigoState.nsTabs[0].tabs[2].drawObj);'>
@@ -449,7 +449,7 @@
 							The size of the bubble corresponds to the LogSize value for the GO Term.</p>
 						<p style="font-size: 9pt">(Navigate with mouse. Click and hold to move view and drag items. Scroll to zoom.)</p>
 						<div id="pnlBPCytoscapeContent" style="width:900px; height:600px; border: 1px solid black;"></div>
-						<p><a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aXGMML&namespace=@((int)GeneOntologyNamespaceEnum.BIOLOGICAL_PROCESS)'><img alt="XGMML" src="@Url.Content("~/Images/Cytoscape.png")" width="22" height="22" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to Cytoscape XGMML for offline use</a></p>
+						<p><a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aXGMML&namespace=@((int)GeneOntologyNamespaceEnum.BiologicalProcess)'><img alt="XGMML" src="@Url.Content("~/Images/Cytoscape.png")" width="22" height="22" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to Cytoscape XGMML for offline use</a></p>
 					</div>
 					<div id="pnlBPCytoscapeLoading" style="display:table; position:relative; margin: 0 auto 0 auto; width: 900px; height:100px; border: 2px solid silver; border-radius: 6px;">
 						<div id="pnlBPCytoscapeMessage" style="display:block; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: larger; color:darkorange;">
@@ -460,8 +460,8 @@
 				<div id="tabResultsBPTreeMap">
 					<div id="pnlBPTreeMap" style="margin: 0 auto 0 auto; display: none;">
 						<div id="pnlBPTreeMapContent" style="position:relative; width:900px; height:600px; border: 1px solid black; padding: 10px; margin:0px 40px 0px 40px; font-family: Calibri,Verdana,Arial,sans-serif; font-size: 12px;"></div>
-						<p><a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aTreeMap&namespace=@((int)GeneOntologyNamespaceEnum.BIOLOGICAL_PROCESS)' style="margin-right: 30px;"><img alt="CSV" src="@Url.Content("~/Images/spreadsheet.png")" width="22" height="22" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to TSV<sup style="color:red">1,2</sup></a><br />
-							<a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aRTreeMap&namespace=@((int)GeneOntologyNamespaceEnum.BIOLOGICAL_PROCESS)' style="margin-right: 30px;"><img alt="R" src="@Url.Content("~/Images/development-r.png")" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to R script for plotting<sup style="color:red">2</sup></a><br />
+						<p><a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aTreeMap&namespace=@((int)GeneOntologyNamespaceEnum.BiologicalProcess)' style="margin-right: 30px;"><img alt="CSV" src="@Url.Content("~/Images/spreadsheet.png")" width="22" height="22" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to TSV<sup style="color:red">1,2</sup></a><br />
+							<a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aRTreeMap&namespace=@((int)GeneOntologyNamespaceEnum.BiologicalProcess)' style="margin-right: 30px;"><img alt="R" src="@Url.Content("~/Images/development-r.png")" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to R script for plotting<sup style="color:red">2</sup></a><br />
 							<a id="ExportBPSVG" download="Revigo_BP_TreeMap.svg" href="#" onclick='return ExportSvg("ExportBPSVG", "pnlBPTreeMapContent", revigoState.nsTabs[0].treeMapData);'><img alt="SVG" src="@Url.Content("~/Images/inkscape.png")" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to SVG<sup style="color:red">2</sup></a></p>
 						<p style="color: red;"><sup>1</sup> Please see the explanation for NULL values in "Representative" column on our <a href='@Url.Content("~/FAQ#q06")'>Frequently Asked Questions</a> page.<br />
 							<sup>2</sup> Please see our <a href='@Url.Content("~/FAQ#q07")'>Frequently Asked Questions</a> page for choices on creating a high quality drawing.</p>
@@ -516,10 +516,10 @@
 						<p><a download="Revigo_CC_OnScreenTable.tsv" href="#" onclick='$(this).attr("href", revigoState.nsTabs[1].tabs[0].drawObj.GetEncodedContents()); return true;'>
 								<img alt="TSV" src="@Url.Content("~/Images/spreadsheet.png")" style="margin:5px 4px 5px 0px;width:22px;height:22px;vertical-align:middle;" />
 								Export table (as is shown on screen) to TSV<sup style="color:red">1,2</sup></a><br />
-							<a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aTable&namespace=@((int)GeneOntologyNamespaceEnum.CELLULAR_COMPONENT)'>
+							<a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aTable&namespace=@((int)GeneOntologyNamespaceEnum.CellularComponent)'>
 								<img alt="TSV" src="@Url.Content("~/Images/spreadsheet.png")" style="margin:5px 4px 5px 0px;margin-bottom:10px;width:22px;height:22px;vertical-align:middle;" />
 								Export raw table to TSV<sup style="color:red">1,2</sup></a><br />
-							<a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aSimMat&namespace=@((int)GeneOntologyNamespaceEnum.CELLULAR_COMPONENT)'>
+							<a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aSimMat&namespace=@((int)GeneOntologyNamespaceEnum.CellularComponent)'>
 								<img alt="TSV" src="@Url.Content("~/Images/spreadsheet.png")" style="margin:5px 4px 5px 0px;width:22px;height:22px;vertical-align:middle;" />
 								Export Term Similarity Matrix</a></p>
 						<p style="color: red;"><sup>1</sup> Please see our <a href='@Url.Content("~/FAQ#q07")'>Frequently Asked Questions</a> page for choices on creating a high quality drawing.<br />
@@ -538,8 +538,8 @@
 							Revigo uses Multidimensional Scaling (MDS) to reduce the dimensionality of a matrix of the GO terms pairwise semantic similarities. 
 							The resulting projection may be highly non linear. The guiding principle is that semantically similar GO terms should remain close together in the plot. 
 							Repeated runs of Revigo may yield different arrangements, but the term distances will remain similar.</p>
-						<p><a style="margin-right: 30px;" href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aRScatterplot&namespace=@((int)GeneOntologyNamespaceEnum.CELLULAR_COMPONENT)'><img alt="R" src="@Url.Content("~/Images/development-r.png")" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to R script for plotting<sup style="color:red">1</sup></a><br />
-							<a style="margin-right:30px;" href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aScatterplot&namespace=@((int)GeneOntologyNamespaceEnum.CELLULAR_COMPONENT)'><img alt="TSV" src="@Url.Content("~/Images/spreadsheet.png")" width="22" height="22" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to TSV<sup style="color:red">1,2</sup></a></p>
+						<p><a style="margin-right: 30px;" href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aRScatterplot&namespace=@((int)GeneOntologyNamespaceEnum.CellularComponent)'><img alt="R" src="@Url.Content("~/Images/development-r.png")" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to R script for plotting<sup style="color:red">1</sup></a><br />
+							<a style="margin-right:30px;" href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aScatterplot&namespace=@((int)GeneOntologyNamespaceEnum.CellularComponent)'><img alt="TSV" src="@Url.Content("~/Images/spreadsheet.png")" width="22" height="22" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to TSV<sup style="color:red">1,2</sup></a></p>
 						<p style="color: red;"><sup>1</sup> Please see our <a href='@Url.Content("~/FAQ#q07")'>Frequently Asked Questions</a> page for choices on creating a high quality drawing.<br />
 							<sup>2</sup> Please see the explanation for NULL values in "Representative" column on our <a href='@Url.Content("~/FAQ#q06")'>Frequently Asked Questions</a> page.</p>
 					</div>
@@ -565,7 +565,7 @@
 							<li>Press 'r' key to reset view</li>
 							<li>View more navigation options on <a href="https://www.x3dom.org/documentation/interaction/" target="_blank">x3dom interaction</a> page</li>
 						</ul>
-						<p><a style="margin-right:30px;" href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aScatterplot3D&namespace=@((int)GeneOntologyNamespaceEnum.CELLULAR_COMPONENT)'>
+						<p><a style="margin-right:30px;" href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aScatterplot3D&namespace=@((int)GeneOntologyNamespaceEnum.CellularComponent)'>
 							<img alt="TSV" src="@Url.Content("~/Images/spreadsheet.png")" width="22" height="22" style="vertical-align:middle; margin:5px 4px 5px 0px;" />
 								Export to TSV<sup style="color:red">1,2</sup>
 							</a><br />
@@ -588,7 +588,7 @@
 							The size of the bubble corresponds to the LogSize value for the GO Term.</p>
 						<p style="font-size: 9pt">(Navigate with mouse. Click and hold to move view and drag items. Scroll to zoom.)</p>
 						<div id="pnlCCCytoscapeContent" style="width:900px; height:600px; border: 1px solid black;"></div>
-						<p><a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aXGMML&namespace=@((int)GeneOntologyNamespaceEnum.CELLULAR_COMPONENT)'><img alt="XGMML" src="@Url.Content("~/Images/Cytoscape.png")" width="22" height="22" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to Cytoscape XGMML for offline use</a></p>
+						<p><a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aXGMML&namespace=@((int)GeneOntologyNamespaceEnum.CellularComponent)'><img alt="XGMML" src="@Url.Content("~/Images/Cytoscape.png")" width="22" height="22" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to Cytoscape XGMML for offline use</a></p>
 					</div>
 					<div id="pnlCCCytoscapeLoading" style="display:table; position:relative; margin: 0 auto 0 auto; width: 900px; height:100px; border: 2px solid silver; border-radius: 6px;">
 						<div id="pnlCCCytoscapeMessage" style="display:block; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: larger; color:darkorange;">
@@ -599,8 +599,8 @@
 				<div id="tabResultsCCTreeMap">
 					<div id="pnlCCTreeMap" style="margin: 0 auto 0 auto; display: none;">
 						<div id="pnlCCTreeMapContent" style="position:relative; width:900px; height:600px; border: 1px solid black; padding: 10px; margin:0px 40px 0px 40px; font-family: Calibri,Verdana,Arial,sans-serif; font-size: 12px;"></div>
-						<p><a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aTreeMap&namespace=@((int)GeneOntologyNamespaceEnum.CELLULAR_COMPONENT)' style="margin-right: 30px;"><img alt="CSV" src="@Url.Content("~/Images/spreadsheet.png")" width="22" height="22" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to TSV<sup style="color:red">1,2</sup></a><br />
-							<a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aRTreeMap&namespace=@((int)GeneOntologyNamespaceEnum.CELLULAR_COMPONENT)' style="margin-right: 30px;"><img alt="R" src="@Url.Content("~/Images/development-r.png")" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to R script for plotting<sup style="color:red">2</sup></a><br />
+						<p><a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aTreeMap&namespace=@((int)GeneOntologyNamespaceEnum.CellularComponent)' style="margin-right: 30px;"><img alt="CSV" src="@Url.Content("~/Images/spreadsheet.png")" width="22" height="22" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to TSV<sup style="color:red">1,2</sup></a><br />
+							<a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aRTreeMap&namespace=@((int)GeneOntologyNamespaceEnum.CellularComponent)' style="margin-right: 30px;"><img alt="R" src="@Url.Content("~/Images/development-r.png")" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to R script for plotting<sup style="color:red">2</sup></a><br />
 							<a id="ExportCCSVG" download="Revigo_CC_TreeMap.svg" href="#" onclick='return ExportSvg("ExportCCSVG", "pnlCCTreeMapContent", revigoState.nsTabs[1].treeMapData);'><img alt="SVG" src="@Url.Content("~/Images/inkscape.png")" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to SVG<sup style="color:red">2</sup></a></p>
 						<p style="color: red;"><sup>1</sup> Please see the explanation for NULL values in "Representative" column on our <a href='@Url.Content("~/FAQ#q06")'>Frequently Asked Questions</a> page.<br />
 							<sup>2</sup> Please see our <a href='@Url.Content("~/FAQ#q07")'>Frequently Asked Questions</a> page for choices on creating a high quality drawing.</p>
@@ -662,10 +662,10 @@
 						<p><a download="Revigo_MF_OnScreenTable.tsv" href="#" onclick='$(this).attr("href", revigoState.nsTabs[2].tabs[0].drawObj.GetEncodedContents()); return true;'>
 								<img alt="TSV" src="@Url.Content("~/Images/spreadsheet.png")" style="margin:5px 4px 5px 0px;width:22px;height:22px;vertical-align:middle;" />
 								Export table (as is shown on screen) to TSV<sup style="color:red">1,2</sup></a><br />
-							<a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aTable&namespace=@((int)GeneOntologyNamespaceEnum.MOLECULAR_FUNCTION)'>
+							<a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aTable&namespace=@((int)GeneOntologyNamespaceEnum.MolecularFunction)'>
 								<img alt="TSV" src="@Url.Content("~/Images/spreadsheet.png")" style="margin:5px 4px 5px 0px;margin-bottom:10px;width:22px;height:22px;vertical-align:middle;" />
 								Export raw table to TSV<sup style="color:red">1,2</sup></a><br />
-							<a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aSimMat&namespace=@((int)GeneOntologyNamespaceEnum.MOLECULAR_FUNCTION)'>
+							<a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aSimMat&namespace=@((int)GeneOntologyNamespaceEnum.MolecularFunction)'>
 								<img alt="TSV" src="@Url.Content("~/Images/spreadsheet.png")" style="margin:5px 4px 5px 0px;width:22px;height:22px;vertical-align:middle;" />
 								Export Term Similarity Matrix</a></p>
 						<p style="color: red;"><sup>1</sup> Please see our <a href='@Url.Content("~/FAQ#q07")'>Frequently Asked Questions</a> page for choices on creating a high quality drawing.<br />
@@ -684,8 +684,8 @@
 							Revigo uses Multidimensional Scaling (MDS) to reduce the dimensionality of a matrix of the GO terms pairwise semantic similarities. 
 							The resulting projection may be highly non linear. The guiding principle is that semantically similar GO terms should remain close together in the plot. 
 							Repeated runs of Revigo may yield different arrangements, but the term distances will remain similar.</p>
-						<p><a style="margin-right: 30px;" href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aRScatterplot&namespace=@((int)GeneOntologyNamespaceEnum.MOLECULAR_FUNCTION)'><img alt="R" src="@Url.Content("~/Images/development-r.png")" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to R script for plotting<sup style="color:red">1</sup></a><br />
-							<a style="margin-right:30px;" href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aScatterplot&namespace=@((int)GeneOntologyNamespaceEnum.MOLECULAR_FUNCTION)'><img alt="TSV" src="@Url.Content("~/Images/spreadsheet.png")" width="22" height="22" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to TSV<sup style="color:red">1,2</sup></a></p>
+						<p><a style="margin-right: 30px;" href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aRScatterplot&namespace=@((int)GeneOntologyNamespaceEnum.MolecularFunction)'><img alt="R" src="@Url.Content("~/Images/development-r.png")" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to R script for plotting<sup style="color:red">1</sup></a><br />
+							<a style="margin-right:30px;" href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aScatterplot&namespace=@((int)GeneOntologyNamespaceEnum.MolecularFunction)'><img alt="TSV" src="@Url.Content("~/Images/spreadsheet.png")" width="22" height="22" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to TSV<sup style="color:red">1,2</sup></a></p>
 						<p style="color: red;"><sup>1</sup> Please see our <a href='@Url.Content("~/FAQ#q07")'>Frequently Asked Questions</a> page for choices on creating a high quality drawing.<br />
 							<sup>2</sup> Please see the explanation for NULL values in "Representative" column on our <a href='@Url.Content("~/FAQ#q06")'>Frequently Asked Questions</a> page.</p>
 					</div>
@@ -711,7 +711,7 @@
 							<li>Press 'r' key to reset view</li>
 							<li>View more navigation options on <a href="https://www.x3dom.org/documentation/interaction/" target="_blank">x3dom interaction</a> page</li>
 						</ul>
-						<p><a style="margin-right:30px;" href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aScatterplot3D&namespace=@((int)GeneOntologyNamespaceEnum.MOLECULAR_FUNCTION)'>
+						<p><a style="margin-right:30px;" href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aScatterplot3D&namespace=@((int)GeneOntologyNamespaceEnum.MolecularFunction)'>
 							<img alt="TSV" src="@Url.Content("~/Images/spreadsheet.png")" width="22" height="22" style="vertical-align:middle; margin:5px 4px 5px 0px;" />
 							Export to TSV<sup style="color:red">1,2</sup></a><br />
 							<a id="ExportMFX3D" download="Revigo_MF_3DScatterplot.x3d" href="#" onclick='return ExportX3D("ExportMFX3D", revigoState.nsTabs[2].tabs[2].drawObj);'>
@@ -733,7 +733,7 @@
 							The size of the bubble corresponds to the LogSize value for the GO Term.</p>
 						<p style="font-size: 9pt">(Navigate with mouse. Click and hold to move view and drag items. Scroll to zoom.)</p>
 						<div id="pnlMFCytoscapeContent" style="width:900px; height:600px; border: 1px solid black;"></div>
-						<p><a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aXGMML&namespace=@((int)GeneOntologyNamespaceEnum.MOLECULAR_FUNCTION)'><img alt="XGMML" src="@Url.Content("~/Images/Cytoscape.png")" width="22" height="22" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to Cytoscape XGMML file for offline use</a></p>
+						<p><a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aXGMML&namespace=@((int)GeneOntologyNamespaceEnum.MolecularFunction)'><img alt="XGMML" src="@Url.Content("~/Images/Cytoscape.png")" width="22" height="22" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to Cytoscape XGMML file for offline use</a></p>
 					</div>
 					<div id="pnlMFCytoscapeLoading" style="display:table; position:relative; margin: 0 auto 0 auto; width: 900px; height:100px; border: 2px solid silver; border-radius: 6px;">
 						<div id="pnlMFCytoscapeMessage" style="display:block; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: larger; color:darkorange;">
@@ -744,8 +744,8 @@
 				<div id="tabResultsMFTreeMap">
 					<div id="pnlMFTreeMap" style="margin: 0 auto 0 auto; display: none;">
 						<div id="pnlMFTreeMapContent" style="position:relative; width:900px; height:600px; border: 1px solid black; padding: 10px; margin:0px 40px 0px 40px; font-family: Calibri,Verdana,Arial,sans-serif; font-size: 12px;"></div>
-						<p><a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aTreeMap&namespace=@((int)GeneOntologyNamespaceEnum.MOLECULAR_FUNCTION)' style="margin-right: 30px;"><img alt="CSV" src="@Url.Content("~/Images/spreadsheet.png")" width="22" height="22" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to TSV<sup style="color:red">1,2</sup></a><br />
-							<a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aRTreeMap&namespace=@((int)GeneOntologyNamespaceEnum.MOLECULAR_FUNCTION)' style="margin-right: 30px;"><img alt="R" src="@Url.Content("~/Images/development-r.png")" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to R script for plotting<sup style="color:red">2</sup></a><br />
+						<p><a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aTreeMap&namespace=@((int)GeneOntologyNamespaceEnum.MolecularFunction)' style="margin-right: 30px;"><img alt="CSV" src="@Url.Content("~/Images/spreadsheet.png")" width="22" height="22" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to TSV<sup style="color:red">1,2</sup></a><br />
+							<a href='@Url.Content("~/QueryJob")?JobID=@(Model.JobID)&type=aRTreeMap&namespace=@((int)GeneOntologyNamespaceEnum.MolecularFunction)' style="margin-right: 30px;"><img alt="R" src="@Url.Content("~/Images/development-r.png")" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to R script for plotting<sup style="color:red">2</sup></a><br />
 							<a id="ExportMFSVG" download="Revigo_MF_TreeMap.svg" href="#" onclick='return ExportSvg("ExportMFSVG", "pnlMFTreeMapContent", revigoState.nsTabs[2].treeMapData);'><img alt="SVG" src="@Url.Content("~/Images/inkscape.png")" style="vertical-align:middle; margin:5px 4px 5px 0px;" />Export to SVG<sup style="color:red">2</sup></a></p>
 						<p style="color: red;"><sup>1</sup> Please see the explanation for NULL values in "Representative" column on our <a href='@Url.Content("~/FAQ#q06")'>Frequently Asked Questions</a> page.<br />
 							<sup>2</sup> Please see our <a href='@Url.Content("~/FAQ#q07")'>Frequently Asked Questions</a> page for choices on creating a high quality drawing.</p>

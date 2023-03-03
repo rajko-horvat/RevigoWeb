@@ -32,7 +32,8 @@ namespace IRB.RevigoWeb.Pages
 
 				if (!error.Message.Contains("Request timed out") &&
 					!error.Message.Contains("invalid webresource request") &&
-					!error.Message.Contains("potentially dangerous"))
+					!error.Message.Contains("potentially dangerous") &&
+					!error.Message.Contains("Unexpected end of request"))
 				{
 					Global.LogAndReportError((error.Source == null) ? "Undefined" : error.Source, error);
 				}

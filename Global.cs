@@ -418,16 +418,16 @@ namespace IRB.RevigoWeb
 									oCommand.Parameters.Add("?vMeasure", MySqlDbType.Int32).Value = (int)worker.SemanticSimilarity;
 									oCommand.Parameters.Add("?vRemoveObsolete", MySqlDbType.Int32).Value = (int)(worker.RemoveObsolete ? 1 : 0);
 									oCommand.Parameters.Add("?vBiologicalProcess", MySqlDbType.Int64).Value =
-										(long)(worker.HasBPVisualizer ? worker.BPVisualizer.Terms.Count : 0);
+										(long)(worker.BPVisualizer.IsEmpty ? 0 : worker.BPVisualizer.Terms.Count);
 									oCommand.Parameters.Add("?vCellularComponent", MySqlDbType.Int64).Value =
-										(long)(worker.HasCCVisualizer ? worker.CCVisualizer.Terms.Count : 0);
+										(long)(worker.CCVisualizer.IsEmpty ? 0 : worker.CCVisualizer.Terms.Count);
 									oCommand.Parameters.Add("?vMolecularFunction", MySqlDbType.Int64).Value =
-										(long)(worker.HasMFVisualizer ? worker.MFVisualizer.Terms.Count : 0);
+										(long)(worker.MFVisualizer.IsEmpty ? 0 : worker.MFVisualizer.Terms.Count);
 									oCommand.Parameters.Add("?vExecTicks", MySqlDbType.Int64).Value = worker.ExecutingTime.Ticks;
 									oCommand.Parameters.Add("?vCount", MySqlDbType.Int64).Value = (long)1;
 									oCommand.Parameters.Add("?vNSCount", MySqlDbType.Double).Value =
-										(worker.HasBPVisualizer ? 1.0 : 0.0) + (worker.HasMFVisualizer ? 1.0 : 0.0) +
-										(worker.HasCCVisualizer ? 1.0 : 0.0);
+										(worker.BPVisualizer.IsEmpty ? 0.0 : 1.0) + (worker.MFVisualizer.IsEmpty ? 0.0 : 1.0) +
+										(worker.CCVisualizer.IsEmpty ? 0.0 : 1.0);
 
 									oCommand.ExecuteNonQuery();
 								}
@@ -449,8 +449,8 @@ namespace IRB.RevigoWeb
 									oCommand.Parameters.Add("?vMeasure", MySqlDbType.Int32).Value = (int)worker.SemanticSimilarity;
 									oCommand.Parameters.Add("?vRemoveObsolete", MySqlDbType.Int32).Value = (int)(worker.RemoveObsolete ? 1 : 0);
 									oCommand.Parameters.Add("?vNSCount", MySqlDbType.Double).Value =
-										(worker.HasBPVisualizer ? 1.0 : 0.0) + (worker.HasMFVisualizer ? 1.0 : 0.0) +
-										(worker.HasCCVisualizer ? 1.0 : 0.0);
+										(worker.BPVisualizer.IsEmpty ? 0.0 : 1.0) + (worker.MFVisualizer.IsEmpty ? 0.0 : 1.0) +
+										(worker.CCVisualizer.IsEmpty ? 0.0 : 1.0);
 									//oCommand.CommandTimeout = 240;
 									id = oCommand.ExecuteScalar();
 								}
@@ -466,11 +466,11 @@ namespace IRB.RevigoWeb
 										"where ID=?id;", oConnection))
 									{
 										oCommand.Parameters.Add("?vBiologicalProcess", MySqlDbType.Int64).Value =
-											(long)(worker.HasBPVisualizer ? worker.BPVisualizer.Terms.Count : 0);
+											(long)(worker.BPVisualizer.IsEmpty ? 0 : worker.BPVisualizer.Terms.Count);
 										oCommand.Parameters.Add("?vCellularComponent", MySqlDbType.Int64).Value =
-											(long)(worker.HasCCVisualizer ? worker.CCVisualizer.Terms.Count : 0);
+											(long)(worker.CCVisualizer.IsEmpty ? 0 : worker.CCVisualizer.Terms.Count);
 										oCommand.Parameters.Add("?vMolecularFunction", MySqlDbType.Int64).Value =
-											(long)(worker.HasMFVisualizer ? worker.MFVisualizer.Terms.Count : 0);
+											(long)(worker.MFVisualizer.IsEmpty ? 0 : worker.MFVisualizer.Terms.Count);
 										oCommand.Parameters.Add("?vExecTicks", MySqlDbType.Int64).Value = worker.ExecutingTime.Ticks;
 										oCommand.Parameters.Add("?id", MySqlDbType.Int64).Value = Convert.ToInt64(id);
 
@@ -491,21 +491,21 @@ namespace IRB.RevigoWeb
 										oCommand.Parameters.Add("?vRequestSource", MySqlDbType.Int32).Value = (int)worker.RequestSource;
 										oCommand.Parameters.Add("?vCutoff", MySqlDbType.Int32).Value = (int)(worker.CutOff * 10.0);
 										oCommand.Parameters.Add("?vValueType", MySqlDbType.Int32).Value = (int)worker.ValueType;
-										oCommand.Parameters.Add("?vSpeciesTaxon", MySqlDbType.Int32).Value = 
+										oCommand.Parameters.Add("?vSpeciesTaxon", MySqlDbType.Int32).Value =
 											WebUtilities.TypeConverter.ToInt32(worker.Annotations?.TaxonID);
 										oCommand.Parameters.Add("?vMeasure", MySqlDbType.Int32).Value = (int)worker.SemanticSimilarity;
 										oCommand.Parameters.Add("?vRemoveObsolete", MySqlDbType.Int32).Value = (int)(worker.RemoveObsolete ? 1 : 0);
 										oCommand.Parameters.Add("?vBiologicalProcess", MySqlDbType.Int64).Value =
-											(long)(worker.HasBPVisualizer ? worker.BPVisualizer.Terms.Count : 0);
+											(long)(worker.BPVisualizer.IsEmpty ? 0 : worker.BPVisualizer.Terms.Count);
 										oCommand.Parameters.Add("?vCellularComponent", MySqlDbType.Int64).Value =
-											(long)(worker.HasCCVisualizer ? worker.CCVisualizer.Terms.Count : 0);
+											(long)(worker.CCVisualizer.IsEmpty ? 0 : worker.CCVisualizer.Terms.Count);
 										oCommand.Parameters.Add("?vMolecularFunction", MySqlDbType.Int64).Value =
-											(long)(worker.HasMFVisualizer ? worker.MFVisualizer.Terms.Count : 0);
+											(long)(worker.MFVisualizer.IsEmpty ? 0 : worker.MFVisualizer.Terms.Count);
 										oCommand.Parameters.Add("?vExecTicks", MySqlDbType.Int64).Value = worker.ExecutingTime.Ticks;
 										oCommand.Parameters.Add("?vCount", MySqlDbType.Int64).Value = (long)1;
 										oCommand.Parameters.Add("?vNSCount", MySqlDbType.Double).Value =
-											(worker.HasBPVisualizer ? 1.0 : 0.0) + (worker.HasMFVisualizer ? 1.0 : 0.0) +
-											(worker.HasCCVisualizer ? 1.0 : 0.0);
+											(worker.BPVisualizer.IsEmpty ? 0.0 : 1.0) + (worker.MFVisualizer.IsEmpty ? 0.0 : 1.0) +
+											(worker.CCVisualizer.IsEmpty ? 0.0 : 1.0);
 
 										oCommand.ExecuteNonQuery();
 									}
@@ -650,8 +650,8 @@ namespace IRB.RevigoWeb
 									oCommand.Parameters.Add("?vMeasure", MySqlDbType.Int32).Value = (int)worker.SemanticSimilarity;
 									oCommand.Parameters.Add("?vRemoveObsolete", MySqlDbType.Int32).Value = (int)(worker.RemoveObsolete ? 1 : 0);
 									oCommand.Parameters.Add("?vNSCount", MySqlDbType.Double).Value =
-										(worker.HasBPVisualizer ? 1.0 : 0.0) + (worker.HasMFVisualizer ? 1.0 : 0.0) +
-										(worker.HasCCVisualizer ? 1.0 : 0.0);
+										(worker.BPVisualizer.IsEmpty ? 0.0 : 1.0) + (worker.MFVisualizer.IsEmpty ? 0.0 : 1.0) +
+										(worker.CCVisualizer.IsEmpty ? 0.0 : 1.0);
 									//oCommand.CommandTimeout = 240;
 									oCommand.ExecuteNonQuery();
 								}

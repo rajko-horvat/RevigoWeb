@@ -111,9 +111,9 @@ namespace IRB.RevigoWeb.Pages
 							oWorker.HasUserWarnings ? WebUtilities.TypeConverter.StringArrayToJSON(oWorker.UserWarnings) : "[]",
 							oWorker.HasUserErrors ? WebUtilities.TypeConverter.StringArrayToJSON(oWorker.UserErrors) : "[]",
 							(long)(oWorker.ExecutingTime.TotalSeconds),
-							oWorker.HasBPVisualizer ? 1 : 0, oWorker.HasBPVisualizer ? oWorker.BPVisualizer.Terms.Count : 0,
-							oWorker.HasCCVisualizer ? 1 : 0, oWorker.HasCCVisualizer ? oWorker.CCVisualizer.Terms.Count : 0,
-							oWorker.HasMFVisualizer ? 1 : 0, oWorker.HasMFVisualizer ? oWorker.MFVisualizer.Terms.Count : 0,
+							oWorker.BPVisualizer.IsEmpty ? 0 : 1, oWorker.BPVisualizer.IsEmpty ? 0 : oWorker.BPVisualizer.Terms.Count,
+							oWorker.CCVisualizer.IsEmpty ? 0 : 1, oWorker.CCVisualizer.IsEmpty ? 0 : oWorker.CCVisualizer.Terms.Count,
+							oWorker.MFVisualizer.IsEmpty ? 0 : 1, oWorker.MFVisualizer.IsEmpty ? 0 : oWorker.MFVisualizer.Terms.Count,
 							oWorker.HasClouds ? 1 : 0);
 						#endregion
 						return Content(writer.ToString(), "application/json", Encoding.UTF8);
@@ -1224,15 +1224,15 @@ namespace IRB.RevigoWeb.Pages
 			{
 				switch (eNamespace)
 				{
-					case GeneOntologyNamespaceEnum.BIOLOGICAL_PROCESS:
+					case GeneOntologyNamespaceEnum.BiologicalProcess:
 						this.oVisualizer = oWorker.BPVisualizer;
 						this.sNamespace = "_BP_";
 						break;
-					case GeneOntologyNamespaceEnum.CELLULAR_COMPONENT:
+					case GeneOntologyNamespaceEnum.CellularComponent:
 						this.oVisualizer = oWorker.CCVisualizer;
 						this.sNamespace = "_CC_";
 						break;
-					case GeneOntologyNamespaceEnum.MOLECULAR_FUNCTION:
+					case GeneOntologyNamespaceEnum.MolecularFunction:
 						this.oVisualizer = oWorker.MFVisualizer;
 						this.sNamespace = "_MF_";
 						break;

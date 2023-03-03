@@ -82,7 +82,7 @@ namespace RevigoIntegrationTest
 			}
 
 			// Third stage - Gather the results
-			// request result table for the BIOLOGICAL_PROCESS namespace
+			// request result table for the Biological process namespace
 			oRequest = (HttpWebRequest)WebRequest.Create(sBaseURL + "/QueryJob");
 			oRequest.ContentType = "application/x-www-form-urlencoded";
 			oRequest.Method = "GET";

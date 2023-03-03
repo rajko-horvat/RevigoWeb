@@ -179,7 +179,7 @@ namespace IRB.RevigoWeb.Pages
 			{
 				if (!oWorker.HasUserErrors && !oWorker.HasDeveloperErrors)
 				{
-					if (oWorker.HasBPVisualizer)
+					if (!oWorker.BPVisualizer.IsEmpty)
 					{
 						// Assign the Biological process controls
 						NamespaceVisualizer oVisualizer = oWorker.BPVisualizer;
@@ -190,7 +190,7 @@ namespace IRB.RevigoWeb.Pages
 
 						Global.UpdateJobUsageStats(oWorker, "table", "1");
 					}
-					if (oWorker.HasCCVisualizer)
+					if (!oWorker.CCVisualizer.IsEmpty)
 					{
 						// Assign the Biological process controls
 						NamespaceVisualizer oVisualizer = oWorker.CCVisualizer;
@@ -201,7 +201,7 @@ namespace IRB.RevigoWeb.Pages
 
 						Global.UpdateJobUsageStats(oWorker, "table", "2");
 					}
-					if (oWorker.HasMFVisualizer)
+					if (!oWorker.MFVisualizer.IsEmpty)
 					{
 						// Assign the Biological process controls
 						NamespaceVisualizer oVisualizer = oWorker.MFVisualizer;
