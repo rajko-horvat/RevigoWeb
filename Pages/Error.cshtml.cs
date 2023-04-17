@@ -34,6 +34,7 @@ namespace IRB.RevigoWeb.Pages
 					!error.Message.Contains("invalid webresource request") &&
 					!error.Message.Contains("potentially dangerous") &&
 					!error.Message.Contains("Unexpected end of request"))
+				//!error.Message.Contains("Form key length"))
 				{
 					Global.LogAndReportError((error.Source == null) ? "Undefined" : error.Source, error);
 				}

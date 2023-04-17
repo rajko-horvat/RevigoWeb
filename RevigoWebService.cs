@@ -1,4 +1,5 @@
 ﻿#if WINDOWS_SERVICE
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Rewrite;
 using System.ServiceProcess;
 
@@ -28,6 +29,13 @@ namespace IRB.RevigoWeb
 		protected override void OnStart(string[] args)
 		{
 			oBuilder = WebApplication.CreateBuilder(args);
+
+			oBuilder.Services.Configure<FormOptions>(options =>
+			{
+				options.KeyLengthLimit = 8192;
+				options.ValueCountLimit = 4096;
+				options.ValueLengthLimit = 8388608;
+			});
 
 			// Add services to the container.
 			oBuilder.Services.AddRazorPages();

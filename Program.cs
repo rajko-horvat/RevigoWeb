@@ -38,6 +38,13 @@ internal class Program
 
 		var builder = WebApplication.CreateBuilder(args);
 
+		oBuilder.Services.Configure<FormOptions>(options =>
+		{
+			options.KeyLengthLimit = 8192;
+			options.ValueCountLimit = 4096;
+			options.ValueLengthLimit = 8388608;
+		});
+
 		// Add services to the container.
 		builder.Services.AddRazorPages();
 
