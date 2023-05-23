@@ -214,7 +214,7 @@ function RevigoTable(containerName, tableData)
 								if (type === "term")
 								{
 									let jA = $("<a></a>").appendTo(jTd);
-									jA.attr("href", "http://amigo.geneontology.org/amigo/term/" + sValue);
+									jA.attr("href", "https://www.ebi.ac.uk/QuickGO/search/" + sValue);
 									jA.attr("target", "_blank");
 									jA.text(sValue);
 								}

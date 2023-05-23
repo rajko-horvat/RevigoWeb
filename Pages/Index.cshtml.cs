@@ -9,7 +9,7 @@ using System.Globalization;
 namespace RevigoWeb.Pages
 {
 	[IgnoreAntiforgeryToken]
-	[RequestFormLimits(KeyLengthLimit = 8192, ValueCountLimit = 4096, ValueLengthLimit = 8388608)]
+	[RequestFormLimits(KeyLengthLimit = 16384, ValueCountLimit = 8192, ValueLengthLimit = 8388608)]
 	public class IndexModel : PageModel
     {
         public string? ErrorMessage = null;

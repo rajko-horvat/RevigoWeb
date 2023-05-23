@@ -32,8 +32,8 @@ namespace IRB.RevigoWeb
 
 			oBuilder.Services.Configure<FormOptions>(options =>
 			{
-				options.KeyLengthLimit = 8192;
-				options.ValueCountLimit = 4096;
+				options.KeyLengthLimit = 16384;
+				options.ValueCountLimit = 8192;
 				options.ValueLengthLimit = 8388608;
 			});
 

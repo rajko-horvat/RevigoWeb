@@ -33,8 +33,9 @@ namespace IRB.RevigoWeb.Pages
 				if (!error.Message.Contains("Request timed out") &&
 					!error.Message.Contains("invalid webresource request") &&
 					!error.Message.Contains("potentially dangerous") &&
-					!error.Message.Contains("Unexpected end of request"))
-				//!error.Message.Contains("Form key length"))
+					!error.Message.Contains("Unexpected end of request") &&
+					!error.Message.Contains("Form key length") &&
+					!error.Message.Contains("Request body too large"))
 				{
 					Global.LogAndReportError((error.Source == null) ? "Undefined" : error.Source, error);
 				}
