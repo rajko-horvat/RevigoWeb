@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Title>REVIGO (REduce + VIsualize Gene Ontology) Web service</Title>
-    <Version>1.8.0</Version>
+    <Version>1.8.1</Version>
     <Authors>FranSupek, rajko-horvat</Authors>
     <Company>IRB</Company>
     <Copyright>Copyright (c) 2011-2023, Ruđer Bošković Institite</Copyright>
