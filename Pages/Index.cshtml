@@ -4,6 +4,7 @@
 @using IRB.RevigoWeb;
 @using RevigoWeb;
 @using System.Globalization;
+@using System.Reflection;
 @model RevigoWeb.Pages.IndexModel
 @{
     Layout = "_MasterLayout";
@@ -227,7 +228,7 @@
 		<input id="cmdStart" name="cmdStart" type="submit" role="button" value="Start Revigo" formmethod="post" />
 
         <div style="margin-top: 35px">
-            Revigo uses these databases which are periodically updated:
+            Revigo version @(Assembly.GetEntryAssembly().GetName().Version.ToString(3)) uses these databases which are periodically updated:
             <ul>
                 <li>
                     The Gene Ontology database

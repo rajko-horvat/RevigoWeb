@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Rewrite;
 using IRB.RevigoWeb;
 using System.Reflection;
+using Microsoft.AspNetCore.Http.Features;
 #if WINDOWS_SERVICE
 using System.ServiceProcess;
 #endif
@@ -36,7 +37,7 @@ internal class Program
 		if (!string.IsNullOrEmpty(path))
 			Directory.SetCurrentDirectory(path);
 
-		var builder = WebApplication.CreateBuilder(args);
+		var oBuilder = WebApplication.CreateBuilder(args);
 
 		oBuilder.Services.Configure<FormOptions>(options =>
 		{
@@ -46,9 +47,9 @@ internal class Program
 		});
 
 		// Add services to the container.
-		builder.Services.AddRazorPages();
+		oBuilder.Services.AddRazorPages();
 
-		oWebApplication = builder.Build();
+		oWebApplication = oBuilder.Build();
 
         var options = new RewriteOptions();
         options.Rules.Add(new RewriteAspxUrl());
